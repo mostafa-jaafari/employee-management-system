@@ -7,6 +7,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  avatar_url: string;
 }
 
 interface UserContextType {
@@ -26,7 +27,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
       if (user) {
         const { data, error } = await supabase
           .from('users')
-          .select('id, name, email, role')
+          .select('id, name, email, role, avatar_url')
           .eq('id', user.id)
           .single();
         if (error) {
