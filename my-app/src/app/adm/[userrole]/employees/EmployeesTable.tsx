@@ -1,7 +1,8 @@
 "use client";
 import { DropDown } from '@/Components/DropDown';
+import { useAddNewEmployer } from '@/context/AddNewEmployer';
 import { EmployerType } from '@/types/Employer';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react'
 import { FaFilterCircleXmark } from 'react-icons/fa6';
 import { HiOutlineDownload } from 'react-icons/hi';
@@ -12,6 +13,8 @@ import { SlOptionsVertical } from 'react-icons/sl';
 
 const LIMIT = 20;
 export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmployees: number; data: EmployerType[]; Available_Status: string[]; } }) {
+    const { setIsOpenAddNewEmployer } = useAddNewEmployer();
+    
     const [searchTableInput, setSearchTableInput] = useState("");
 
     const router = useRouter();
@@ -43,6 +46,21 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
         router.push(`/adm/admin/employees?${searchParams.toString()}`);
     }
 
+    const pathname = usePathname();
+    const [selectedLabel, setSelectedLabel] = useState("");
+    const HandleSelectOption = (Label: string, option: string, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        setSelectedLabel(option);
+        const searchParams = new URLSearchParams(window.location.search);
+        if(option === "all") {
+            searchParams.delete(Label.toLowerCase());
+            router.push(`${pathname}?${searchParams.toString()}`);
+            return;
+        }
+        searchParams.set(Label.toLowerCase(), option.toUpperCase());
+        router.push(`${pathname}?${searchParams.toString()}`);
+    }
+
     useEffect(() => {
         const handleKeyBoard = (e: KeyboardEvent) => {
             if(e.key === "Enter"){
@@ -56,7 +74,6 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
 
     return (
         <div>
-            {/* {JSON.stringify(searchParams.get("q"))} */}
             {/* --- Table Top Header --- */}
             <div
                 className='space-y-1.5'
@@ -79,6 +96,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             <HiOutlineDownload size={16}/> Export DataTable
                         </button>
                         <button
+                            onClick={() => setIsOpenAddNewEmployer(true)}
                             className='text-xs cursor-pointer bg-blue-600 hover:bg-blue-600/90 flex items-center gap-1.5 border-b border-blue-800 rounded-lg px-3 py-1.5 text-white'
                         >
                             <MdPersonAddAlt1 size={14}/> Add Employer
@@ -121,7 +139,13 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                         className='flex items-center gap-3'
                     >
                         {/* DropDowns */}
-                        <DropDown Options={Employees_Data?.Available_Status} Label="status" />
+                        <DropDown 
+                            HandleSelectOption={(option, e) => HandleSelectOption("status", option, e)}
+                            selectedLabel={selectedLabel}
+                            Options={Employees_Data?.Available_Status} 
+                            Label="status"
+                            className='hover:ring-neutral-300 hover:bg-neutral-100/50 cursor-pointer text-xs text-neutral-600 ring ring-neutral-200 border-b border-neutral-400/90 rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
+                        />
                         {/* <DropDown /> */}
                     </div>
                 </div>

@@ -2,29 +2,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { FaChevronDown } from 'react-icons/fa';
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from 'next/navigation';
 
 
-export function DropDown({ Label, Options }: { Label: string; Options: string[]; }) {
+export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, className, DefaultAllButton = true }: { Label: string; Options: string[]; selectedLabel: string; HandleSelectOption: (option: string, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void; className: string; DefaultAllButton?: boolean; }) {
     const MenuRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedLabel, setSelectedLabel] = useState("");
-    
-    const router = useRouter();
-    const pathname = usePathname();
-
-    const HandleSelectOption = (option: string, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        setSelectedLabel(option);
-        const searchParams = new URLSearchParams(window.location.search);
-        if(option === "all") {
-            searchParams.delete(Label.toLowerCase());
-            router.push(`${pathname}?${searchParams.toString()}`);
-            return;
-        }
-        searchParams.set(Label.toLowerCase(), option.toUpperCase());
-        router.push(`${pathname}?${searchParams.toString()}`);
-    }
 
     useEffect(() => {
         const HideMenu  = (e: MouseEvent) => {
@@ -41,9 +23,9 @@ export function DropDown({ Label, Options }: { Label: string; Options: string[];
             role='button'
             onClick={() => setIsOpen(!isOpen)}
             ref={MenuRef}
-            className='relative flex items-center justify-between gap-3 hover:ring-neutral-300 hover:bg-neutral-100/50 cursor-pointer text-xs text-neutral-600 ring ring-neutral-200 border-b border-neutral-400/90 rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
+            className={`${className} ${isOpen ? "ring-blue-400 bg-blue-100 border-blue-400" : "ring-neutral-200 border-neutral-400"} border-b ring cursor-pointer relative flex items-center justify-between gap-3`}
         >
-            <h2 className='capitalize'>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180" : ""} transition-transform duration-200`}/>
+            <h2 className='capitalize text-neutral-700'>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180" : ""} transition-transform duration-200`}/>
             {isOpen && (
                 <motion.div
                     key="dropdown"
@@ -56,13 +38,15 @@ export function DropDown({ Label, Options }: { Label: string; Options: string[];
                     <ul
                         className='flex flex-col'
                     >
-                        <button
-                            onClick={(e) => HandleSelectOption("all", e)}
-                            className="p-1.5 text-neutral-600 hover:bg-neutral-100 hover:rounded-lg cursor-pointer capitalize text-start
+                        {DefaultAllButton && (
+                            <button
+                                onClick={(e) => HandleSelectOption("all", e)}
+                                className="p-1.5 text-neutral-600 hover:bg-neutral-100 hover:rounded-lg cursor-pointer capitalize text-start
                                 border-b border-neutral-200"
-                        >
-                            All
-                        </button>
+                                >
+                                All
+                            </button>
+                        )}
                         {Options.map((opt, idx) => {
                             return (
                                 <button
