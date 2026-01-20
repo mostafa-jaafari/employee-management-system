@@ -94,7 +94,9 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             <HiOutlineDownload size={16}/> Export DataTable
                         </button>
                         <button
-                            onClick={() => setIsOpenAddNewEmployer(true)}
+                            onClick={() => {
+                                setIsOpenAddNewEmployer(true);
+                            }}
                             className='text-xs cursor-pointer bg-blue-600 hover:bg-blue-600/90 flex items-center gap-1.5 border-b border-blue-800 rounded-lg px-3 py-1.5 text-white'
                         >
                             <MdPersonAddAlt1 size={14}/> Add Employer

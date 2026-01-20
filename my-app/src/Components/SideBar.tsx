@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { AiOutlineApartment } from "react-icons/ai";
 import { FaArrowsAltH, FaUsers } from "react-icons/fa";
 import { FaFolderTree } from "react-icons/fa6";
 import { FiSidebar } from "react-icons/fi"
@@ -10,12 +11,12 @@ import { GoHomeFill } from "react-icons/go";
 import { RiInboxFill } from "react-icons/ri";
 
 
-
 const SideBar__Navigations = [
     { name: "home", href:"", icon: GoHomeFill },
     { name: "my task", href:"task", icon: FaFolderTree },
     { name: "inbox", href: "inbox", icon: RiInboxFill },
     { name: "employees", href: "employees", icon: FaUsers },
+    { name: "dapartments", href: "departments", icon: AiOutlineApartment }
 ];
 export function SideBar(){
     const [isOpen, setIsOpen] = useState(true);

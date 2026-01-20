@@ -33,7 +33,9 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className='absolute left-0 top-full z-10 text-nowrap truncate bg-white border-b border-neutral-400/70 ring ring-neutral-200 shadow-lg w-full mt-1 rounded-lg overflow-hidden p-1.5'
+                    className='absolute left-0 top-full z-10 text-nowrap truncate
+                        bg-white border-b border-neutral-400/70 ring ring-neutral-200 
+                        shadow-lg w-full max-h-50 overflow-y-auto mt-1 rounded-lg overflow-hidden p-1.5'
                 >
                     <ul
                         className='flex flex-col'
