@@ -29,31 +29,48 @@ export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[
             </div>
             
             <span className='flex my-3 bg-gray-300 w-full h-px' />
-            
-            <div
-                className="space-y-1.5"
-            >
-                {Departments_Data && Departments_Data.length > 0 ? 
-                Departments_Data.map((dep, idx) => {
-                    return (
-                        <div
-                            key={idx}
-                            className='w-full hover:border-blue-400 hover:ring-blue-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-between p-3 text-sm rounded-lg border-b border-neutral-400 ring ring-neutral-300'
+
+                {Departments_Data && Departments_Data.length > 0 ? (
+                    <div
+                        className="grid grid-cols-2 gap-3"
+                    >
+                        {Departments_Data.map((dep, idx) => {
+                            return (
+                                <div
+                                    key={idx}
+                                    className='w-full hover:border-blue-400 hover:ring-blue-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-between p-3 text-sm rounded-lg border-b border-neutral-400 ring ring-neutral-300'
+                                >
+                                    <span
+                                        className="flex items-center gap-1.5 font-semibold"
+                                    >
+                                        <AiOutlineApartment size={18} className="text-neutral-500" /> {dep}
+                                    </span>
+                                    <button
+                                        className="text-red-600 border border-transparent hover:border-red-700 hover:text-red-700 rounded-lg p-1 cursor-pointer"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )
+                : (
+                    <div
+                        className="text-neutral-500 w-full flex flex-col gap-3 justify-center items-center py-14 text-sm"
+                    >
+                        No &quote;Departments&quote; Available right now !
+                        <br />
+                        <button
+                            onClick={() => {
+                                setIsOpenAddNewDepartment(true);
+                            }}
+                            className='cursor-pointer bg-blue-600 hover:bg-blue-600/90 flex items-center gap-1.5 border-b border-blue-800 rounded-lg px-3 py-1.5 text-white'
                         >
-                            <span
-                                className="flex items-center gap-1.5 font-semibold"
-                            >
-                                <AiOutlineApartment size={18} /> {dep}
-                            </span>
-                            <button
-                                className="text-red-600 border border-transparent hover:border-red-700 hover:text-red-700 rounded-lg p-1 cursor-pointer"
-                            >
-                                <FaTrash />
-                            </button>
-                        </div>
-                    )
-                }) : ""}
-            </div>
+                            <MdOutlineAddCircle /> <span className='text-xs'>Add Department</span>
+                        </button>
+                    </div>
+                )}
         </section>
     )
 }
