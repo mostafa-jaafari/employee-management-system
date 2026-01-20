@@ -23,9 +23,9 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
             role='button'
             onClick={() => setIsOpen(!isOpen)}
             ref={MenuRef}
-            className={`${className} ${isOpen ? "ring-blue-400 bg-blue-100 border-blue-400" : "ring-neutral-200 border-neutral-400"} border-b ring cursor-pointer relative flex items-center justify-between gap-3`}
+            className={`${className} ${isOpen ? "ring-blue-400 bg-blue-100 border-blue-400" : "ring-neutral-300 border-neutral-400"} border-b ring cursor-pointer relative flex items-center justify-between gap-3`}
         >
-            <h2 className='capitalize text-neutral-700'>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180" : ""} transition-transform duration-200`}/>
+            <h2 className={`capitalize font-[500] ${isOpen ? "text-blue-600" : "text-neutral-700"}`}>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180 text-blue-600" : ""} transition-transform duration-200`}/>
             {isOpen && (
                 <motion.div
                     key="dropdown"

@@ -40,5 +40,8 @@ export const EmployeesData = (page: number, status?: string, department?: string
       };
     },
     ["Employees-Data", `page-${page}`, `status-${status}`, `department-${department}`, `q-${q}`],
-    { revalidate: 3600 }
+    { 
+      tags: ["Employees-Data"],
+      revalidate: 3600
+    }
   )();
