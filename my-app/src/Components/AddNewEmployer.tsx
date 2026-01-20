@@ -8,7 +8,7 @@ import { AddNewEmployerAction } from '@/app/actions/AddNewEmployer';
 import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';
-import { AddNewDepartment } from '@/app/actions/AddNewDepartment';
+import { AddNewDepartment } from '@/app/actions/Department';
 import { useUserInfos } from '@/context/UserInfos';
 import { useRouter } from 'next/navigation';
 

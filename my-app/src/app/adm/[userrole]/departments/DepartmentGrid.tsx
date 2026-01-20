@@ -1,13 +1,31 @@
 "use client";
 
+import { DeleteDepartment } from "@/app/actions/Department";
 import { useAddNewEmployer } from "@/context/AddNewEmployer";
+import { useUserInfos } from "@/context/UserInfos";
 import { AiOutlineApartment } from "react-icons/ai";
 import { FaTrash } from "react-icons/fa6";
 import { MdOutlineAddCircle } from "react-icons/md";
+import { toast } from "sonner";
 
 export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[]; }) {
     const { setIsOpenAddNewDepartment } = useAddNewEmployer();
-  
+    const { userInfos } = useUserInfos();
+
+
+    const HandleRemoveDepartment = async (DepartmentToDelete: string) => {
+        if(!userInfos) return;
+
+        const Result = await DeleteDepartment(userInfos?.id, DepartmentToDelete);
+
+        if(!Result.success){
+            toast.error(Result.message);
+            return;
+        }
+
+        toast.success(Result.message);
+    }
+
     return (
         <section>
             <div
@@ -46,6 +64,7 @@ export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[
                                         <AiOutlineApartment size={18} className="text-neutral-500" /> {dep}
                                     </span>
                                     <button
+                                        onClick={() => HandleRemoveDepartment(dep)}
                                         className="text-red-600 border border-transparent hover:border-red-700 hover:text-red-700 rounded-lg p-1 cursor-pointer"
                                     >
                                         <FaTrash />
