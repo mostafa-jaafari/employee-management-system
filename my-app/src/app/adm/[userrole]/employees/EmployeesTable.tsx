@@ -4,9 +4,7 @@ import { useAddNewEmployer } from '@/context/AddNewEmployer';
 import { EmployerType } from '@/types/Employer';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react'
-import { FaFilterCircleXmark } from 'react-icons/fa6';
 import { HiOutlineDownload } from 'react-icons/hi';
-import { IoSearch } from 'react-icons/io5';
 import { MdPersonAddAlt1 } from 'react-icons/md';
 import { SlOptionsVertical } from 'react-icons/sl';
 
@@ -43,7 +41,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
         } else {
             searchParams.delete("q");
         }
-        router.push(`/adm/admin/employees?${searchParams.toString()}`);
+        router.push(`/adm/admin/employees?${searchParams.toString().trim()}`);
     }
 
     const pathname = usePathname();
@@ -70,7 +68,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
         window.addEventListener("keydown", handleKeyBoard);
         return () => window.removeEventListener("keydown", handleKeyBoard);
     })
-    const Current_q_value = searchParams.get("q") || "";
+    // const Current_q_value = searchParams.get("q") || "";
 
     return (
         <div>
@@ -113,17 +111,20 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                     className='flex items-center justify-between'
                 >
                     <div
-                        className='flex items-center text-sm min-w-[300px] bg-white py-0.5 px-0.5 pl-3 rounded-lg border-b border-neutral-400 ring ring-neutral-300'
+                        className='flex items-center text-sm min-w-[300px] 
+                            bg-white py-0.5 px-0.5 pl-3 rounded-lg border-b 
+                            border-neutral-400 ring ring-neutral-300
+                            focus-within:ring-blue-400 focus-within:border-blue-400'
                     >
                         <input 
                             type="text"
                             onChange={(e) => setSearchTableInput(e.target.value)}
                             value={searchTableInput}
-                            placeholder='Search employer here...'
+                            placeholder='Search employer by FirstName'
                             maxLength={40}
-                            className='w-full outline-none text-sm'
+                            className='w-full outline-none text-sm py-1.5'
                         />
-                        <button
+                        {/* <button
                             onClick={HandleSearchTableInput}
                             disabled={searchTableInput.length === 0 && Current_q_value === ""}
                             className='text-neutral-600 hover:bg-neutral-200/30 
@@ -132,7 +133,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                                 disabled:cursor-not-allowed disabled:opacity-40'
                         >
                             {Current_q_value !== "" && searchTableInput.length === 0 ? <FaFilterCircleXmark title='clear search' className='text-red-600' size={20}/> : <IoSearch size={20}/>}
-                        </button>
+                        </button> */}
                     </div>
 
                     <div
@@ -144,7 +145,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             selectedLabel={selectedLabel}
                             Options={Employees_Data?.Available_Status} 
                             Label="status"
-                            className='hover:ring-neutral-300 hover:bg-neutral-100/50 cursor-pointer text-xs text-neutral-600 ring ring-neutral-200 border-b border-neutral-400/90 rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
+                            className='text-sm text-neutral-600 rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
                         />
                         {/* <DropDown /> */}
                     </div>
@@ -270,7 +271,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                 {/* Next */}
                 <button
                   onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || Employees_Data.TotalEmployees === 0}
                   className="px-2.5 py-1.5 text-white cursor-pointer bg-blue-600 rounded-md text-xs
                   disabled:opacity-40 disabled:cursor-not-allowed disabled:cursor-not-allowed"
                 >

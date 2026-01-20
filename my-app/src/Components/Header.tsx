@@ -112,7 +112,7 @@ export function Header() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.3, ease: "easeOut" }}
-                                className='absolute left-0 top-full mt-1 bg-white w-full 
+                                className='absolute z-50 left-0 top-full mt-1 bg-white w-full 
                                     space-y-0.5 text-sm rounded-lg shadow-lg p-1.5
                                     flex flex-col border border-neutral-200/80'
                             >
