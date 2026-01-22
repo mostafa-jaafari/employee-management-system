@@ -16,7 +16,13 @@ export async function AddNewEmployerAction(formData: FormData){
     const hired_at = formData.get('hired_at') as string;
 
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase.auth.admin.inviteUserByEmail(
+        email,
+        {
+            redirectTo: "https://fluffy-fortnight-gw56pw6p6v5hw446-3000.app.github.dev/auth/set-password"
+        });
+
+    await supabase
         .from("employees")
         .insert([
             {
@@ -28,6 +34,7 @@ export async function AddNewEmployerAction(formData: FormData){
                 status: status.toUpperCase(),
                 department,
                 hired_at,
+                role: "employee"
             }
         ])
         if(error){
@@ -36,4 +43,22 @@ export async function AddNewEmployerAction(formData: FormData){
     
         updateTag("Employees-Data");
     return { success: true, message: "Employer added successfully.", data: data };
+}
+
+
+export async function UpdateEmployee(password: string){
+    const supabase = SupabaseServer();
+
+    if(password.length < 6){
+        return { success: false, message: "Password should be atleast 6 caracters !" }
+    }
+    const { error } = await supabase.auth.updateUser({
+        password: password,
+    })
+
+    if(error){
+        return { success: false, message: error.message }
+    }
+
+    return { success: true, message: "Password created successfully." }
 }

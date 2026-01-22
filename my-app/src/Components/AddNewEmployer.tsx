@@ -79,7 +79,7 @@ export function AddNewEmployer() {
             setIsLoadingAddNewEmployer(false);
             setIsOpenAddNewEmployer(false);
             setIsOpenAddNewDepartment(false);
-            toast.success("New Employer Added Successfully: " + JSON.stringify(Result));
+            toast.success("New Employer Added Successfully");
         }catch(err){
             toast.error((err as { message: string }).message);
             setIsLoadingAddNewEmployer(false);
@@ -120,7 +120,11 @@ export function AddNewEmployer() {
                 backdrop-blur-[2px] bg-black/20 flex justify-end items-end gap-1.5 p-6'
         >
             {isOpenAddNewDepartment && (
-                <div
+                <motion.div
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                     className='relative w-full max-w-1/4 bg-white rounded-2xl border border-neutral-200 shadow-lg min-h-80'
                 >
                     <header
@@ -214,7 +218,7 @@ export function AddNewEmployer() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             )}
             {isOpenAddNewEmployer && (
                 <motion.div

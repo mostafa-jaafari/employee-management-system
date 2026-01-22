@@ -19,6 +19,10 @@ export async function AddNewDepartment(userId: string, NewDepartment: string){
     if(error){
         return { success: false, message: error.message }
     }
+
+    if(data?.available_departments.includes(NewDepartment)){
+        return { success: false, message: `${NewDepartment} is already exist !` }
+    }
     
     const updated_Departments = [...data?.available_departments, NewDepartment];
 
