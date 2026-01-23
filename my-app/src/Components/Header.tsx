@@ -25,7 +25,7 @@ const Navigation_Menu_Links = [
 ];
 export function Header() {
     const [searchInput, setSearchInput] = useState("");
-    const { userInfos } = useUserInfos();
+    const { userInfos, isLoadingUserInfos } = useUserInfos();
 
     const [isOpenMenu, setIsOpenMenu] = useState(false);
     const Open_Menu_Ref = useRef<HTMLDivElement | null>(null);
@@ -68,7 +68,9 @@ export function Header() {
                     value={searchInput}
                     maxLength={50}
                     placeholder='Search here...'
-                    className='text-sm min-w-[300px] bg-white p-1.5 rounded-lg outline-none border-b border-neutral-400 ring ring-neutral-300'
+                    className='text-sm min-w-[300px] bg-white px-3 py-2 rounded-lg 
+                        outline-none border-b border-neutral-400 focus:border-blue-400 
+                        ring ring-neutral-300 focus:ring-blue-400'
                 />
                 <span
                     className='flex items-center gap-3 text-neutral-600'
@@ -77,8 +79,11 @@ export function Header() {
                     <RiMessage3Fill size={20}/>
                     <IoSettingsSharp size={20}/>
                 </span>
-                {/* {JSON.stringify(userInfos)} */}
-                {userInfos !== null ? (
+                {isLoadingUserInfos ? (
+                    <div className='w-32 h-8 rounded-lg bg-neutral-300 animate-pulse'/>
+                )
+                :
+                userInfos !== null ? (
                     <div
                         role='button'
                         ref={Open_Menu_Ref}
