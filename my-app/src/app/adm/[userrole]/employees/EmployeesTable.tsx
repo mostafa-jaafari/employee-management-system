@@ -5,8 +5,10 @@ import { DropDown } from '@/Components/DropDown';
 import { useAddNewEmployer } from '@/context/AddNewEmployer';
 import { useConfirmationModal } from '@/context/ConfirmationModal';
 import { EmployerType } from '@/types/Employer';
+import { ConvertToCSV } from '@/utils/ConvertToCSV';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaTrash } from 'react-icons/fa6';
 import { HiOutlineDownload } from 'react-icons/hi';
 import { MdModeEdit, MdPersonAddAlt1 } from 'react-icons/md';
@@ -173,6 +175,36 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
     })
     // const Current_q_value = searchParams.get("q") || "";
 
+    const [isLoadingDownload, setIsLoadingDownload] = useState(false);
+    const HandleExportDataTable = () => {
+        const Employees = Employees_Data.data;
+        if(!Employees || Employees.length === 0){
+            toast.error("No data is available right now to download it !")
+            return;
+        }
+
+        setIsLoadingDownload(true);
+        try{
+            const CSV_File = ConvertToCSV(Employees);
+            const blob = new Blob([CSV_File], { type: "text/csv;charset=utf-8;" });
+            const Url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = Url;
+            link.setAttribute("download", "Employees.csv");
+            // document.appendChild(link);
+            link.click();
+            // document.removeChild(link);
+            URL.revokeObjectURL(Url);
+
+            setIsLoadingDownload(false);
+            toast.success("File donloaded successfully");
+        }catch (err){
+            toast.error((err as { message: string }).message);
+            setIsLoadingDownload(false);
+        }
+
+    }
+
     return (
         <div>
             {/* --- Table Top Header --- */}
@@ -192,9 +224,14 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                         className='flex items-center gap-1.5'
                     >
                         <button
-                            className='text-xs cursor-pointer hover:bg-gray-200/20 flex items-center gap-1.5 border border-neutral-300 rounded-lg px-3 py-1.5 text-neutral-600'
+                            disabled={isLoadingDownload}
+                            onClick={HandleExportDataTable}
+                            className='text-xs cursor-pointer hover:bg-gray-200/20
+                                border border-neutral-300 rounded-lg 
+                                px-3 py-1.5 text-neutral-600
+                                disabled:opacity-70 disabled:cursor-not-allowed'
                         >
-                            <HiOutlineDownload size={16}/> Export DataTable
+                            {isLoadingDownload ? (<span className='flex items-center gap-1.5'><AiOutlineLoading3Quarters size={12} className='animate-spin'/> Exporting DataTable...</span>) : (<span className='flex items-center gap-1.5'><HiOutlineDownload size={16}/> Export DataTable</span>)}
                         </button>
                         <button
                             onClick={() => {
