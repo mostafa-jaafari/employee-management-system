@@ -89,20 +89,24 @@ export function Header() {
                         ref={Open_Menu_Ref}
                         onClick={() => setIsOpenMenu(!isOpenMenu)}
                         className={`relative cursor-pointer hover:bg-neutral-200 
-                            p-0.5 rounded-lg flex items-center gap-1.5
+                            p-0.5 rounded-lg flex items-center gap-1.5 min-w-44
                             ${isOpenMenu ? "bg-neutral-200" : ""}`}
                     >
                         <div
-                            className='relative w-10 h-10 rounded-full overflow-hidden border-2 border-white'
+                            className='relative w-10 h-10 flex justify-center items-center bg-gradient-to-r from-blue-300 to-blue-600 rounded-full overflow-hidden border-2 border-white'
                         >
-                            <Image
-                                src={userInfos?.avatar_url}
-                                alt={userInfos?.name}
-                                fill
-                                className='object-cover'
-                                priority
-                                quality={100}
-                            />
+                            {userInfos?.avatar_url ? (
+                                <Image
+                                    src={userInfos?.avatar_url}
+                                    alt={userInfos?.name}
+                                    fill
+                                    className='object-cover'
+                                    priority
+                                    quality={100}
+                                />
+                            ) : (
+                                <h1 className='text-white text-lg font-bold'>{userInfos.name.slice(0 ,1).toUpperCase()}</h1>
+                            )}
                         </div>
                         <span
                             className="flex flex-col"
