@@ -185,6 +185,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
 
         setIsLoadingDownload(true);
         try{
+            setTimeout(() => {
             const CSV_File = ConvertToCSV(Employees);
             const blob = new Blob([CSV_File], { type: "text/csv;charset=utf-8;" });
             const Url = URL.createObjectURL(blob);
@@ -195,9 +196,10 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
             link.click();
             // document.removeChild(link);
             URL.revokeObjectURL(Url);
-
+            
             setIsLoadingDownload(false);
             toast.success("File donloaded successfully");
+        }, 500);
         }catch (err){
             toast.error((err as { message: string }).message);
             setIsLoadingDownload(false);
