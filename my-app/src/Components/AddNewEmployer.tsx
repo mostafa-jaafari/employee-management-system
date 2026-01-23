@@ -2,9 +2,9 @@
 import { useAddNewEmployer } from '@/context/AddNewEmployer';
 import { FaXmark } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DropDown } from './DropDown';
-import { AddNewEmployerAction } from '@/app/actions/AddNewEmployer';
+import { AddNewEmployerAction, UpdateEmployee } from '@/app/actions/AddNewEmployer';
 import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';
@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 
 
 export function AddNewEmployer() {
-    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment } = useAddNewEmployer();
+    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate } = useAddNewEmployer();
     const { userInfos } = useUserInfos();
     
     const today = new Date().toISOString().split("T")[0];
@@ -25,10 +25,40 @@ export function AddNewEmployer() {
         salary: 0,
         email: "",
         position: "",
-        status: "" as "active" | "inactive" | "probation",
+        status: "" as "ACTIVE" | "INACTIVE" | "PROBATION",
         department: "",
         hired_at: today,
     })
+
+    const derivedInputs = useMemo(() => {
+        if (!employeeDataToUpdate) {
+            return {
+                firstname: "",
+                lastname: "",
+                salary: 0,
+                email: "",
+                position: "",
+                status: "" as "ACTIVE" | "INACTIVE" | "PROBATION",
+                department: "",
+                hired_at: today,
+            };
+        }
+
+        return {
+            firstname: employeeDataToUpdate.first_name ?? "",
+            lastname: employeeDataToUpdate.last_name ?? "",
+            salary: employeeDataToUpdate.salary ?? 0,
+            email: employeeDataToUpdate.email ?? "",
+            position: employeeDataToUpdate.position ?? "",
+            status: employeeDataToUpdate.status as "ACTIVE" | "INACTIVE" | "PROBATION",
+            department: employeeDataToUpdate.department ?? "",
+            hired_at: employeeDataToUpdate.hired_at ?? today,
+        };
+    }, [employeeDataToUpdate, today]);
+
+    useEffect(() => {
+        setInputs(derivedInputs);
+    }, [derivedInputs]);
 
     const [newDepartment, setNewDepartment] = useState("");
 
@@ -44,42 +74,68 @@ export function AddNewEmployer() {
 
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setInputs({
-            ...inputs,
-            [name]: value
-        })
+        setInputs(prevInputs => ({
+            ...prevInputs,
+            [name]: value === 'salary' ? Number(value) : value,
+        }))
     }
 
     const [isLoadingAddNewEmployer, setIsLoadingAddNewEmployer] = useState(false);
+    const [isLoadingUpdateEmployer, setIsLoadingUpdateEmployer] = useState(false);
     const HandleAddNewEmployer = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         // --- Check Validation Inputs ---
-        if(inputs.email === "" && inputs.firstname === "" && inputs.lastname === "" && inputs.salary === 0 && inputs.department === "" && inputs.position === "" && !inputs.status && inputs.hired_at === ""){
+        if(!inputs.email || !inputs.firstname || !inputs.lastname || !inputs.salary || !inputs.department || !inputs.position || !!inputs.status && !inputs.hired_at){
             toast.info("Please fill all Inputs");
             return;
         }
-        setIsLoadingAddNewEmployer(true);
         try{
             const formData = new FormData();
-                formData.append('firstname', inputs.firstname);
-                formData.append('lastname', inputs.lastname);
-                formData.append('salary', inputs.salary.toString());
-                formData.append('email', inputs.email);
-                formData.append('position', inputs.position);
-                formData.append('status', inputs.status);
-                formData.append('department', inputs.department);
-                formData.append('hired_at', inputs.hired_at);
+                formData.append('firstname', inputs.firstname || '');
+                formData.append('lastname', inputs.lastname || '');
+                formData.append('salary', (inputs.salary || 0).toString());
+                formData.append('email', inputs.email || '');
+                formData.append('position', inputs.position || '');
+                formData.append('status', inputs.status.toUpperCase() || '');
+                formData.append('department', inputs.department || '');
+                formData.append('hired_at', inputs.hired_at || '');
             
-            const Result = await AddNewEmployerAction(formData);
-            if(!Result.success){
-                toast.error(Result.message)
+            if(employeeDataToUpdate === null){
+                setIsLoadingAddNewEmployer(true);
+                const Result = await AddNewEmployerAction(formData);
+                if(!Result.success){
+                    toast.error(Result.message)
+                    setIsLoadingAddNewEmployer(false);
+                    return;
+                }
                 setIsLoadingAddNewEmployer(false);
-                return;
+                toast.success("New Employer Added Successfully.");
+            }else{
+                if(!employeeDataToUpdate) return;
+                setIsLoadingUpdateEmployer(true);
+                const NewEmployeeUpdatedData = {
+                    first_name: inputs.firstname,
+                    last_name: inputs.lastname,
+                    salary: Number(inputs.salary),
+                    email: inputs.email,
+                    position: inputs.position,
+                    status: inputs.status.toUpperCase() as "ACTIVE" | "INACTIVE" | "PROBATION",
+                    department: inputs.department,
+                    hired_at: inputs.hired_at,
+                };
+                const Result = await UpdateEmployee(employeeDataToUpdate.id.toString(), NewEmployeeUpdatedData);
+
+                if(!Result.success){
+                    toast.error(Result.message);
+                    setIsLoadingUpdateEmployer(false);
+                    return;
+                }
+                setIsLoadingUpdateEmployer(false);
+                setEmployeeDataToUpdate(null);
+                toast.success("Employee Updated Successfully.");
             }
-            setIsLoadingAddNewEmployer(false);
             setIsOpenAddNewEmployer(false);
             setIsOpenAddNewDepartment(false);
-            toast.success("New Employer Added Successfully");
         }catch(err){
             toast.error((err as { message: string }).message);
             setIsLoadingAddNewEmployer(false);
@@ -237,7 +293,10 @@ export function AddNewEmployer() {
                             Add New Employer
                         </h1>
                         <button
-                            onClick={() => setIsOpenAddNewEmployer(false)}
+                            onClick={() => {
+                                setEmployeeDataToUpdate(null);
+                                setIsOpenAddNewEmployer(false);
+                            }}
                             className='cursor-pointer text-neutral-500 hover:text-neutral-700'
                         >
                             <FaXmark size={20}/>
@@ -281,7 +340,7 @@ export function AddNewEmployer() {
                             <DropDown 
                                 Label='Position'
                                 HandleSelectOption={(option) => setInputs({...inputs, position: option})}
-                                selectedLabel={inputs.position}
+                                selectedLabel={inputs.position || ''}
                                 DefaultAllButton={false}
                                 Options={["HR Manager", "test test", "test test test"]}
                                 className='w-full py-3 rounded-lg px-3 text-sm'
@@ -325,16 +384,16 @@ export function AddNewEmployer() {
                         >
                             <DropDown 
                                 Label='Status'
-                                HandleSelectOption={(option) => setInputs({...inputs, status: option as "active" | "inactive" | "probation"})}
+                                HandleSelectOption={(option) => setInputs({...inputs, status: option as "ACTIVE" | "INACTIVE" | "PROBATION"})}
                                 selectedLabel={inputs.status}
                                 DefaultAllButton={false}
-                                Options={["active", "inactive", "probation"]}
+                                Options={["ACTIVE", "INACTIVE", "PROBATION"]}
                                 className='w-full py-3 rounded-lg px-3 text-sm'
                             />
                             <DropDown 
                                 Label='Department'
                                 HandleSelectOption={(option) => setInputs({...inputs, department: option})}
-                                selectedLabel={inputs.department}
+                                selectedLabel={inputs.department || ''}
                                 DefaultAllButton={false}
                                 Options={departments}
                                 className='w-full py-3 rounded-lg px-3 text-sm'
@@ -370,13 +429,13 @@ export function AddNewEmployer() {
                             className='p-3 border-t border-neutral-200'
                         >
                             <button
-                                disabled={isLoadingAddNewEmployer}
+                                disabled={isLoadingAddNewEmployer || isLoadingUpdateEmployer}
                                 onClick={HandleAddNewEmployer}
                                 className='text-white text-sm cursor-pointer bg-gradient-to-t from-blue-600 to-blue-500
                                     rounded-lg w-full flex justify-center px-6 py-3 hover:to-blue-600 border-b border-blue-800
                                     disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-neutral-500'
                                 >
-                                    {isLoadingAddNewEmployer ? "Loading..." : "Add New Employer"}
+                                    {(isLoadingAddNewEmployer || isLoadingUpdateEmployer) ? "Loading..." : employeeDataToUpdate === null ? "Add New Employer" : "Update Employer"}
                             </button>
                         </div>
                     </div>

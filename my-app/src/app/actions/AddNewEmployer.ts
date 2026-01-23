@@ -1,5 +1,6 @@
 "use server";
 import { SupabaseServer } from "@/lib/supabase/server";
+import { EmployerType } from "@/types/Employer";
 import { updateTag } from "next/cache";
 
 
@@ -46,7 +47,7 @@ export async function AddNewEmployerAction(formData: FormData){
 }
 
 
-export async function UpdateEmployee(password: string){
+export async function UpdateEmployeeUser(password: string){
     const supabase = SupabaseServer();
 
     if(password.length < 6){
@@ -61,4 +62,45 @@ export async function UpdateEmployee(password: string){
     }
 
     return { success: true, message: "Password created successfully." }
+}
+
+export async function DeleteEmployee(EmployeeId: string){
+    const supabase = SupabaseServer();
+
+    if(!EmployeeId){
+        return { success: false, message: "Employee id is missing !" }
+    }
+
+    const { error } = await supabase
+        .from("employees")
+        .delete()
+        .eq("id", EmployeeId);
+
+    if(error){
+        return { success: false, message: error.message }
+    }
+
+    updateTag("Employees-Data");
+    return { success: true, message: "Employee Deleted Successfully."  }
+}
+
+
+export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>){
+    const supabase = SupabaseServer();
+
+    if(employeeId === ""){
+        return { success: false, message: "Employee Id is missing !" }
+    }
+
+    const { error } = await supabase
+        .from('employees')
+        .update(updatedData)
+        .eq("id", employeeId);
+
+    if(error){
+        return { success: false, message: error.message }
+    }
+
+    updateTag("Employees-Data");
+    return { success: true, message: "Employee updated successfully." }
 }

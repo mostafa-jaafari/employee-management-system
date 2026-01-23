@@ -1,5 +1,5 @@
 "use client";
-import { UpdateEmployee } from '@/app/actions/AddNewEmployer';
+import { UpdateEmployeeUser } from '@/app/actions/AddNewEmployer';
 import React, { useState } from 'react'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { toast } from 'sonner';
@@ -32,7 +32,7 @@ export function SetPasswordForm() {
         setIsLoadingSubmit(true);
 
         try {
-            const Result = await UpdateEmployee(inputs.newPassword);
+            const Result = await UpdateEmployeeUser(inputs.newPassword);
             if(!Result.success){
                 toast.error(Result.message);
                 setIsLoadingSubmit(false);

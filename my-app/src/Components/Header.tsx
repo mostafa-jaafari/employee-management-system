@@ -136,7 +136,12 @@ export function Header() {
                 )
                 :
                 (
-                    <button></button>
+                    <Link
+                        href="/auth/login"
+                        className='bg-blue-600 hover:bg-blue-700 cursor-pointer w-max text-white font-semibold px-6 py-1.5 text-sm rounded-lg'
+                    >
+                        Login
+                    </Link>
                 )}
             </div>
         </div>

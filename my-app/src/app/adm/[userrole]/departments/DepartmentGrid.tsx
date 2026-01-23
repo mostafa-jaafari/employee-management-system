@@ -30,7 +30,6 @@ export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[
             }
 
             toast.success(Result.message);
-            setIsConfirmationModalOpen(false);
             setIsLoadingDeleteDepartment(false);
         }catch (err){
             toast.error((err as { message: string }).message)

@@ -1,18 +1,121 @@
 "use client";
+import { DeleteEmployee } from '@/app/actions/AddNewEmployer';
+import { ConfirmationModal } from '@/Components/ConfirmationModal';
 import { DropDown } from '@/Components/DropDown';
 import { useAddNewEmployer } from '@/context/AddNewEmployer';
+import { useConfirmationModal } from '@/context/ConfirmationModal';
 import { EmployerType } from '@/types/Employer';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { FaTrash } from 'react-icons/fa6';
 import { HiOutlineDownload } from 'react-icons/hi';
-import { MdPersonAddAlt1 } from 'react-icons/md';
+import { MdModeEdit, MdPersonAddAlt1 } from 'react-icons/md';
 import { SlOptionsVertical } from 'react-icons/sl';
+import { toast } from 'sonner';
 
+const OptionsMenu = [
+    { label: "Delete", icon: FaTrash },
+    { label: "Edit", icon: MdModeEdit }
+];
+const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptions }: { EmployeesData: EmployerType[]; CurrentIndex: number; isOpenOptions: boolean; setIsOpenOptions: (isOpen: null | number) => void; }) => {
+    
+    const { setIsConfirmationModalOpen } = useConfirmationModal();
+    const { setIsOpenAddNewEmployer, setEmployeeDataToUpdate } = useAddNewEmployer();
+    const OptionsMenuRef = useRef<HTMLDivElement | null>(null);
 
+    useEffect(() => {
+        const HideOptons = (e: MouseEvent) => {
+            if(OptionsMenuRef.current && !OptionsMenuRef.current.contains(e.target as Node)){
+                setIsOpenOptions(null);
+            }
+        }
+
+        window.addEventListener("mousedown", HideOptons);
+        return () => window.removeEventListener("mousedown", HideOptons);
+    },[setIsOpenOptions])
+
+    const [isLoadingDeleteEmployee, setIsLoadingDeleteEmployee] = useState(false);
+    const HandleDeleteEmployee = async (EmployeeId: string) => {
+        if(EmployeeId === ""){
+            toast.error("Employee Id is Missing !")
+            return;
+        }
+
+        setIsLoadingDeleteEmployee(true);
+        try{
+            const Result = await DeleteEmployee(EmployeeId);
+            if(!Result.success){
+                toast.error(Result.message);
+                setIsLoadingDeleteEmployee(false);
+                return;
+            }
+
+            toast.success(Result.message);
+            setIsLoadingDeleteEmployee(false);
+            setIsOpenOptions(null);
+        }catch (err){
+            toast.error((err as { message: string }).message)
+            setIsLoadingDeleteEmployee(false);
+        }
+    }
+
+    if(!isOpenOptions) return null;
+    return (
+        <div
+            ref={OptionsMenuRef}
+            className={`absolute z-40 right-0 w-full flex flex-col
+                min-w-28 rounded-lg border border-neutral-300 shadow-lg bg-white py-1.5
+                ${(CurrentIndex === EmployeesData.length - 1 || CurrentIndex === EmployeesData.length - 2 || CurrentIndex === EmployeesData.length - 3 ) ? 
+                    "bottom-full"
+                    :
+                    "top-full" }`}
+        >
+            <ConfirmationModal
+                ConfirmButtonLabel="Delete"
+                Title={`Are you sure you want to delete "${EmployeesData[CurrentIndex].first_name} ${EmployeesData[CurrentIndex].last_name}" ?`}
+                HandelConfirmModal={() => HandleDeleteEmployee(EmployeesData[CurrentIndex].id.toString())}
+                HandelCancelModal={() => setIsOpenOptions(null)}
+                ShowWarningMessage
+                isLoadingConfirmation={isLoadingDeleteEmployee}
+                WarningMessage="This department will be permanently deleted and cannot be recovered."
+            />
+            {OptionsMenu.map((item, idx) => {
+                return (
+                    <button
+                        onClick={() => {
+                            if(item.label.toLowerCase() === "delete"){
+                                setIsConfirmationModalOpen(true);
+                            }else if(item.label.toLowerCase() === "edit"){
+                                setEmployeeDataToUpdate(EmployeesData[CurrentIndex])
+                                setIsOpenAddNewEmployer(true);
+                                // HandleUpdateEmployee(EmployeesData[CurrentIndex].id.toString(), EmployeesData[CurrentIndex]);
+                            }
+                        }}
+                        key={idx}
+                        className={`flex items-center gap-1.5 text-md py-1
+                            cursor-pointer text-start px-3 font-semibold
+                            ${OptionsMenu.length - 1 !== idx ? "border-b border-neutral-200" : ""}
+                            ${item.label.toLowerCase() === "edit" ? 
+                                "hover:bg-blue-100 text-neutral-600 hover:text-blue-600"
+                                :
+                                item.label.toLowerCase() === "delete" ?
+                                "hover:bg-red-100 text-neutral-600 hover:text-red-600"
+                                :
+                                "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-700"}`}
+                    >
+                        <item.icon size={12}/> {item.label}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
 const LIMIT = 20;
 export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmployees: number; data: EmployerType[]; Available_Status: string[]; } }) {
     const { setIsOpenAddNewEmployer } = useAddNewEmployer();
     
+    const [isOpenOptions, setIsOpenOptions] = useState<null | number>(null);
+
     const [searchTableInput, setSearchTableInput] = useState("");
 
     const router = useRouter();
@@ -179,11 +282,12 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                 <tbody
                     className='overflow-y-auto'
                 >
-                    {Employees_Data.data.map((employer) => {
+                    {Employees_Data.data.map((employer, idx) => {
                         return (
                             <tr
                                 key={employer.id}
-                                className='border border-neutral-300 hover:bg-blue-50'
+                                className={`border border-neutral-300
+                                    ${isOpenOptions === idx ? "bg-neutral-200" : "hover:bg-blue-50"}`}
                             >
                                 {/* <td className='p-3 text-left text-xs'>
                                     <input type='checkbox'/>
@@ -213,12 +317,16 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                                 <td className='p-3 text-left text-xs'>
                                     {employer.hired_at}
                                 </td>
-                                <td className='p-3 text-center text-xs'>
+                                <td className='relative p-3 text-center text-xs'>
                                     <button
+                                        onClick={() => setIsOpenOptions(isOpenOptions === idx ? null : idx)}
                                         className='cursor-pointer hover:bg-neutral-600/10 rounded-lg p-1'
                                     >
                                         <SlOptionsVertical size={14} className='text-neutral-500'/>
                                     </button>
+                                    {(
+                                        <OptionMenu setIsOpenOptions={setIsOpenOptions} key={idx} isOpenOptions={isOpenOptions === idx} EmployeesData={Employees_Data.data} CurrentIndex={idx} />
+                                    )}
                                 </td>
                             </tr>
                         )

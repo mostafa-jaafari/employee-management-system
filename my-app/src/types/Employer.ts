@@ -5,7 +5,7 @@ export type EmployerType = {
     email: string;
     position: string;
     salary: number;
-    status: "active" | "inactive" | "probation";
+    status: "ACTIVE" | "INACTIVE" | "PROBATION";
     department: string;
     hired_at: string;
 }

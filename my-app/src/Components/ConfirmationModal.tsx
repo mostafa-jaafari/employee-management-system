@@ -20,7 +20,7 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
     if(!isConfirmationModalOpen) return null;
     return (
         <section
-            className='absolute left-0 top-0 z-50 w-full h-screen backdrop-blur-[2px]
+            className='fixed left-0 top-0 z-50 w-full h-screen backdrop-blur-[2px]
             overflow-hidden bg-black/20 flex justify-center items-center px-6'
         >
             <div
@@ -63,7 +63,10 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
                     </button>
                     <button
                         disabled={isLoadingConfirmation}
-                        onClick={() => HandelConfirmModal()}
+                        onClick={() => {
+                            setIsConfirmationModalOpen(false);
+                            HandelConfirmModal();
+                        }}
                         className={`flex items-center gap-1.5 ${isLoadingConfirmation ? "px-3" : "px-6"} py-1.5 cursor-pointer rounded-full text-white 
                             font-semibold text-sm disabled:opacity-50 disabled:text-red-300 disabled:cursor-not-allowed
                             ${ConfirmButtonLabel.toLowerCase() === "delete" ?
