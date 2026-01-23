@@ -1,11 +1,11 @@
 "use server";
-import { SupabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { EmployerType } from "@/types/Employer";
 import { updateTag } from "next/cache";
 
 
 export async function AddNewEmployerAction(formData: FormData){
-    const supabase = SupabaseServer();
+    const supabase = await await createSupabaseServerClient();
 
     const first_name = formData.get('firstname') as string;
     const last_name = formData.get('lastname') as string;
@@ -48,7 +48,7 @@ export async function AddNewEmployerAction(formData: FormData){
 
 
 export async function UpdateEmployeeUser(password: string){
-    const supabase = SupabaseServer();
+    const supabase = await createSupabaseServerClient();
 
     if(password.length < 6){
         return { success: false, message: "Password should be atleast 6 caracters !" }
@@ -65,7 +65,7 @@ export async function UpdateEmployeeUser(password: string){
 }
 
 export async function DeleteEmployee(EmployeeId: string){
-    const supabase = SupabaseServer();
+    const supabase = await createSupabaseServerClient();
 
     if(!EmployeeId){
         return { success: false, message: "Employee id is missing !" }
@@ -86,7 +86,7 @@ export async function DeleteEmployee(EmployeeId: string){
 
 
 export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>){
-    const supabase = SupabaseServer();
+    const supabase = await createSupabaseServerClient();
 
     if(employeeId === ""){
         return { success: false, message: "Employee Id is missing !" }

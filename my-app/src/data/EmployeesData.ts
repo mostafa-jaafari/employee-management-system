@@ -1,4 +1,4 @@
-import { SupabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { unstable_cache } from "next/cache";
 
 const EMPLOYEES_LIMIT = 20;
@@ -6,7 +6,7 @@ const EMPLOYEES_LIMIT = 20;
 export const EmployeesData = (page: number, status?: string, department?: string, q?: string) =>
   unstable_cache(
     async () => {
-      const supabase = SupabaseServer();
+      const supabase = await createSupabaseServerClient();
 
       const from = (page - 1) * EMPLOYEES_LIMIT;
       const to = from + EMPLOYEES_LIMIT - 1;

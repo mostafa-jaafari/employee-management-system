@@ -1,10 +1,10 @@
-import { SupabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { unstable_cache } from "next/cache";
 
 export const DepartmentsData = () =>
   unstable_cache(
     async () => {
-      const supabase = SupabaseServer();
+      const supabase = await createSupabaseServerClient();
 
       const { data, error } = await supabase
         .from("users")

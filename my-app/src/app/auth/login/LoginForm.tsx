@@ -1,6 +1,6 @@
 "use client";
 import { LoginAction } from '@/app/actions/LoginAction';
-import { SupabaseClient } from '@/lib/supabase/client';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react'
 import { FaGoogle, FaStarOfLife } from 'react-icons/fa';
@@ -36,7 +36,7 @@ export function LoginForm() {
             toast.error(Res.ErrorMessage || "Login failed. Please try again.");
             return;
         }
-        router.push('/adm/admin');
+        router.refresh();
         toast.success(Res.data?.user.email?.split('@')[0] + ", welcome back!");
     }
 
@@ -48,7 +48,7 @@ export function LoginForm() {
             return;
         }
 
-        const supabase = SupabaseClient();
+        const supabase = createSupabaseBrowserClient();
         const { error } = await supabase.auth.signInWithOAuth({
             provider: provider,
             options: {

@@ -1,10 +1,10 @@
 "use server";
-import { SupabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { updateTag } from "next/cache";
 
 
 export async function AddNewDepartment(userId: string, NewDepartment: string){
-    const supabase = SupabaseServer();
+    const supabase = await createSupabaseServerClient();
 
     if(userId === "" || NewDepartment === ""){
         return { success: false, message: "One of the parametres is not available!" };
@@ -40,7 +40,7 @@ export async function AddNewDepartment(userId: string, NewDepartment: string){
 }
 
 export async function DeleteDepartment(userId: string, DepartmentToDelete: string){
-    const supabase = SupabaseServer();
+    const supabase = await createSupabaseServerClient();
 
     if(userId === "" || DepartmentToDelete === ""){
         return { success: false, message: "One of the parametres is not available!" };
