@@ -1,76 +1,85 @@
 "use server";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { updateTag } from "next/cache";
 
+// Standardized response type
+type ActionResponse = {
+  success: boolean;
+  message: string;
+};
 
-export async function AddNewDepartment(userId: string, NewDepartment: string){
-    const supabase = await createSupabaseServerClient();
+export async function AddNewDepartment(userId: string, newDepartment: string): Promise<ActionResponse> {
+  const supabase = await createSupabaseServerClient();
 
-    if(userId === "" || NewDepartment === ""){
-        return { success: false, message: "One of the parametres is not available!" };
-    }
-    
-    const { data, error } = await supabase.
-        from("users")
-        .select("available_departments")
-        .eq("id", userId)
-        .single();
+  if (!userId || !newDepartment) {
+    return { success: false, message: "Missing required fields." };
+  }
 
-    if(error){
-        return { success: false, message: error.message }
-    }
+  // 1. Fetch current departments
+  const { data: userData, error: fetchError } = await supabase
+    .from("users")
+    .select("available_departments")
+    .eq("id", userId)
+    .single();
 
-    if(data?.available_departments !== null){
-        if(data?.available_departments.includes(NewDepartment)){
-            return { success: false, message: `${NewDepartment} is already exist !` }
-        }
-    }
-    
-    const currentAvailableDepartments = data?.available_departments ?? [];
-    const updated_Departments = [...currentAvailableDepartments, NewDepartment];
+  if (fetchError) return { success: false, message: fetchError.message };
 
-    const { error: Updated_Departments_Error } = await supabase
-        .from("users")
-        .update({ available_departments: updated_Departments })
-        .eq("id", userId);
-    
-    if(error){
-        return { success: false, message: Updated_Departments_Error?.message }
-    }
+  const currentDepartments = userData?.available_departments ?? [];
 
-    updateTag(`Departments-Data-${userId}`);
-    return { success: true, message: "Department added Successfully." }
+  // 2. Check for duplicates
+  // Case insensitive check is usually better (optional)
+  if (currentDepartments.includes(newDepartment)) {
+    return { success: false, message: `"${newDepartment}" already exists.` };
+  }
+
+  const updatedDepartments = [...currentDepartments, newDepartment];
+
+  // 3. Update Database
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ available_departments: updatedDepartments })
+    .eq("id", userId);
+
+  if (updateError) {
+    return { success: false, message: updateError.message };
+  }
+
+  return { success: true, message: "Department added successfully." };
 }
 
-export async function DeleteDepartment(userId: string, DepartmentToDelete: string){
-    const supabase = await createSupabaseServerClient();
+export async function DeleteDepartment(userId: string, departmentToDelete: string): Promise<ActionResponse> {
+  const supabase = await createSupabaseServerClient();
 
-    if(userId === "" || DepartmentToDelete === ""){
-        return { success: false, message: "One of the parametres is not available!" };
-    }
-    
-    const { data, error } = await supabase.
-        from("users")
-        .select("available_departments")
-        .eq("id", userId)
-        .single();
+  if (!userId || !departmentToDelete) {
+    return { success: false, message: "Missing required fields." };
+  }
 
-    if(error){
-        return { success: false, message: error.message }
-    }
-    
-    const currentAvailableDepartments = data?.available_departments ?? [];
-    const updated_Departments = currentAvailableDepartments.filter((dep: string) => dep !== DepartmentToDelete);
+  // 1. Fetch current departments
+  const { data: userData, error: fetchError } = await supabase
+    .from("users")
+    .select("available_departments")
+    .eq("id", userId)
+    .single();
 
-    const { error: Updated_Departments_Error } = await supabase
-        .from("users")
-        .update({ available_departments: updated_Departments })
-        .eq("id", userId);
-    
-    if(error){
-        return { success: false, message: Updated_Departments_Error?.message }
-    }
+  if (fetchError) return { success: false, message: fetchError.message };
 
-    updateTag("Departments-Data");
-    return { success: true, message: "Department removed Successfully." }
+  const currentDepartments = userData?.available_departments ?? [];
+  
+  // 2. Filter out the item
+  const updatedDepartments = currentDepartments.filter(
+    (dep: string) => dep !== departmentToDelete
+  );
+
+  // 3. Update Database
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ available_departments: updatedDepartments })
+    .eq("id", userId);
+
+  // *** THE FIX: Checking updateError, not fetchError ***
+  if (updateError) {
+    return { success: false, message: updateError.message };
+  }
+
+  return { success: true, message: "Department deleted successfully." };
 }

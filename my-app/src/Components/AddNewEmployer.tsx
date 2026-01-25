@@ -11,11 +11,14 @@ import { AiOutlineApartment } from 'react-icons/ai';
 import { AddNewDepartment } from '@/app/actions/Department';
 import { useUserInfos } from '@/context/UserInfos';
 import { useRouter } from 'next/navigation';
+import { useDepartments } from '@/Hooks/useDepartments';
 
 
 export function AddNewEmployer() {
     const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate } = useAddNewEmployer();
     const { userInfos } = useUserInfos();
+
+    const { mutateDepartments, departments: DepartmentsHook } = useDepartments(userInfos?.id);
     
     const today = new Date().toISOString().split("T")[0];
     const router = useRouter();
@@ -70,7 +73,7 @@ export function AddNewEmployer() {
     }
     useEffect(() => {
         fetchDepartments()
-    },[])
+    },[DepartmentsHook])
 
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -160,6 +163,7 @@ export function AddNewEmployer() {
             }
 
             toast.success(newDepartment + ", " + "Added successfully.")
+            mutateDepartments();
             setIsLoadingAddNewDepartment(false);
             setNewDepartment("");
             fetchDepartments();

@@ -6,7 +6,7 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json([], { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { data, error } = await supabase
@@ -16,7 +16,7 @@ export async function GET() {
     .single();
 
   if (error) {
-    return NextResponse.json([], { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return NextResponse.json(data?.available_departments ?? []);

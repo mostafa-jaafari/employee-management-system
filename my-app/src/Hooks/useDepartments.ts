@@ -1,13 +1,26 @@
 import useSWR from "swr";
-import { fetcher } from "@/utils/fetcher";
+
+// Simple fetcher function
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch departments");
+    return res.json();
+  });
 
 export function useDepartments(userId?: string) {
-  return useSWR(
-    userId ? ["departments", userId] : null,
-    () => fetcher("/api/departments"),
+  const { data, error, isLoading, mutate } = useSWR<string[]>(
+    userId ? "/api/departments" : null, // Key is the URL
+    fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 1000 * 60 * 10, // 10 دقائق
+      dedupingInterval: 60000, // Cache for 1 minute
     }
   );
+
+  return {
+    departments: data ?? [],
+    isLoading,
+    isError: error,
+    mutateDepartments: mutate, // Expose mutate to trigger re-fetch
+  };
 }
