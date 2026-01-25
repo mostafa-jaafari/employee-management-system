@@ -155,7 +155,7 @@ export function AddNewEmployer() {
         }
         setIsLoadingAddNewDepartment(true);
         try{
-            const Result = await AddNewDepartment(userInfos?.id, newDepartment);
+            const Result = await AddNewDepartment(userInfos?.id, newDepartment, userInfos?.role);
             if(!Result.success){
                 toast.error(Result.message);
                 setIsLoadingAddNewDepartment(false);

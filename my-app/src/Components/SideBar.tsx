@@ -1,7 +1,7 @@
 "use client";
+import { useUserInfos } from "@/context/UserInfos";
 import Image from "next/image"
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineApartment } from "react-icons/ai";
 import { FaArrowsAltH, FaUsers } from "react-icons/fa";
@@ -20,8 +20,14 @@ const SideBar__Navigations = [
 ];
 export function SideBar(){
     const [isOpen, setIsOpen] = useState(true);
-    const User_Role = useParams()?.userrole;
+
+    const { userInfos, isLoadingUserInfos } = useUserInfos();
+    const User_Role = userInfos?.role as "employee" | "admin";
     
+    const SideBarNavigations = User_Role === "employee" ? 
+        SideBar__Navigations.filter((item) => item.name !== "dapartments")
+        :
+        SideBar__Navigations;
     return (
         <div
             className={`group sticky top-0 w-full h-screen py-1.5
@@ -66,7 +72,14 @@ export function SideBar(){
                 className={`flex flex-col px-1.5 my-3
                     ${isOpen ? "" : "gap-1 w-max"}`}
             >
-                {SideBar__Navigations.map((nav, idx) => {
+                {isLoadingUserInfos ? 
+                    Array(4).fill(0).map((_, idx) => {
+                        return (
+                            <span key={idx} className="mb-1.5 w-full h-6 rounded bg-neutral-300 animate-pulse" />
+                        )
+                    })
+                :
+                SideBarNavigations.map((nav, idx) => {
                     return (
                         <Link
                             key={idx}

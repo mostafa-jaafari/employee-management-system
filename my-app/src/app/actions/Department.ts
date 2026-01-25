@@ -8,11 +8,15 @@ type ActionResponse = {
   message: string;
 };
 
-export async function AddNewDepartment(userId: string, newDepartment: string): Promise<ActionResponse> {
+export async function AddNewDepartment(userId: string, newDepartment: string, userRole: "admin" | "employee" ): Promise<ActionResponse> {
   const supabase = await createSupabaseServerClient();
 
   if (!userId || !newDepartment) {
     return { success: false, message: "Missing required fields." };
+  }
+
+  if(userRole === "employee"){
+    return { success: false, message: "Sorry employees can't add departments." };
   }
 
   // 1. Fetch current departments

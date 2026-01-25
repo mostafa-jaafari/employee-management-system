@@ -1,6 +1,7 @@
 // middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getUserRole } from './utils/getUserRole'
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
@@ -32,6 +33,13 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  const UserRole = await getUserRole();
+
+  // const UserRole = profile?.role as "employee" | "admin";
+
+  if(UserRole.UserRole && UserRole.UserRole.role === "employee" && pathname.includes("/departments")){
+    return NextResponse.redirect(new URL('/adm/dashboard', request.url))
+  }
   // Protected routes logic
   if (!user && pathname.startsWith('/adm')) {
     return NextResponse.redirect(new URL('/auth/login', request.url));

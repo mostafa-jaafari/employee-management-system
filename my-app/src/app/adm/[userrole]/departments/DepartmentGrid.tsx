@@ -58,7 +58,7 @@ export function DepartmentGrid() {
     return (
       <div className="w-full grid grid-cols-2 gap-3 pt-10">
         {Array(6).fill(0).map((_, idx) => (
-          <div key={idx} className="w-full h-14 bg-gray-200 rounded-lg animate-pulse" />
+          <div key={idx} className="w-full h-12 bg-gray-200 rounded-lg animate-pulse" />
         ))}
       </div>
     );
