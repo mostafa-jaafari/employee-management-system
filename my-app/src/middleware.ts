@@ -37,7 +37,10 @@ export async function middleware(request: NextRequest) {
 
   // const UserRole = profile?.role as "employee" | "admin";
 
-  if(UserRole.UserRole && UserRole.UserRole.role === "employee" && pathname.includes("/departments")){
+  const Not_Available_Employees_Route = ["departments", "employees"];
+  const isRouteToNotAvailableRoutesEmployee = Not_Available_Employees_Route.some((route) => pathname.includes(`/adm/employee/${route}`))
+
+  if(UserRole.UserRole && UserRole.UserRole.role === "employee" && isRouteToNotAvailableRoutesEmployee){
     return NextResponse.redirect(new URL('/adm/dashboard', request.url))
   }
   // Protected routes logic

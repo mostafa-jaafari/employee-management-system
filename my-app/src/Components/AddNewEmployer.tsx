@@ -103,9 +103,13 @@ export function AddNewEmployer() {
                 formData.append('department', inputs.department || '');
                 formData.append('hired_at', inputs.hired_at || '');
             
+                if(!userInfos) {
+                    toast.error("Please authenticated first !");
+                    return;
+                }
             if(employeeDataToUpdate === null){
                 setIsLoadingAddNewEmployer(true);
-                const Result = await AddNewEmployerAction(formData);
+                const Result = await AddNewEmployerAction(formData, userInfos?.role);
                 if(!Result.success){
                     toast.error(Result.message)
                     setIsLoadingAddNewEmployer(false);
@@ -126,7 +130,7 @@ export function AddNewEmployer() {
                     department: inputs.department,
                     hired_at: inputs.hired_at,
                 };
-                const Result = await UpdateEmployee(employeeDataToUpdate.id.toString(), NewEmployeeUpdatedData);
+                const Result = await UpdateEmployee(employeeDataToUpdate.id.toString(), NewEmployeeUpdatedData, userInfos.role);
 
                 if(!Result.success){
                     toast.error(Result.message);

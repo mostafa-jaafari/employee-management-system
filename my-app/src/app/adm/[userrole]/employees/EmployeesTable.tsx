@@ -4,6 +4,7 @@ import { ConfirmationModal } from '@/Components/ConfirmationModal';
 import { DropDown } from '@/Components/DropDown';
 import { useAddNewEmployer } from '@/context/AddNewEmployer';
 import { useConfirmationModal } from '@/context/ConfirmationModal';
+import { useUserInfos } from '@/context/UserInfos';
 import { EmployerType } from '@/types/Employer';
 import { ConvertToCSV } from '@/utils/ConvertToCSV';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -20,7 +21,7 @@ const OptionsMenu = [
     { label: "Edit", icon: MdModeEdit }
 ];
 const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptions }: { EmployeesData: EmployerType[]; CurrentIndex: number; isOpenOptions: boolean; setIsOpenOptions: (isOpen: null | number) => void; }) => {
-    
+    const { userInfos } = useUserInfos();
     const { setIsConfirmationModalOpen } = useConfirmationModal();
     const { setIsOpenAddNewEmployer, setEmployeeDataToUpdate } = useAddNewEmployer();
     const OptionsMenuRef = useRef<HTMLDivElement | null>(null);
@@ -43,9 +44,13 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
             return;
         }
 
+        if(!userInfos){
+            toast.error("Please authenticate first !")
+            return;
+        }
         setIsLoadingDeleteEmployee(true);
         try{
-            const Result = await DeleteEmployee(EmployeeId);
+            const Result = await DeleteEmployee(EmployeeId, userInfos?.role);
             if(!Result.success){
                 toast.error(Result.message);
                 setIsLoadingDeleteEmployee(false);

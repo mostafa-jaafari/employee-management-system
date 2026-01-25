@@ -4,8 +4,8 @@ import { EmployerType } from "@/types/Employer";
 import { updateTag } from "next/cache";
 
 
-export async function AddNewEmployerAction(formData: FormData){
-    const supabase = await await createSupabaseServerClient();
+export async function AddNewEmployerAction(formData: FormData, userRole: "admin" | "employee"){
+    const supabase = await createSupabaseServerClient();
 
     const first_name = formData.get('firstname') as string;
     const last_name = formData.get('lastname') as string;
@@ -16,6 +16,9 @@ export async function AddNewEmployerAction(formData: FormData){
     const department = formData.get('department') as string;
     const hired_at = formData.get('hired_at') as string;
 
+    if(userRole === "employee"){
+        return { success: false, message: "Sorry, employees can't add employees" }
+    }
 
     const { data, error } = await supabase.auth.admin.inviteUserByEmail(
         email,
@@ -53,6 +56,7 @@ export async function UpdateEmployeeUser(password: string){
     if(password.length < 6){
         return { success: false, message: "Password should be atleast 6 caracters !" }
     }
+
     const { error } = await supabase.auth.updateUser({
         password: password,
     })
@@ -64,8 +68,12 @@ export async function UpdateEmployeeUser(password: string){
     return { success: true, message: "Password created successfully." }
 }
 
-export async function DeleteEmployee(EmployeeId: string){
+export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "employee"){
     const supabase = await createSupabaseServerClient();
+
+    if(userRole === "employee"){
+        return { success: false, message: "Sorry, employees cant't delete employees !" }
+    }
 
     if(!EmployeeId){
         return { success: false, message: "Employee id is missing !" }
@@ -85,8 +93,12 @@ export async function DeleteEmployee(EmployeeId: string){
 }
 
 
-export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>){
+export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>, userRole: "admin" | "employee"){
     const supabase = await createSupabaseServerClient();
+
+    if(userRole === "employee"){
+        return { success: false, message: "Sorry, employees can't update employees !" }
+    }
 
     if(employeeId === ""){
         return { success: false, message: "Employee Id is missing !" }
