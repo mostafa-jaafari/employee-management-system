@@ -25,7 +25,7 @@ export function SideBar(){
     const User_Role = userInfos?.role as "employee" | "admin";
     
     const SideBarNavigations = User_Role === "employee" ? 
-        SideBar__Navigations.filter((item) => item.name !== "dapartments")
+        SideBar__Navigations.filter((item) => (item.name !== "dapartments" && item.name !== "employees"))
         :
         SideBar__Navigations;
     return (
