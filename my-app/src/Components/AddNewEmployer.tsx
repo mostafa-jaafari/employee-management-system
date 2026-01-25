@@ -245,7 +245,7 @@ export function AddNewEmployer() {
                             onClick={() => {
                                 setIsOpenAddNewDepartment(false);
                                 setIsOpenAddNewEmployer(false);
-                                router.push("/adm/admin/departments")
+                                router.push("/u/admin/departments")
                             }}
                             className='capitalize w-max flex justify-center items-center hover:underline text-blue-600 text-sm cursor-pointer'
                         >

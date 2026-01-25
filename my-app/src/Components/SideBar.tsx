@@ -83,7 +83,7 @@ export function SideBar(){
                     return (
                         <Link
                             key={idx}
-                            href={`/adm/${User_Role}/${nav.href}`}
+                            href={`/u/${User_Role}/${nav.href}`}
                             className="capitalize hover:bg-neutral-400/20 hover:text-neutral-700 px-1.5 py-1 rounded text-neutral-600 flex items-center gap-1.5 font-semibold text-sm"
                         >
                             <nav.icon size={isOpen ? 16 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>

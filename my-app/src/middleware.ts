@@ -38,24 +38,29 @@ export async function middleware(request: NextRequest) {
   // const UserRole = profile?.role as "employee" | "admin";
 
   const Not_Available_Employees_Route = ["departments", "employees"];
-  const isRouteToNotAvailableRoutesEmployee = Not_Available_Employees_Route.some((route) => pathname.includes(`/adm/employee/${route}`))
+  const isRouteToNotAvailableRoutesEmployee = Not_Available_Employees_Route.some((route) => pathname.includes(`/u/employee/${route}`))
+
+  // FIXE THIS 
+  if(pathname === "/u" || pathname === "/u/"){
+    return NextResponse.redirect(new URL("/adm/admin", request.url))
+  }
 
   if(UserRole.UserRole && UserRole.UserRole.role === "employee" && isRouteToNotAvailableRoutesEmployee){
-    return NextResponse.redirect(new URL('/adm/dashboard', request.url))
+    return NextResponse.redirect(new URL('/u/dashboard', request.url))
   }
   // Protected routes logic
-  if (!user && pathname.startsWith('/adm')) {
+  if (!user && pathname.startsWith('/u')) {
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 
   // Auth routes logic
   if (user && pathname.startsWith('/auth/login')) {
-    return NextResponse.redirect(new URL('/adm/admin', request.url));
+    return NextResponse.redirect(new URL('/u/admin', request.url));
   }
 
   return response
 }
 
 export const config = {
-  matcher: ["/adm/:path*", "/auth/:path*"],
+  matcher: ["/u/:path*", "/auth/:path*"],
 }

@@ -50,7 +50,7 @@ export function LoginForm() {
                 provider,
                 options: {
                     // Point to the callback route, and pass the final destination as a query param
-                    redirectTo: `${window.location.origin}/auth/callback?next=/adm/admin`, 
+                    redirectTo: `${window.location.origin}/auth/callback?next=/u/admin`, 
             },
         });
 

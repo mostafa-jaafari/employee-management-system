@@ -141,7 +141,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
 
         const searchParams = new URLSearchParams(window.location.search);
         searchParams.set("page", page.toString());
-        router.push(`/adm/admin/employees?${searchParams.toString()}`);
+        router.push(`/u/admin/employees?${searchParams.toString()}`);
     };
 
     const HandleSearchTableInput = () => {
@@ -151,7 +151,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
         } else {
             searchParams.delete("q");
         }
-        router.push(`/adm/admin/employees?${searchParams.toString().trim()}`);
+        router.push(`/u/admin/employees?${searchParams.toString().trim()}`);
     }
 
     const pathname = usePathname();

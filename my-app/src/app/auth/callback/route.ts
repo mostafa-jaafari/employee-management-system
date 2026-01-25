@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   // 1. Parse the URL
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') ?? '/adm/admin'
+  const next = requestUrl.searchParams.get('next') ?? '/u/admin'
   
   // 2. Calculate the correct origin (Fix for Codespaces/Proxies)
   // Check if we have an x-forwarded-host header (standard in proxies like Codespaces)
