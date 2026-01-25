@@ -40,26 +40,27 @@ export function LoginForm() {
         toast.success(Res.data?.user.email?.split('@')[0] + ", welcome back!");
     }
 
-    const SingInWithProvider = async (provider: "google" | "facebook" | "github", e: MouseEvent<HTMLButtonElement>) => {
+    const supabase = createSupabaseBrowserClient();
+    const signInWithProvider = async (provider: "google", e: MouseEvent) => {
         e.preventDefault();
-
-        if(provider === "facebook" || provider === "github"){
-            toast.error("This provider is not available yet.");
-            return;
-        }
-
-        const supabase = createSupabaseBrowserClient();
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: provider,
-            options: {
-                redirectTo: window.location.origin + '/adm/admin',
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    // Point to the callback route, and pass the final destination as a query param
+                    redirectTo: `${window.location.origin}/auth/callback?next=/adm/admin`, 
             },
         });
-        if(error){
-            toast.error("Error signing in with " + provider + ": " + error.message);
-            return;
+
+        if (error) throw error;
+
+        // لا تحاول استخدام data.user هنا، سيتم redirect تلقائيًا
+        toast.success("Redirecting to login provider…");
+        router.refresh();
+        } catch (err) {
+        toast.error("Error signing in: " + (err as { message: string }).message);
         }
-    }
+    };
 
     return (
         <form
@@ -150,7 +151,7 @@ export function LoginForm() {
                     className='w-full flex items-center gap-1.5'
                 >
                     <button
-                        onClick={(e) => SingInWithProvider("google", e)}
+                        onClick={(e) => signInWithProvider("google", e)}
                         className='bg-gray-400/40 w-full py-2 flex gap-1.5 items-center text-sm justify-center rounded-lg border border-gray-400/10 hover:bg-gray-400/50 cursor-pointer'
                     ><FaGoogle size={20} /> Continue with Google</button>
                     {/* <button

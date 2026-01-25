@@ -1,33 +1,26 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
-export const DepartmentsData = () =>
-  unstable_cache(
-    async () => {
-      const supabase = await createSupabaseServerClient();
+export const DepartmentsData = cache(
+  async () => {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user }, error: UserError } = await supabase.auth.getUser();
 
-      const { data, error } = await supabase
+    if(!user) {
+      return { success: false, message: UserError?.message }
+    }
+
+    const { data, error: DataError } = await supabase
         .from("users")
         .select("available_departments")
-        .limit(1)
+        .eq("id", user?.id)
         .single();
+        
+        if(DataError){
+          return { success: false, message: DataError.message, data: [] }
+        }
 
-      if (error) {
-        return {
-          success: false,
-          message: error.message,
-          data: [],
-        };
-      }
-
-      return {
-        success: true,
-        message: "Get departments successfully.",
-        data: data?.available_departments ?? [],
-      };
-    },
-    ["Departments-Data"],
-    {
-      tags: ["Departments-Data"],
+        return { success: true, message: "Get data successfully.", data: data ?? [] }
     }
-  )();
+
+)

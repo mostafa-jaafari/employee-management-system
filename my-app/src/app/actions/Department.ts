@@ -20,11 +20,14 @@ export async function AddNewDepartment(userId: string, NewDepartment: string){
         return { success: false, message: error.message }
     }
 
-    if(data?.available_departments.includes(NewDepartment)){
-        return { success: false, message: `${NewDepartment} is already exist !` }
+    if(data?.available_departments !== null){
+        if(data?.available_departments.includes(NewDepartment)){
+            return { success: false, message: `${NewDepartment} is already exist !` }
+        }
     }
     
-    const updated_Departments = [...data?.available_departments, NewDepartment];
+    const currentAvailableDepartments = data?.available_departments ?? [];
+    const updated_Departments = [...currentAvailableDepartments, NewDepartment];
 
     const { error: Updated_Departments_Error } = await supabase
         .from("users")
@@ -35,7 +38,7 @@ export async function AddNewDepartment(userId: string, NewDepartment: string){
         return { success: false, message: Updated_Departments_Error?.message }
     }
 
-    updateTag("Departments-Data");
+    updateTag(`Departments-Data-${userId}`);
     return { success: true, message: "Department added Successfully." }
 }
 
@@ -56,7 +59,8 @@ export async function DeleteDepartment(userId: string, DepartmentToDelete: strin
         return { success: false, message: error.message }
     }
     
-    const updated_Departments = data?.available_departments.filter((dep: string) => dep !== DepartmentToDelete);
+    const currentAvailableDepartments = data?.available_departments ?? [];
+    const updated_Departments = currentAvailableDepartments.filter((dep: string) => dep !== DepartmentToDelete);
 
     const { error: Updated_Departments_Error } = await supabase
         .from("users")

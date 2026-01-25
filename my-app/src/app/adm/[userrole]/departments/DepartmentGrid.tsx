@@ -5,16 +5,18 @@ import { ConfirmationModal } from "@/Components/ConfirmationModal";
 import { useAddNewEmployer } from "@/context/AddNewEmployer";
 import { useConfirmationModal } from "@/context/ConfirmationModal";
 import { useUserInfos } from "@/context/UserInfos";
+import { useDepartments } from "@/Hooks/useDepartments";
 import { useState } from "react";
 import { AiOutlineApartment } from "react-icons/ai";
 import { FaTrash } from "react-icons/fa6";
 import { MdOutlineAddCircle } from "react-icons/md";
 import { toast } from "sonner";
 
-export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[]; }) {
+export function DepartmentGrid() {
     const { setIsOpenAddNewDepartment } = useAddNewEmployer();
     const { userInfos } = useUserInfos();
-    const { setIsConfirmationModalOpen } = useConfirmationModal()
+    const { setIsConfirmationModalOpen } = useConfirmationModal();
+    const { data: Departments_Data, isLoading } = useDepartments(userInfos?.id);
 
     const [departmentToDelete, setDepartmentToDelete] = useState<string>("");
     const [isLoadingDeleteDepartment, setIsLoadingDeleteDepartment] = useState(false);
@@ -37,6 +39,12 @@ export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[
         }
     }
 
+    if(isLoading){
+        return (
+            <div>Loading...</div>
+        )
+    }
+
     return (
         <section>
             <ConfirmationModal 
@@ -54,7 +62,7 @@ export function DepartmentGrid({ Departments_Data }: { Departments_Data: string[
                 <h1
                     className='font-semibold'
                 >
-                    Departments ({Departments_Data.length})
+                    Departments ({Departments_Data?.length})
                 </h1>
                 <button
                     onClick={() => {

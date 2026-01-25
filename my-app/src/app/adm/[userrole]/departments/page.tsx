@@ -7,7 +7,7 @@ export default async function page() {
     <main
         className='w-full min-h-140'
     >
-        <DepartmentGrid Departments_Data={Departments_Data.data} />
+        <DepartmentGrid Departments_Data={(Departments_Data as { data: { available_departments: string[] } }).data?.available_departments ?? []} />
     </main>
   )
 }
