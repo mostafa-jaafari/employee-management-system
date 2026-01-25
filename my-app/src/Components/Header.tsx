@@ -41,6 +41,11 @@ export function Header() {
         return () => window.removeEventListener("mousedown", handleHideMenu);
     },[])
 
+    const NavigationMenuLinks = userInfos?.role === "employee" ?
+        Navigation_Menu_Links.filter((nav) => nav.name !== "employees")
+        :
+        Navigation_Menu_Links;
+
     return (
         <div
             className='flex items-center justify-between mb-3'
@@ -125,10 +130,10 @@ export function Header() {
                                     space-y-0.5 text-sm rounded-lg shadow-lg p-1.5
                                     flex flex-col border border-neutral-200/80'
                             >
-                                {Navigation_Menu_Links.map((nav, idx) => {
+                                {NavigationMenuLinks.map((nav, idx) => {
                                     return (
                                         <Link
-                                            href={nav.href}
+                                            href={`/u/${userInfos.role}/${nav.href}`}
                                             key={idx}
                                             className='capitalize flex items-center gap-1.5 
                                                 hover:bg-neutral-100 cursor-pointer py-1 px-1.5 
