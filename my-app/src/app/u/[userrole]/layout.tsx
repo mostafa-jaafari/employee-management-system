@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }){
                     >
                         <Header />
                         <div
-                            className="w-full overflow-hidden"
+                            className="w-full overflow-hidden pr-3"
                         >
                             {children}
                         </div>
