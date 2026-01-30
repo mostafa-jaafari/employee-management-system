@@ -189,12 +189,12 @@ export function AddNewEmployer() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className='relative w-full max-w-1/4 bg-white rounded-2xl border border-neutral-200 shadow-lg min-h-80'
+                    className='relative w-full max-w-1/4 bg-neutral-800 rounded-lg border border-neutral-700/60 shadow-lg min-h-80'
                 >
                     <header
-                        className='w-full border-b border-neutral-200 flex items-center justify-between p-3'
+                        className='w-full border-b border-neutral-700/60 flex items-center justify-between p-3'
                     >
-                        <h1 className='font-semibold text-sm'>Add New Department</h1>
+                        <h1 className='text-sm text-neutral-300'>Add New Department</h1>
                         <button
                             onClick={() => setIsOpenAddNewDepartment(false)}
                             className='cursor-pointer text-neutral-500 hover:text-neutral-700'
@@ -216,8 +216,8 @@ export function AddNewEmployer() {
                                             <div
                                                 key={idx}
                                                 className='flex justify-start items-center gap-1.5 
-                                                    py-1 px-1.5 rounded-lg border border-dashed 
-                                                    border-neutral-400 w-full'
+                                                    py-1 px-1.5 rounded border border-dashed 
+                                                    border-neutral-600 text-neutral-300 w-full'
                                             >
                                                 <AiOutlineApartment size={14} className='flex-shrink-0'/> 
                                                 <span
@@ -247,7 +247,7 @@ export function AddNewEmployer() {
                                 setIsOpenAddNewEmployer(false);
                                 router.push("/u/admin/departments")
                             }}
-                            className='capitalize w-max flex justify-center items-center hover:underline text-blue-600 text-sm cursor-pointer'
+                            className='capitalize w-max flex justify-center items-center hover:underline text-blue-600 text-xs cursor-pointer'
                         >
                             view & manage All
                         </button>
@@ -265,7 +265,7 @@ export function AddNewEmployer() {
                                 onChange={(e) => setNewDepartment(e.target.value)}
                                 value={newDepartment}
                                 placeholder='Enter department...'
-                                className='outline-none w-full py-3 text-sm px-3 rounded-lg border-b border-neutral-400 ring ring-neutral-300 focus:ring-blue-400 focus:border-blue-400'
+                                className='outline-none w-full py-3 text-sm px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 ring ring-neutral-700 focus:ring-blue-400 focus:border-blue-400'
                             />
                         </div>
                         <div
@@ -274,8 +274,8 @@ export function AddNewEmployer() {
                             <button
                                 onClick={HandleAddNewDepartment}
                                 disabled={newDepartment.trim() === "" || isLoadingAddNewDepartment}
-                                className='text-white text-sm cursor-pointer bg-gradient-to-t from-blue-600 to-blue-500
-                                    rounded-lg w-full flex justify-center px-6 py-3 hover:to-blue-600 border-b border-blue-800
+                                className='bg-blue-600 hover:bg-blue-700 text-neutral-200 hover:bg-blue-700 
+                                    py-3 px-6 text-sm w-full rounded-lg cursor-pointer
                                     disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-neutral-500'
                                 >
                                     {isLoadingAddNewDepartment ? "Loading..." : "Add New Department"}
@@ -291,13 +291,14 @@ export function AddNewEmployer() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className='relative w-full min-w-[200px] max-w-1/3 bg-white rounded-2xl border border-neutral-200 shadow-lg min-h-120'
+                    className='relative w-full min-w-[200px] max-w-1/3 bg-neutral-800 
+                        rounded-lg border border-neutral-700/60 shadow-lg min-h-120'
                 >
                     {/* --- ADD New Employer Header --- */}
                     <header
-                        className='w-full border-b border-neutral-200 flex items-center justify-between p-3'
+                        className='w-full border-b border-neutral-700/60 flex items-center justify-between p-3'
                     >
-                        <h1 className='font-semibold'>
+                        <h1 className='text-neutral-300'>
                             Add New Employer
                         </h1>
                         <button
@@ -305,7 +306,7 @@ export function AddNewEmployer() {
                                 setEmployeeDataToUpdate(null);
                                 setIsOpenAddNewEmployer(false);
                             }}
-                            className='cursor-pointer text-neutral-500 hover:text-neutral-700'
+                            className='cursor-pointer text-neutral-600 hover:text-neutral-500'
                         >
                             <FaXmark size={20}/>
                         </button>
@@ -327,7 +328,7 @@ export function AddNewEmployer() {
                                 placeholder='First Name'
                                 onChange={HandleChangeInputs}
                                 value={inputs.firstname}
-                                className='w-full py-3 px-3 rounded-lg border-b border-neutral-400 focus:border-blue-400 ring ring-neutral-300 text-sm outline-none focus:ring-blue-400'
+                                className='w-full py-3 px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 focus:border-blue-400 ring ring-neutral-700 text-sm outline-none focus:ring-blue-400'
                                 required
                             />
                             <input 
@@ -336,7 +337,7 @@ export function AddNewEmployer() {
                                 placeholder='Last Name'
                                 onChange={HandleChangeInputs}
                                 value={inputs.lastname}
-                                className='w-full py-3 px-3 rounded-lg border-b border-neutral-400 focus:border-blue-400 ring ring-neutral-300 text-sm outline-none focus:ring-blue-400'
+                                className='w-full py-3 px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 focus:border-blue-400 ring ring-neutral-700 text-sm outline-none focus:ring-blue-400'
                                 required
                             />
                         </div>
@@ -359,7 +360,7 @@ export function AddNewEmployer() {
                                 placeholder='Salary'
                                 onChange={HandleChangeInputs}
                                 value={inputs.salary}
-                                className='w-full py-3 px-3 rounded-lg border-b border-neutral-400 focus:border-blue-400 ring ring-neutral-300 text-sm outline-none focus:ring-blue-400'
+                                className='w-full py-3 px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 focus:border-blue-400 ring ring-neutral-700 text-sm outline-none focus:ring-blue-400'
                                 required
                             />
                         </div>
@@ -373,7 +374,7 @@ export function AddNewEmployer() {
                                 placeholder='Email'
                                 onChange={HandleChangeInputs}
                                 value={inputs.email}
-                                className='w-full py-3 px-3 rounded-lg border-b border-neutral-400 focus:border-blue-400 ring ring-neutral-300 text-sm outline-none focus:ring-blue-400'
+                                className='w-full py-3 px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 focus:border-blue-400 ring ring-neutral-700 text-sm outline-none focus:ring-blue-400'
                                 required
                             />
                             <input
@@ -382,7 +383,7 @@ export function AddNewEmployer() {
                                 name="hired_at"
                                 value={inputs.hired_at}
                                 onChange={HandleChangeInputs}
-                                className="w-max text-sm py-3 px-3 cursor-pointer outline-none rounded-lg border-b border-neutral-400 focus:border-blue-400 ring ring-neutral-300 focus:ring-blue-400 focus:text-blue-600"
+                                className="w-max text-sm py-3 px-3 cursor-pointer outline-none rounded-lg placeholder:text-neutral-500 text-neutral-200 focus:border-blue-400 ring ring-neutral-700 focus:ring-blue-400 focus:text-blue-600"
                             />
 
                         </div>
@@ -414,33 +415,35 @@ export function AddNewEmployer() {
                         className='absolute left-0 bottom-0 w-full'
                     >
                         <div
-                            className='w-full flex gap-1.5 border-t border-neutral-200 py-1.5 px-3'
+                            className='w-full flex gap-1.5 border-t border-neutral-700/60 py-1.5 px-3'
                         >
                             <button
                                 onClick={() => setIsOpenAddNewDepartment(true)}
                                 className='w-full flex items-center gap-1.5 justify-center
-                                    py-2 text-blue-600 bg-blue-100 hover:bg-blue-200 cursor-pointer
-                                    font-semibold text-sm border border-blue-600 rounded-lg'
+                                    py-2 hover:bg-neutral-700/20 bg-neutral-700/40 cursor-pointer 
+                                    border border-neutral-700 text-sm rounded-lg
+                                    text-neutral-300'
                             >
                                 <MdOutlineAddCircle size={18} /> Add Department
                             </button>
                             <button
                                 className='w-full flex items-center gap-1.5 justify-center
-                                    py-2 text-blue-600 bg-blue-100 hover:bg-blue-200 cursor-pointer
-                                    font-semibold text-sm border border-blue-600 rounded-lg'
+                                    py-2 hover:bg-neutral-700/20 bg-neutral-700/40 cursor-pointer 
+                                    border border-neutral-700 text-sm rounded-lg
+                                    text-neutral-300'
                             >
                                 <MdOutlineAddCircle size={18} /> Add Position
                             </button>
                         </div>
                         {/* --- ADD New Employer Submit Button --- */}
                         <div
-                            className='p-3 border-t border-neutral-200'
+                            className='p-3 border-t border-neutral-700/60'
                         >
                             <button
                                 disabled={isLoadingAddNewEmployer || isLoadingUpdateEmployer}
                                 onClick={HandleAddNewEmployer}
-                                className='text-white text-sm cursor-pointer bg-gradient-to-t from-blue-600 to-blue-500
-                                    rounded-lg w-full flex justify-center px-6 py-3 hover:to-blue-600 border-b border-blue-800
+                                className='bg-blue-600 hover:bg-blue-700 text-neutral-200 hover:bg-blue-700 
+                                    py-3 px-6 text-sm w-full rounded-lg cursor-pointer
                                     disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-neutral-500'
                                 >
                                     {(isLoadingAddNewEmployer || isLoadingUpdateEmployer) ? "Loading..." : employeeDataToUpdate === null ? "Add New Employer" : "Update Employer"}

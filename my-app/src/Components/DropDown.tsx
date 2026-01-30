@@ -35,7 +35,7 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                     className='absolute left-0 top-full z-10 text-nowrap truncate
                         bg-neutral-800 border border-neutral-700/60
-                        shadow-lg w-full max-h-50 overflow-y-auto mt-1 rounded-lg overflow-hidden p-1.5'
+                        shadow-lg shadow-neutral-900 w-full max-h-50 overflow-y-auto mt-1 rounded-lg overflow-hidden p-1.5'
                 >
                     <ul
                         className='flex flex-col'
