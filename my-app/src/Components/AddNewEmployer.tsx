@@ -151,7 +151,7 @@ export function AddNewEmployer() {
     
     const [isLoadingAddNewDepartment, setIsLoadingAddNewDepartment] = useState(false);
     const HandleAddNewDepartment = async () => {
-        if(!userInfos) return;
+        if(!userInfos || userInfos.role === "guest") return;
 
         if(newDepartment === ""){
             toast.info("Please type department first !");

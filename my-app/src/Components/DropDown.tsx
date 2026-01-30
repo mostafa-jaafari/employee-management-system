@@ -23,9 +23,9 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
             role='button'
             onClick={() => setIsOpen(!isOpen)}
             ref={MenuRef}
-            className={`${className} ${isOpen ? "ring-blue-400 bg-blue-100 border-blue-400" : "ring-neutral-300 border-neutral-400"} border-b ring cursor-pointer relative flex items-center justify-between gap-3`}
+            className={`${className} ${isOpen ? "bg-neutral-800 border-neutral-600" : "border-neutral-700/60 bg-neutral-800/60"} border cursor-pointer relative flex items-center justify-between gap-3`}
         >
-            <h2 className={`capitalize font-[500] ${isOpen ? "text-blue-600" : "text-neutral-600"}`}>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180 text-blue-600" : ""} transition-transform duration-200`}/>
+            <h2 className={`capitalize font-[500] ${isOpen ? "text-white" : "text-neutral-300"}`}>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180 text-white" : "text-neutral-300"} transition-transform duration-200`}/>
             {isOpen && (
                 <motion.div
                     key="dropdown"
@@ -34,7 +34,7 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                     className='absolute left-0 top-full z-10 text-nowrap truncate
-                        bg-white border-b border-neutral-400/70 ring ring-neutral-200 
+                        bg-neutral-800 border border-neutral-700/60
                         shadow-lg w-full max-h-50 overflow-y-auto mt-1 rounded-lg overflow-hidden p-1.5'
                 >
                     <ul
@@ -43,8 +43,9 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
                         {DefaultAllButton && (
                             <button
                                 onClick={(e) => HandleSelectOption("all", e)}
-                                className="p-1.5 text-neutral-600 hover:bg-neutral-100 hover:rounded-lg cursor-pointer capitalize text-start
-                                border-b border-neutral-300"
+                                className="px-1.5 py-1 text-neutral-400 hover:text-neutral-200 
+                                    hover:bg-neutral-700/60 cursor-pointer 
+                                    capitalize text-start border-b border-neutral-700/60"
                                 >
                                 All
                             </button>
@@ -54,8 +55,8 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
                                 <button
                                     key={idx}
                                     onClick={(e) => HandleSelectOption(opt, e)}
-                                    className={`p-1.5 text-neutral-600 hover:bg-neutral-100 hover:rounded-lg cursor-pointer capitalize text-start
-                                        ${idx !== Options.length - 1 && "border-b border-neutral-300"}`}
+                                    className={`px-1.5 py-1 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/60 cursor-pointer capitalize text-start
+                                        ${idx !== Options.length - 1 && "border-b border-neutral-700/60"}`}
                                 >
                                     {opt.toLowerCase()}
                                 </button>

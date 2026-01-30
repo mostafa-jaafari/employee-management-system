@@ -6,9 +6,9 @@ export default async function page(){
     return (
         <main>
             <div
-                className="w-full flex items-center justify-between"
+                className="w-full flex items-center justify-between border-b border-neutral-700/60"
             >
-                <h1 className="text-3xl font-bold text-white mb-6">
+                <h1 className="text-xl md:text-2xl font-bold text-white mb-6">
                     Tasks Management - Admin Panel
                 </h1>
                 <button
@@ -17,6 +17,12 @@ export default async function page(){
                     <IoIosAddCircle size={18}/> New Task
                 </button>
             </div>
+
+            {/* --- Tasks Body --- */}
+
+            <section>
+                
+            </section>
         </main>
     )
 }

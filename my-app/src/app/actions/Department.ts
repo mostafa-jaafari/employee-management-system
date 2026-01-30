@@ -8,7 +8,7 @@ type ActionResponse = {
   message: string;
 };
 
-export async function AddNewDepartment(userId: string, newDepartment: string, userRole: "admin" | "employee" ): Promise<ActionResponse> {
+export async function AddNewDepartment(userId: string, newDepartment: string, userRole: "admin" | "employee" | "guest"): Promise<ActionResponse> {
   const supabase = await createSupabaseServerClient();
 
   if (!userId || !newDepartment) {

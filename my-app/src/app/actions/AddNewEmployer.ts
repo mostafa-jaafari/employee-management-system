@@ -4,7 +4,7 @@ import { EmployerType } from "@/types/Employer";
 import { updateTag } from "next/cache";
 
 
-export async function AddNewEmployerAction(formData: FormData, userRole: "admin" | "employee"){
+export async function AddNewEmployerAction(formData: FormData, userRole: "admin" | "employee" | "guest"){
     const supabase = await createSupabaseServerClient();
 
     const first_name = formData.get('firstname') as string;
@@ -68,7 +68,7 @@ export async function UpdateEmployeeUser(password: string){
     return { success: true, message: "Password created successfully." }
 }
 
-export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "employee"){
+export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "employee" | "guest"){
     const supabase = await createSupabaseServerClient();
 
     if(userRole === "employee"){
@@ -93,7 +93,7 @@ export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "em
 }
 
 
-export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>, userRole: "admin" | "employee"){
+export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>, userRole: "admin" | "employee" | "guest"){
     const supabase = await createSupabaseServerClient();
 
     if(userRole === "employee"){

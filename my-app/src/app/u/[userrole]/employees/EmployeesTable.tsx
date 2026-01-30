@@ -70,8 +70,8 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
     return (
         <div
             ref={OptionsMenuRef}
-            className={`absolute z-40 right-0 w-full flex flex-col
-                min-w-28 rounded-lg border border-neutral-300 shadow-lg bg-white py-1.5
+            className={`absolute z-40 right-0 w-full flex flex-col overflow-hidden
+                min-w-28 rounded-lg border border-neutral-700/60 shadow-lg bg-neutral-800
                 ${(CurrentIndex === EmployeesData.length - 1 || CurrentIndex === EmployeesData.length - 2 || CurrentIndex === EmployeesData.length - 3 ) ? 
                     "bottom-full"
                     :
@@ -99,16 +99,16 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
                             }
                         }}
                         key={idx}
-                        className={`flex items-center gap-1.5 text-md py-1
+                        className={`flex items-center gap-1.5 text-md py-1.5
                             cursor-pointer text-start px-3 font-semibold
-                            ${OptionsMenu.length - 1 !== idx ? "border-b border-neutral-200" : ""}
+                            ${OptionsMenu.length - 1 !== idx ? "border-b border-neutral-700/60" : ""}
                             ${item.label.toLowerCase() === "edit" ? 
-                                "hover:bg-blue-100 text-neutral-600 hover:text-blue-600"
+                                "hover:bg-blue-100 text-neutral-300 hover:text-blue-600"
                                 :
                                 item.label.toLowerCase() === "delete" ?
-                                "hover:bg-red-100 text-neutral-600 hover:text-red-600"
+                                "hover:bg-red-100 text-neutral-300 hover:text-red-600"
                                 :
-                                "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-700"}`}
+                                "hover:bg-neutral-100 text-neutral-300 hover:text-neutral-700"}`}
                     >
                         <item.icon size={12}/> {item.label}
                     </button>
@@ -216,14 +216,14 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
         <div>
             {/* --- Table Top Header --- */}
             <div
-                className='space-y-1.5'
+                className='space-y-3'
             >
                 {/* --- Top Header --- */}
                 <div
                     className='w-full flex items-center justify-between'
                 >
                     <h1
-                        className='font-semibold'
+                        className='text-xl md:text-2xl font-bold text-white'
                     >
                         Employee Management
                     </h1>
@@ -233,9 +233,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                         <button
                             disabled={isLoadingDownload}
                             onClick={HandleExportDataTable}
-                            className='text-xs cursor-pointer hover:bg-gray-200/20
-                                border border-neutral-300 rounded-lg 
-                                px-3 py-1.5 text-neutral-600
+                            className='text-sm text-neutral-200 bg-neutral-800/60 hover:bg-neutral-800 cursor-pointer px-3 py-1.5 rounded-lg border border-neutral-700/60
                                 disabled:opacity-70 disabled:cursor-not-allowed'
                         >
                             {isLoadingDownload ? (<span className='flex items-center gap-1.5'><AiOutlineLoading3Quarters size={12} className='animate-spin'/> Exporting DataTable...</span>) : (<span className='flex items-center gap-1.5'><HiOutlineDownload size={16}/> Export DataTable</span>)}
@@ -244,15 +242,15 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             onClick={() => {
                                 setIsOpenAddNewEmployer(true);
                             }}
-                            className='text-xs cursor-pointer bg-blue-600 hover:bg-blue-600/90 flex items-center gap-1.5 border-b border-blue-800 rounded-lg px-3 py-1.5 text-white'
+                            className='text-sm cursor-pointer bg-blue-600 hover:bg-blue-700 flex items-center gap-1.5 border-b border-blue-800 rounded-lg px-3 py-1.5 text-white'
                         >
-                            <MdPersonAddAlt1 size={14}/> Add Employer
+                            <MdPersonAddAlt1 size={18}/> Add Employer
                         </button>
-                        <button
+                        {/* <button
                             className='text-xs cursor-pointer hover:bg-gray-200/20 flex items-center gap-1.5 border border-neutral-300 rounded-lg px-2 py-1.5 text-neutral-600'
                         >
                             <SlOptionsVertical size={16}/>
-                        </button>
+                        </button> */}
                     </div>
                 </div>
                 {/* --- Botton Header --- */}
@@ -260,10 +258,9 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                     className='flex items-center justify-between'
                 >
                     <div
-                        className='flex items-center text-sm min-w-[300px] 
-                            bg-white py-0.5 px-0.5 pl-3 rounded-lg border-b 
-                            border-neutral-400 ring ring-neutral-300
-                            focus-within:ring-blue-400 focus-within:border-blue-400'
+                        className='text-sm min-w-[300px] bg-section-h px-3 rounded-lg 
+                            ml-0.5 outline-none border-b border-neutral-600/60 focus-within:border-blue-400 
+                            ring ring-neutral-700/60 focus-within:ring-blue-400'
                     >
                         <input 
                             type="text"
@@ -271,18 +268,8 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             value={searchTableInput}
                             placeholder='Search employer by FirstName'
                             maxLength={40}
-                            className='w-full outline-none text-sm py-1.5'
+                            className='w-full outline-none text-sm py-2'
                         />
-                        {/* <button
-                            onClick={HandleSearchTableInput}
-                            disabled={searchTableInput.length === 0 && Current_q_value === ""}
-                            className='text-neutral-600 hover:bg-neutral-200/30 
-                                p-1.5 rounded-lg cursor-pointer border border-transparent 
-                                hover:border-neutral-200 ml-1.5
-                                disabled:cursor-not-allowed disabled:opacity-40'
-                        >
-                            {Current_q_value !== "" && searchTableInput.length === 0 ? <FaFilterCircleXmark title='clear search' className='text-red-600' size={20}/> : <IoSearch size={20}/>}
-                        </button> */}
                     </div>
 
                     <div
@@ -294,13 +281,13 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                             selectedLabel={selectedLabel}
                             Options={Employees_Data?.Available_Status} 
                             Label="status"
-                            className='text-sm text-neutral-600 rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
+                            className='text-sm rounded-lg px-3 py-1.5 min-w-[150px] w-full max-w-[300px]'
                         />
                         {/* <DropDown /> */}
                     </div>
                 </div>
             </div>
-            <span className='flex bg-neutral-200 w-full h-px my-3'/>
+            <span className='flex bg-neutral-700/60 w-full h-px my-3'/>
 
 
             {/* --- Table Header --- */}
@@ -309,7 +296,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
             >
                 <thead>
                     <tr
-                        className='w-full border border-neutral-300'
+                        className='w-full border border-neutral-700/60 bg-neutral-800/60'
                         >
                         {/* <th className='py-1.5 px-3 text-left text-sm capitalize font-semibold'><input type='checkbox'/> </th> */}
                         <th className='py-1.5 px-3 text-left text-sm capitalize font-semibold'>#</th>
@@ -330,8 +317,8 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                         return (
                             <tr
                                 key={employer.id}
-                                className={`border border-neutral-300
-                                    ${isOpenOptions === idx ? "bg-neutral-200" : "hover:bg-blue-50"}`}
+                                className={`border border-neutral-700/60
+                                    ${isOpenOptions === idx ? "bg-neutral-700/60" : "hover:bg-neutral-800/60"}`}
                             >
                                 {/* <td className='p-3 text-left text-xs'>
                                     <input type='checkbox'/>
@@ -364,9 +351,9 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                                 <td className='relative p-3 text-center text-xs'>
                                     <button
                                         onClick={() => setIsOpenOptions(isOpenOptions === idx ? null : idx)}
-                                        className='cursor-pointer hover:bg-neutral-600/10 rounded-lg p-1'
+                                        className='cursor-pointer hover:bg-neutral-700/60 rounded-lg p-1'
                                     >
-                                        <SlOptionsVertical size={14} className='text-neutral-500'/>
+                                        <SlOptionsVertical size={14} className='text-neutral-300'/>
                                     </button>
                                     {(
                                         <OptionMenu setIsOpenOptions={setIsOpenOptions} key={idx} isOpenOptions={isOpenOptions === idx} EmployeesData={Employees_Data.data} CurrentIndex={idx} />
@@ -376,9 +363,9 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                         )
                     })}
                     {/* Pagination */}
-        <tr className="border border-neutral-300 bg-white">
+        <tr className="border border-neutral-700/60 bg-neutral-800/60">
           <td colSpan={9} className="p-3">
-            <div className="flex items-center justify-between text-sm text-neutral-600">
+            <div className="flex items-center justify-between text-sm text-neutral-400">
 
               {/* Info */}
               <span>
@@ -393,7 +380,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-2.5 py-1.5 text-white cursor-pointer bg-blue-600 rounded-md text-xs
+                  className="px-2.5 py-1.5 font-semibold text-neutral-700 cursor-pointer bg-white rounded-md text-xs
                   disabled:opacity-40 disabled:cursor-not-allowed disabled:cursor-not-allowed"
                 >
                   Prev
@@ -408,11 +395,11 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                       <button
                         key={page}
                         onClick={() => goToPage(page)}
-                        className={`px-2.5 p-1.5 border border-blue-600 rounded-md text-xs
+                        className={`px-2.5 p-1.5 border border-neutral-700/60 rounded-md text-xs
                           ${
                             page === currentPage
-                              ? "bg-blue-600 text-white"
-                              : "hover:bg-blue-100 cursor-pointer"
+                              ? "bg-neutral-800/60 text-white"
+                              : "hover:bg-neutral-700/60 cursor-pointer"
                           }`}
                       >
                         {page}
@@ -426,7 +413,7 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages || Employees_Data.TotalEmployees === 0}
-                  className="px-2.5 py-1.5 text-white cursor-pointer bg-blue-600 rounded-md text-xs
+                  className="px-2.5 py-1.5 text-neutral-700 cursor-pointer bg-white font-semibold rounded-md text-xs
                   disabled:opacity-40 disabled:cursor-not-allowed disabled:cursor-not-allowed"
                 >
                   Next
