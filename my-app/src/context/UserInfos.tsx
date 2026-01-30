@@ -1,6 +1,6 @@
 "use client";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"; // Use the new Browser Client
+import { SupabaseClient } from "@/lib/supabase/client"; 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,8 +8,8 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "employee";
-  avatar_url: string;
+  role: "admin" | "employee" | "guest";
+  avatar_url: string | null;
 }
 
 interface UserContextType {
@@ -22,66 +22,80 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserInfosProvider = ({ children }: { children: React.ReactNode }) => {
   const [userInfos, setUserInfos] = useState<User | null>(null);
   const [isLoadingUserInfos, setIsLoadingUserInfos] = useState(true);
-  
-  // Use the Browser Client
-  const supabase = createSupabaseBrowserClient();
+  const supabase = SupabaseClient();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUserInfo = async (userId: string) => {
-      // Fetch from your custom users table
-      const { data: user, error } = await supabase
-        .from("users")
-        .select("id, name, email, role, avatar_url")
-        .eq("id", userId)
-        .single();
+    let isMounted = true; // 🔹 لمنع تحديث state بعد unmount
 
-      if (error || !user) {
-        console.error("Error fetching user details:", error);
-        setUserInfos(null);
-      } else {
-        setUserInfos({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar_url: user.avatar_url,
-        });
+    const fetchUserInfo = async (userId: string) => {
+      try {
+        const { data: user, error } = await supabase
+          .from("users")
+          .select("id, name, email, role, avatar_url")
+          .eq("id", userId)
+          .single();
+
+        if (!isMounted) return;
+
+        if (error || !user) {
+          console.error("Error fetching user details:", error);
+          setUserInfos(null);
+        } else {
+          setUserInfos({
+            id: user.id,
+            name: user.name || "No Name",
+            email: user.email,
+            role: user.role || "guest",
+            avatar_url: user.avatar_url || null,
+          });
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        if (isMounted) setUserInfos(null);
+      } finally {
+        if (isMounted) setIsLoadingUserInfos(false);
       }
-      setIsLoadingUserInfos(false);
     };
 
     const initializeAuth = async () => {
-        setIsLoadingUserInfos(true);
-        // Check active session on mount
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
+      setIsLoadingUserInfos(true);
+      try {
+        const { data } = await supabase.auth.getSession();
+        const session = data.session;
+
+        if (session?.user?.id) {
           await fetchUserInfo(session.user.id);
         } else {
           setUserInfos(null);
           setIsLoadingUserInfos(false);
         }
+      } catch (err) {
+        console.error(err);
+        setUserInfos(null);
+        setIsLoadingUserInfos(false);
+      }
     };
 
     initializeAuth();
 
-    // Listen for Auth Changes (Login, Logout, Auto-Refresh)
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
-          await fetchUserInfo(session.user.id);
-          router.refresh(); // 🔥 Force Server Components to re-render
-        } else if (event === "SIGNED_OUT") {
-          setUserInfos(null);
-          setIsLoadingUserInfos(false);
-          router.refresh(); // 🔥 Force Server Components to clear data
-        }
+    // Subscription for auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+
+      if (event === "SIGNED_IN" && session?.user?.id) {
+        await fetchUserInfo(session.user.id);
+      } else if (event === "SIGNED_OUT") {
+        setUserInfos(null);
+        setIsLoadingUserInfos(false);
       }
-    );
+
+      router.refresh(); // تحديث Server Components
+    });
 
     return () => {
-      subscription.subscription.unsubscribe();
+      isMounted = false;
+      authListener.subscription.unsubscribe(); // تنظيف الاشتراك
     };
   }, [supabase, router]);
 

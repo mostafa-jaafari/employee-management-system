@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #171717;
     --foreground: #ededed;
   }
 }
@@ -22,4 +22,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+.bg-section {
+  background-color: #1F1F1F;
+}
+
+.bg-section-h {
+  background-color: #1F1F1F;
+}
+.bg-section-h:hover {
+  background-color: #1a1a1a;
 }

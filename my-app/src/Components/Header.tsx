@@ -73,9 +73,9 @@ export function Header() {
                     value={searchInput}
                     maxLength={50}
                     placeholder='Search here...'
-                    className='text-sm min-w-[300px] bg-white px-3 py-2 rounded-lg 
-                        outline-none border-b border-neutral-400 focus:border-blue-400 
-                        ring ring-neutral-300 focus:ring-blue-400'
+                    className='text-sm min-w-[300px] bg-section-h px-3 py-2 rounded-lg 
+                        outline-none border-b border-neutral-600/60 focus:border-blue-400 
+                        ring ring-neutral-700/60 focus:ring-blue-400'
                 />
                 <span
                     className='flex items-center gap-3 text-neutral-600'
@@ -93,12 +93,13 @@ export function Header() {
                         role='button'
                         ref={Open_Menu_Ref}
                         onClick={() => setIsOpenMenu(!isOpenMenu)}
-                        className={`relative cursor-pointer hover:bg-neutral-200 
-                            p-0.5 rounded-lg flex items-center gap-1.5 min-w-44
-                            ${isOpenMenu ? "bg-neutral-200" : ""}`}
+                        className={`relative cursor-pointer hover:bg-neutral-800 
+                            px-1 py-0.5 rounded-lg flex items-center gap-1.5 min-w-44
+                            border hover:border-neutral-700/60
+                            ${isOpenMenu ? "bg-neutral-800 border-neutral-700/60" : "border-transparent"}`}
                     >
                         <div
-                            className='relative w-10 h-10 flex justify-center items-center bg-gradient-to-r from-blue-300 to-blue-600 rounded-full overflow-hidden border-2 border-white'
+                            className='relative w-9 h-9 flex justify-center items-center bg-gradient-to-r from-blue-300 to-blue-600 rounded-full overflow-hidden border-2 border-white'
                         >
                             {userInfos?.avatar_url ? (
                                 <Image
@@ -116,7 +117,7 @@ export function Header() {
                         <span
                             className="flex flex-col"
                         >
-                            <h1 className='text-sm max-w-[120px] truncate text-neutral-600 font-semibold'>{userInfos.name || userInfos.email.split('@')[0]}</h1>
+                            <h1 className='text-sm max-w-[120px] truncate text-neutral-100 font-semibold'>{userInfos.name || userInfos.email.split('@')[0]}</h1>
                             <p className='text-xs max-w-[140px] truncate text-gray-400'>{userInfos.email}</p>
                         </span>
 
@@ -126,18 +127,18 @@ export function Header() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.3, ease: "easeOut" }}
-                                className='absolute z-50 left-0 top-full mt-1 bg-white w-full 
+                                className='absolute z-50 left-0 top-full mt-1 bg-neutral-800 w-full 
                                     space-y-0.5 text-sm rounded-lg shadow-lg p-1.5
-                                    flex flex-col border border-neutral-200/80'
+                                    flex flex-col border border-neutral-700/60'
                             >
                                 {NavigationMenuLinks.map((nav, idx) => {
                                     return (
                                         <Link
                                             href={`/u/${userInfos.role}/${nav.href}`}
                                             key={idx}
-                                            className='capitalize flex items-center gap-1.5 
-                                                hover:bg-neutral-100 cursor-pointer py-1 px-1.5 
-                                                text-neutral-500 hover:text-neutral-700 rounded-lg'
+                                            className='capitalize flex items-center gap-2
+                                                hover:bg-neutral-700/60 cursor-pointer py-1.5 px-2 
+                                                text-neutral-500 hover:text-neutral-100 rounded-lg'
                                         >
                                             <nav.icon size={16} /> {nav.name}
                                         </Link>

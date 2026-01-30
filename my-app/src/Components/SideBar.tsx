@@ -1,7 +1,7 @@
 "use client";
 import { useUserInfos } from "@/context/UserInfos";
-import Image from "next/image"
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineApartment } from "react-icons/ai";
 import { FaArrowsAltH, FaUsers } from "react-icons/fa";
@@ -13,7 +13,7 @@ import { RiInboxFill } from "react-icons/ri";
 
 const SideBar__Navigations = [
     { name: "home", href:"", icon: GoHomeFill },
-    { name: "my task", href:"task", icon: FaFolderTree },
+    { name: "my task", href:"tasks", icon: FaFolderTree },
     { name: "inbox", href: "inbox", icon: RiInboxFill },
     { name: "employees", href: "employees", icon: FaUsers },
     { name: "dapartments", href: "departments", icon: AiOutlineApartment }
@@ -21,6 +21,11 @@ const SideBar__Navigations = [
 export function SideBar(){
     const [isOpen, setIsOpen] = useState(true);
 
+    const pathname = usePathname();
+    const isActive = (href: string) => {
+        const fullPath = `/u/${User_Role}/${href}`;
+        return pathname === fullPath || pathname.startsWith(`${fullPath}/`) || (href === "" && pathname === `/u/${User_Role}`);
+    };
     const { userInfos, isLoadingUserInfos } = useUserInfos();
     const User_Role = userInfos?.role as "employee" | "admin";
     
@@ -30,47 +35,47 @@ export function SideBar(){
         SideBar__Navigations;
     return (
         <div
-            className={`group sticky top-0 w-full h-screen py-1.5
+            className={`group sticky top-0 w-full h-screen py-1.5 border-r border-transparent hover:border-neutral-700/60
                 ${isOpen ? "max-w-54 px-3" : "max-w-14 flex flex-col items-center"} transition-width duration-300`}
         >
             <div
-                className="w-full flex items-center justify-between"
+                className={`w-full flex items-center mt-3 px-3 ${isOpen ? "justify-between" : "justify-center"}`}
             >
-                <span className="w-max flex items-center">
-                    <Image
+                <span className="flex justify-center items-center">
+                    {/* <Image
                         src="/STAFFY-LOGO.png"
                         quality={100}
                         priority
                         width={60}
                         height={60}
                         alt="STAFFY-LOGO.png"
-                    />
+                    /> */}
                     <h1
                         className={`font-bold text-xl uppercase text-blue-600
-                            ${isOpen ? "block" : "hidden"}`}
+                            ${isOpen ? "" : "group-hover:opacity-0 opacity-100"}`}
                     >
-                        STAFFY
+                        {isOpen ? "STAFFY" : "S"}
                     </h1>
                 </span>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={`absolute right-0 w-full flex
-                        ${isOpen ? "flex justify-end pr-3" : "bg-gray-100 w-full h-12 items-center justify-center hidden group-hover:flex"}`}
+                        ${isOpen ? "flex justify-end pr-3" : "w-full h-12 items-center justify-center group-hover:opacity-100 opacity-0"}`}
                 >
                     {isOpen ?
                         <FiSidebar
                             size={26}
-                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700/10 transition-colors duration-200"
+                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700 transition-colors duration-200"
                         /> 
                         : <FaArrowsAltH
                             size={26}
-                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700/10 transition-colors duration-200"
+                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700 transition-colors duration-200"
                         />}
                 </button>
             </div>
             <ul
-                className={`flex flex-col px-1.5 my-3
-                    ${isOpen ? "" : "gap-1 w-max"}`}
+                className={`flex flex-col px-1 my-3
+                    ${isOpen ? "gap-0.5" : "gap-1.5 w-max"}`}
             >
                 {isLoadingUserInfos ? 
                     Array(4).fill(0).map((_, idx) => {
@@ -84,9 +89,12 @@ export function SideBar(){
                         <Link
                             key={idx}
                             href={`/u/${User_Role}/${nav.href}`}
-                            className="capitalize hover:bg-neutral-400/20 hover:text-neutral-700 px-1.5 py-1 rounded text-neutral-600 flex items-center gap-1.5 font-semibold text-sm"
+                            className={`capitalize border
+                                px-2 py-1.5 rounded-lg flex items-center gap-2
+                                font-semibold text-sm
+                                ${isActive(nav.href) ? "bg-neutral-800 text-neutral-200 border-neutral-700/60" : "border-transparent hover:bg-neutral-800 hover:text-neutral-200 text-neutral-500"}`}
                         >
-                            <nav.icon size={isOpen ? 16 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>
+                            <nav.icon size={isOpen ? 18 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>
                         </Link>
                     )
                 })}

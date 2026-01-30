@@ -1,5 +1,5 @@
 "use client";
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { SupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react'
 import { FaGoogle, FaStarOfLife } from 'react-icons/fa';
@@ -21,7 +21,8 @@ export function LoginForm() {
     }
 
     const router = useRouter();
-
+    
+    const supabase = SupabaseClient();
     const HandleSubmitForm = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -42,7 +43,6 @@ export function LoginForm() {
         toast.success("welcome back!");
     }
 
-    const supabase = createSupabaseBrowserClient();
     const signInWithProvider = async (provider: "google", e: MouseEvent) => {
         e.preventDefault();
         try {

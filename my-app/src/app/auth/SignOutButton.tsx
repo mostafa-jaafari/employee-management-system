@@ -1,6 +1,6 @@
 "use client"; // 1. Ensure this is a client component
 
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { SupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation'; // 2. Import useRouter
 import { toast } from 'sonner';
 
@@ -8,7 +8,7 @@ export function SignOutButton({ className }: { className: string }) {
     const router = useRouter(); // 3. Initialize router
     
     const HandleSignOut = async () => {
-        const supabase = createSupabaseBrowserClient();
+        const supabase = SupabaseClient();
         
         // 4. Perform the sign out
         const { error } = await supabase.auth.signOut();

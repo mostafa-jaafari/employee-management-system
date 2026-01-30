@@ -8,7 +8,7 @@ import { ConfirmationModalProvider } from "@/context/ConfirmationModal";
 export default function RootLayout({ children }: { children: React.ReactNode }){
     return (
         <main
-            className="w-full h-screen overflow-x-hidden overflow-y-auto bg-gray-100 text-neutral-800"
+            className="w-full h-screen overflow-x-hidden overflow-y-auto text-neutral-100"
         >
             <ConfirmationModalProvider>
                 <div
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }){
                     >
                         <Header />
                         <div
-                            className="w-full border border-neutral-300 rounded-lg overflow-hidden p-3 bg-white"
+                            className="w-full overflow-hidden"
                         >
                             {children}
                         </div>

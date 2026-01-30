@@ -6,29 +6,23 @@ type StatCardProps = {
     Title: string;
     Value: number;
     Icon: IconType;
-    BgColor: string;
-    IconColor: string;
-    BgIconColor: string;
-    BorderColor: string;
 }
-export function StatCard({ Title, Value, Icon, BgColor, IconColor, BgIconColor, BorderColor }: StatCardProps) {
+export function StatCard({ Title, Value, Icon }: StatCardProps) {
   return (
     <div
-        className={`${BgColor} w-full min-h-20 flex gap-3 items-center 
-            justify-start p-3 border ${BorderColor} rounded-lg`}
+        className="w-full min-h-20 flex gap-3 items-center 
+            justify-start p-3 border rounded-lg bg-section-h
+            border border-neutral-700/60"
     >
         <span
-            className={`flex w-max p-1.5 rounded-lg
-                ${IconColor} ${BgIconColor}`}
+            className="flex w-max p-2 rounded-lg bg-neutral-800 border border-neutral-700/20"
         >
             <Icon size={24} />
         </span>
 
-        <span
-            className='-space-y-1'
-        >
-            <p className='capitalize text-neutral-500 text-sm'>{Title}</p>
-            <h1 className='text-lg font-bold text-neutral-600'>{Value}</h1>
+        <span>
+            <p className='capitalize text-neutral-300 text-sm font-semibold'>{Title}</p>
+            <h1 className='text-md font-semibold text-neutral-500'>{Value}</h1>
         </span>
     </div>
   )

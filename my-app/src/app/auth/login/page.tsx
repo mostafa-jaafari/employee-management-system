@@ -2,7 +2,7 @@ import { LoginForm } from './LoginForm'
 import { FaStarOfLife } from 'react-icons/fa'
 
 export default function page() {
-  return (
+    return (
     <main
         className='w-full h-screen p-6 flex items-start justify-between gap-6 overflow-auto bg-white text-neutral-800'
     >
