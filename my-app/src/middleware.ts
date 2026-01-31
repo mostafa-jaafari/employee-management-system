@@ -12,6 +12,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/set-role', request.url));
   }
 
+  if(!UserRole && pathname === "/auth/set-role") {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+
   // 4️⃣ إعادة التوجيه حسب الدور
   if (pathname.startsWith('/u/admin') && UserRole === 'employee') {
     return NextResponse.redirect(new URL('/u/employee', request.url));
