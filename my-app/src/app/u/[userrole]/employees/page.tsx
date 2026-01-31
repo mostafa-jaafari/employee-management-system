@@ -2,7 +2,6 @@ import { EmployeesData } from "@/data/EmployeesData";
 import { EmployeesTable } from "./EmployeesTable";
 
 
-export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {

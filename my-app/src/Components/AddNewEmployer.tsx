@@ -65,16 +65,6 @@ export function AddNewEmployer() {
 
     const [newDepartment, setNewDepartment] = useState("");
 
-    const [departments, setDepartments] = useState<string[]>([]);
-    const fetchDepartments = () => {
-        fetch("/api/departments")
-        .then(res => res.json())
-        .then(data => setDepartments(data));
-    }
-    useEffect(() => {
-        fetchDepartments()
-    },[DepartmentsHook])
-
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setInputs(prevInputs => ({
@@ -171,7 +161,6 @@ export function AddNewEmployer() {
             mutateDepartments();
             setIsLoadingAddNewDepartment(false);
             setNewDepartment("");
-            fetchDepartments();
         }catch (err){
             toast.error((err as { message: string }).message);
             setIsLoadingAddNewDepartment(false);
@@ -206,12 +195,12 @@ export function AddNewEmployer() {
                     
                     {/* --- ADD New Department Body --- */}
 
-                    {departments.length > 0 ? 
+                    {DepartmentsHook.length > 0 ? 
                         (
                             <ul
                                 className='w-full p-3 grid grid-cols-3 gap-1.5'
                             >
-                                {departments.slice(0, 9)
+                                {DepartmentsHook.slice(0, 9)
                                     .map((dep, idx) => {
                                         return (
                                             <div
@@ -405,7 +394,7 @@ export function AddNewEmployer() {
                                 HandleSelectOption={(option) => setInputs({...inputs, department: option})}
                                 selectedLabel={inputs.department || ''}
                                 DefaultAllButton={false}
-                                Options={departments}
+                                Options={DepartmentsHook}
                                 className='w-full py-3 rounded-lg px-3 text-sm'
                             />
                         </div>
