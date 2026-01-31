@@ -15,18 +15,13 @@ export async function AddNewEmployerAction(formData: FormData, userRole: "admin"
     const status = formData.get('status') as string;
     const department = formData.get('department') as string;
     const hired_at = formData.get('hired_at') as string;
+    const chef_admin = formData.get('chef_admin') as string;
 
     if(userRole === "employee"){
         return { success: false, message: "Sorry, employees can't add employees" }
     }
 
-    const { data, error } = await supabase.auth.admin.inviteUserByEmail(
-        email,
-        {
-            redirectTo: "https://fluffy-fortnight-gw56pw6p6v5hw446-3000.app.github.dev/auth/set-password"
-        });
-
-    await supabase
+    const { data, error } = await supabase
         .from("employees")
         .insert([
             {
@@ -38,34 +33,16 @@ export async function AddNewEmployerAction(formData: FormData, userRole: "admin"
                 status: status.toUpperCase(),
                 department,
                 hired_at,
+                chef_admin,
                 role: "employee"
             }
         ])
         if(error){
-            return { success: false, message: error.message, data: null };
+            return { success: false, message: `Insert Error : --${error.message}--`, data: null };
         }
     
         updateTag("Employees-Data");
     return { success: true, message: "Employer added successfully.", data: data };
-}
-
-
-export async function UpdateEmployeeUser(password: string){
-    const supabase = await createSupabaseServerClient();
-
-    if(password.length < 6){
-        return { success: false, message: "Password should be atleast 6 caracters !" }
-    }
-
-    const { error } = await supabase.auth.updateUser({
-        password: password,
-    })
-
-    if(error){
-        return { success: false, message: error.message }
-    }
-
-    return { success: true, message: "Password created successfully." }
 }
 
 export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "employee" | "guest"){

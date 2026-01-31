@@ -35,8 +35,8 @@ export function SideBar(){
         SideBar__Navigations;
     return (
         <div
-            className={`group sticky top-0 w-full h-screen py-1.5 border-r border-transparent hover:border-neutral-700/60
-                ${isOpen ? "max-w-54 px-3" : "max-w-14 flex flex-col items-center"} transition-width duration-300`}
+            className={`group sticky top-0 w-full h-screen py-1.5 border-r
+                ${isOpen ? "max-w-54 px-3 border-transparent hover:border-neutral-700/60" : "max-w-14 flex flex-col items-center border-neutral-700/60"} transition-width duration-300`}
         >
             <div
                 className={`w-full flex items-center mt-3 px-3 ${isOpen ? "justify-between" : "justify-center"}`}
@@ -51,8 +51,8 @@ export function SideBar(){
                         alt="STAFFY-LOGO.png"
                     /> */}
                     <h1
-                        className={`font-bold text-xl uppercase text-blue-600
-                            ${isOpen ? "" : "group-hover:opacity-0 opacity-100"}`}
+                        className={`font-bold uppercase text-blue-600
+                            ${isOpen ? "text-xl" : "text-3xl group-hover:opacity-0 opacity-100"}`}
                     >
                         {isOpen ? "STAFFY" : "S"}
                     </h1>
@@ -60,16 +60,16 @@ export function SideBar(){
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={`absolute right-0 w-full flex
-                        ${isOpen ? "flex justify-end pr-3" : "w-full h-12 items-center justify-center group-hover:opacity-100 opacity-0"}`}
+                        ${isOpen ? "justify-end pr-4" : "justify-center group-hover:opacity-100 opacity-0"}`}
                 >
                     {isOpen ?
                         <FiSidebar
-                            size={26}
-                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700 transition-colors duration-200"
+                            size={34}
+                            className="px-1.5 bg-neutral-800 text-neutral-400 hover:text-neutral-200 border border-transparent hover:border-neutral-700/60 cursor-pointer rounded-lg transition-colors duration-200"
                         /> 
                         : <FaArrowsAltH
-                            size={26}
-                            className="text-neutral-500 cursor-pointer p-0.5 rounded hover:bg-neutral-700 transition-colors duration-200"
+                            size={36}
+                            className="px-1.5 bg-neutral-800 text-neutral-400 hover:text-neutral-200 border border-transparent hover:border-neutral-700/60 cursor-pointer rounded-lg transition-colors duration-200"
                         />}
                 </button>
             </div>

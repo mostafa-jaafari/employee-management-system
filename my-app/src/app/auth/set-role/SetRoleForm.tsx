@@ -1,5 +1,5 @@
 "use client";
-import { SetRole } from "@/app/actions/SetRole";
+import { SetRoleAction } from "@/app/actions/SetRoleAction";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
@@ -18,10 +18,11 @@ export function SetRoleForm() {
         if(!selectedRole) return;
         try{
             setIsLoadingSubmit(true);
-            const res = await SetRole(selectedRole);
+            const res = await SetRoleAction(selectedRole);
             const Role = res.role;
             if(res.success){
                 toast.success("Role set successfully.");
+                router.refresh();
                 router.push(Role === "admin" ? "/u/admin" : "/u/employee");
             } else {
                 toast.error(res.message);

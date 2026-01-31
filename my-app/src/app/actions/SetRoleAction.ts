@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 
 
-export async function SetRole(role: "admin" | "employee") {
+export async function SetRoleAction(role: "admin" | "employee") {
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase

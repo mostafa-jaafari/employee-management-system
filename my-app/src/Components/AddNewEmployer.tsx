@@ -102,6 +102,7 @@ export function AddNewEmployer() {
                 formData.append('status', inputs.status.toUpperCase() || '');
                 formData.append('department', inputs.department || '');
                 formData.append('hired_at', inputs.hired_at || '');
+                formData.append('chef_admin', userInfos?.id || '');
             
                 if(!userInfos) {
                     toast.error("Please authenticated first !");
