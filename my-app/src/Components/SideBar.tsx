@@ -31,7 +31,7 @@ export function SideBar(){
     const User_Role = userInfos?.role as "employee" | "admin";
     
     const SideBarNavigations = User_Role === "employee" ? 
-        SideBar__Navigations.filter((item) => (item.name !== "dapartments" && item.name !== "employees"))
+        SideBar__Navigations.filter((item) => (item.name !== "departments" && item.name !== "employees" && item.name !== "positions"))
         :
         SideBar__Navigations;
     return (
@@ -79,9 +79,9 @@ export function SideBar(){
                     ${isOpen ? "gap-0.5" : "gap-1.5 w-max"}`}
             >
                 {isLoadingUserInfos ? 
-                    Array(4).fill(0).map((_, idx) => {
+                    Array(6).fill(0).map((_, idx) => {
                         return (
-                            <span key={idx} className="mb-1.5 w-full h-6 rounded bg-neutral-300 animate-pulse" />
+                            <span key={idx} className="mb-0.5 w-full h-7 rounded bg-neutral-800 animate-pulse" />
                         )
                     })
                 :
@@ -90,12 +90,28 @@ export function SideBar(){
                         <Link
                             key={idx}
                             href={`/u/${User_Role}/${nav.href}`}
-                            className={`capitalize border
-                                px-2 py-1.5 rounded-lg flex items-center gap-2
-                                font-semibold text-sm
-                                ${isActive(nav.href) ? "bg-neutral-800 text-neutral-200 border-neutral-700/60" : "border-transparent hover:bg-neutral-800 hover:text-neutral-200 text-neutral-500"}`}
+                            
                         >
-                            <nav.icon size={isOpen ? 18 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>
+                            <div
+                                className={`capitalize border
+                                    px-2 py-1.5 rounded-lg flex items-center gap-2
+                                    font-semibold text-sm
+                                    ${isActive(nav.href) ? "bg-neutral-800 text-neutral-200 border-neutral-700/60" : "border-transparent hover:bg-neutral-800 hover:text-neutral-200 text-neutral-500"}`}
+                            >
+                                <nav.icon size={isOpen ? 18 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>
+                            </div>
+                            {nav.name === "inbox" && (
+                                <div
+                                    className={`${isOpen && "pl-2"} mt-1 flex items-center gap-1.5`}
+                                >
+                                    {isOpen && (
+                                        <h2 className="text-xs font-[550] text-neutral-600 capitalize">
+                                        Admin
+                                    </h2>
+                                    )}
+                                    <span className="flex w-full h-px bg-neutral-700/60" />
+                                </div>
+                            )}
                         </Link>
                     )
                 })}
