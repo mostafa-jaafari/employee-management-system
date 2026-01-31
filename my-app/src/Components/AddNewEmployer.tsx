@@ -102,12 +102,19 @@ export function AddNewEmployer() {
                 setIsLoadingAddNewEmployer(true);
                 const Result = await AddNewEmployerAction(formData, userInfos?.role);
                 if(!Result.success){
-                    toast.error(Result.message)
+                    let ErrorMessage;
+                    if(Result.message.includes("duplicate key value")){
+                        ErrorMessage = "Employer Email already exists. Please use a different email.";
+                    }else{
+                        ErrorMessage = Result.message;
+                    }
+                    toast.error(ErrorMessage)
                     setIsLoadingAddNewEmployer(false);
                     return;
                 }
                 setIsLoadingAddNewEmployer(false);
-                toast.success("New Employer Added Successfully.");
+                setIsOpenAddNewEmployer(false);
+                toast.success("Employer Added Successfully.");
             }else{
                 if(!employeeDataToUpdate) return;
                 setIsLoadingUpdateEmployer(true);
@@ -130,6 +137,7 @@ export function AddNewEmployer() {
                 }
                 setIsLoadingUpdateEmployer(false);
                 setEmployeeDataToUpdate(null);
+                setIsOpenAddNewEmployer(false);
                 toast.success("Employee Updated Successfully.");
             }
             setIsOpenAddNewEmployer(false);
@@ -161,6 +169,7 @@ export function AddNewEmployer() {
             mutateDepartments();
             setIsLoadingAddNewDepartment(false);
             setNewDepartment("");
+            setIsOpenAddNewDepartment(false)
         }catch (err){
             toast.error((err as { message: string }).message);
             setIsLoadingAddNewDepartment(false);
@@ -187,7 +196,7 @@ export function AddNewEmployer() {
                         <h1 className='text-sm text-neutral-300'>Add New Department</h1>
                         <button
                             onClick={() => setIsOpenAddNewDepartment(false)}
-                            className='cursor-pointer text-neutral-500 hover:text-neutral-700'
+                            className='cursor-pointer text-neutral-500 hover:text-neutral-300'
                         >
                             <FaXmark size={16}/>
                         </button>
@@ -259,7 +268,7 @@ export function AddNewEmployer() {
                             />
                         </div>
                         <div
-                            className='w-full p-3 border-t border-neutral-200'
+                            className='w-full p-3 border-t border-neutral-700/60'
                         >
                             <button
                                 onClick={HandleAddNewDepartment}

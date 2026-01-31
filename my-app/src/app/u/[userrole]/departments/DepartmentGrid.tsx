@@ -124,7 +124,7 @@ export function DepartmentGrid() {
         </div>
       ) : (
         // Empty State
-        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+        <div className="flex flex-col items-center justify-center py-16 border border-neutral-700/60 rounded-lg bg-section">
           <div className="text-gray-400 mb-3">
             <AiOutlineApartment size={40} />
           </div>
@@ -132,7 +132,7 @@ export function DepartmentGrid() {
           <p className="text-gray-400 text-sm mb-4">Get started by adding a new one</p>
           <button
             onClick={() => setIsOpenAddNewDepartment(true)}
-            className="text-blue-600 hover:underline text-sm font-medium"
+            className="cursor-pointer text-blue-600 hover:underline text-sm font-medium"
           >
             Create your first department
           </button>

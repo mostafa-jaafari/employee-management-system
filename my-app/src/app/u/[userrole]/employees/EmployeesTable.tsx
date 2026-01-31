@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaTrash } from 'react-icons/fa6';
 import { HiOutlineDownload } from 'react-icons/hi';
-import { MdModeEdit, MdPersonAddAlt1 } from 'react-icons/md';
+import { MdFilterAltOff, MdModeEdit, MdPersonAddAlt1 } from 'react-icons/md';
 import { SlOptionsVertical } from 'react-icons/sl';
 import { toast } from 'sonner';
 
@@ -209,7 +209,12 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
             toast.error((err as { message: string }).message);
             setIsLoadingDownload(false);
         }
+    }
 
+    const HandleClearFilter = () => {
+        setSelectedLabel("");
+        setSearchTableInput("");
+        router.push(`/u/admin/employees`);
     }
 
     return (
@@ -273,8 +278,17 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                     </div>
 
                     <div
-                        className='flex items-center gap-3'
+                        className='flex items-center gap-1.5'
                     >
+                        {(searchParams.get("status") || searchParams.get("q")) &&
+                        (
+                            <button
+                                onClick={HandleClearFilter}
+                                className='flex items-center gap-1.5 bg-red-800/40 hover:bg-red-800/20 text-nowrap text-red-400 cursor-pointer text-sm px-3 py-1.5 border border-red-800 rounded-lg'
+                            >
+                                Clear Filters <MdFilterAltOff size={16}/>
+                            </button>
+                        )}
                         {/* DropDowns */}
                         <DropDown 
                             HandleSelectOption={(option, e) => HandleSelectOption("status", option, e)}
