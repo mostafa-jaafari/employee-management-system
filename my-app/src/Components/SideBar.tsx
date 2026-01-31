@@ -13,7 +13,7 @@ import { RiInboxFill } from "react-icons/ri";
 
 const SideBar__Navigations = [
     { name: "home", href:"", icon: GoHomeFill },
-    { name: "my task", href:"tasks", icon: FaFolderTree },
+    { name: "tasks", href:"tasks", icon: FaFolderTree },
     { name: "inbox", href: "inbox", icon: RiInboxFill },
     { name: "employees", href: "employees", icon: FaUsers },
     { name: "departments", href: "departments", icon: AiOutlineApartment },
@@ -100,7 +100,7 @@ export function SideBar(){
                             >
                                 <nav.icon size={isOpen ? 18 : 20}/> <span className={isOpen ? "block" : "hidden"}>{nav.name}</span>
                             </div>
-                            {nav.name === "inbox" && (
+                            {(nav.name === "inbox" && User_Role === "admin") && (
                                 <div
                                     className={`${isOpen && "pl-2"} mt-1 flex items-center gap-1.5`}
                                 >

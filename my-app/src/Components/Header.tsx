@@ -19,7 +19,7 @@ const Header_Links = [
 
 const Navigation_Menu_Links = [
     { name: "home", href:"", icon: GoHomeFill },
-    { name: "my task", href:"task", icon: FaFolderTree },
+    { name: "tasks", href:"tasks", icon: FaFolderTree },
     { name: "inbox", href: "inbox", icon: RiInboxFill },
     { name: "employees", href: "employees", icon: FaUsers },
 ];
@@ -136,15 +136,19 @@ export function Header() {
                                         <Link
                                             href={`/u/${userInfos.role}/${nav.href}`}
                                             key={idx}
-                                            className='capitalize flex items-center gap-2
-                                                hover:bg-neutral-700/60 cursor-pointer py-1.5 px-2 
-                                                text-neutral-500 hover:text-neutral-100 rounded-lg'
                                         >
-                                            <nav.icon size={16} /> {nav.name}
+                                            <div
+                                                className="capitalize flex items-center gap-2
+                                                    hover:bg-neutral-700/60 cursor-pointer py-1.5 px-2 
+                                                    text-neutral-400 hover:text-neutral-100"
+                                                    >
+                                                <nav.icon size={16} /> {nav.name}
+                                            </div>
+                                            {idx !== NavigationMenuLinks.length -1 && <span className="border-b border-neutral-700/60 w-full block" />}
                                         </Link>
                                     )
                                 })}
-                                <SignOutButton className='bg-red-500 hover:bg-red-600 text-sm text-white px-6 py-1 rounded-lg cursor-pointer'/>
+                                <SignOutButton className='bg-red-800 border border-red-600 hover:bg-red-800/80 text-sm text-white px-6 py-1 rounded cursor-pointer'/>
                             </motion.div>
                         )}
                     </div>
