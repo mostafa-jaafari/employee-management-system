@@ -1,8 +1,8 @@
 "use client";
-import { DeleteEmployee } from '@/app/actions/AddNewEmployer';
+import { DeleteEmployeeAction } from '@/app/actions/AddNewEntity';
 import { ConfirmationModal } from '@/Components/ConfirmationModal';
 import { DropDown } from '@/Components/DropDown';
-import { useAddNewEmployer } from '@/context/AddNewEmployer';
+import { useAddNewEntity } from '@/context/AddNewEntityProvider';
 import { useConfirmationModal } from '@/context/ConfirmationModal';
 import { useUserInfos } from '@/context/UserInfos';
 import { EmployerType } from '@/types/Employer';
@@ -23,7 +23,7 @@ const OptionsMenu = [
 const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptions }: { EmployeesData: EmployerType[]; CurrentIndex: number; isOpenOptions: boolean; setIsOpenOptions: (isOpen: null | number) => void; }) => {
     const { userInfos } = useUserInfos();
     const { setIsConfirmationModalOpen } = useConfirmationModal();
-    const { setIsOpenAddNewEmployer, setEmployeeDataToUpdate } = useAddNewEmployer();
+    const { setIsOpenAddNewEmployer, setEmployeeDataToUpdate } = useAddNewEntity();
     const OptionsMenuRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -50,7 +50,7 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
         }
         setIsLoadingDeleteEmployee(true);
         try{
-            const Result = await DeleteEmployee(EmployeeId, userInfos?.role);
+            const Result = await DeleteEmployeeAction(EmployeeId, userInfos?.role);
             if(!Result.success){
                 toast.error(Result.message);
                 setIsLoadingDeleteEmployee(false);
@@ -119,7 +119,7 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
 }
 const LIMIT = 20;
 export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmployees: number; data: EmployerType[]; Available_Status: string[]; } }) {
-    const { setIsOpenAddNewEmployer } = useAddNewEmployer();
+    const { setIsOpenAddNewEmployer } = useAddNewEntity();
     
     const [isOpenOptions, setIsOpenOptions] = useState<null | number>(null);
 

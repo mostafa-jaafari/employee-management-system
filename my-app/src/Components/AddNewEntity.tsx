@@ -1,10 +1,10 @@
 "use client";
-import { useAddNewEmployer } from '@/context/AddNewEmployer';
+import { useAddNewEntity } from '@/context/AddNewEntityProvider';
 import { FaXmark } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { DropDown } from './DropDown';
-import { AddNewEmployerAction, UpdateEmployee } from '@/app/actions/AddNewEmployer';
+import { AddNewEmployerAction, UpdateEmployeeAction } from '@/app/actions/AddNewEntity';
 import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';
@@ -14,8 +14,8 @@ import { useRouter } from 'next/navigation';
 import { useDepartments } from '@/Hooks/useDepartments';
 
 
-export function AddNewEmployer() {
-    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate } = useAddNewEmployer();
+export function AddNewEntity() {
+    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate } = useAddNewEntity();
     const { userInfos } = useUserInfos();
 
     const { mutateDepartments, departments: DepartmentsHook } = useDepartments(userInfos?.id);
@@ -128,7 +128,7 @@ export function AddNewEmployer() {
                     department: inputs.department,
                     hired_at: inputs.hired_at,
                 };
-                const Result = await UpdateEmployee(employeeDataToUpdate.id.toString(), NewEmployeeUpdatedData, userInfos.role);
+                const Result = await UpdateEmployeeAction(employeeDataToUpdate.id.toString(), NewEmployeeUpdatedData, userInfos.role);
 
                 if(!Result.success){
                     toast.error(Result.message);

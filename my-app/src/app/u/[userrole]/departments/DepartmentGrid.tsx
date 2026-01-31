@@ -10,13 +10,13 @@ import { MdOutlineAddCircle } from "react-icons/md";
 import { DeleteDepartment } from "@/app/actions/Department";
 import { useDepartments } from "@/Hooks/useDepartments";
 import { useUserInfos } from "@/context/UserInfos";
-import { useAddNewEmployer } from "@/context/AddNewEmployer";
+import { useAddNewEntity } from "@/context/AddNewEntityProvider";
 import { useConfirmationModal } from "@/context/ConfirmationModal";
 import { ConfirmationModal } from "@/Components/ConfirmationModal";
 
 export function DepartmentGrid() {
   const { userInfos, isLoadingUserInfos } = useUserInfos();
-  const { setIsOpenAddNewDepartment } = useAddNewEmployer(); // Assuming this opens your Add Modal
+  const { setIsOpenAddNewDepartment } = useAddNewEntity(); // Assuming this opens your Add Modal
   const { setIsConfirmationModalOpen } = useConfirmationModal();
   
   // Use our clean hook

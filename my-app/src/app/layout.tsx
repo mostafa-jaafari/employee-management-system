@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { UserInfosProvider } from "@/context/UserInfos";
-import { AddNewEmployerProvider } from "@/context/AddNewEmployer";
-import { AddNewEmployer } from "@/Components/AddNewEmployer";
+import { AddNewEntityProvider } from "@/context/AddNewEntityProvider";
+import { AddNewEntity } from "@/Components/AddNewEntity";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,10 +28,10 @@ export default function RootLayout({
       >
         <Toaster position="top-right"/>
         <UserInfosProvider>
-          <AddNewEmployerProvider>
-            <AddNewEmployer />
+          <AddNewEntityProvider>
+            <AddNewEntity />
             {children}
-          </AddNewEmployerProvider>
+          </AddNewEntityProvider>
         </UserInfosProvider>
       </body>
     </html>

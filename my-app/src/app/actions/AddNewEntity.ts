@@ -45,7 +45,7 @@ export async function AddNewEmployerAction(formData: FormData, userRole: "admin"
     return { success: true, message: "Employer added successfully.", data: data };
 }
 
-export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "employee" | "guest"){
+export async function DeleteEmployeeAction(EmployeeId: string, userRole: "admin" | "employee" | "guest"){
     const supabase = await createSupabaseServerClient();
 
     if(userRole === "employee"){
@@ -69,8 +69,7 @@ export async function DeleteEmployee(EmployeeId: string, userRole: "admin" | "em
     return { success: true, message: "Employee Deleted Successfully."  }
 }
 
-
-export async function UpdateEmployee(employeeId: string, updatedData: Partial<EmployerType>, userRole: "admin" | "employee" | "guest"){
+export async function UpdateEmployeeAction(employeeId: string, updatedData: Partial<EmployerType>, userRole: "admin" | "employee" | "guest"){
     const supabase = await createSupabaseServerClient();
 
     if(userRole === "employee"){
