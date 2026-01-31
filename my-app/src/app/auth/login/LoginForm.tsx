@@ -23,6 +23,8 @@ export function LoginForm() {
     const router = useRouter();
     
     const supabase = SupabaseClient();
+
+    const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
     const HandleSubmitForm = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -31,16 +33,23 @@ export function LoginForm() {
             return;
         }
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email: inputs.email,
-            password: inputs.password
-        })
-        if(error) {
-            toast.error(error.message);
-            return;
+        try{
+            const { error } = await supabase.auth.signInWithPassword({
+                email: inputs.email,
+                password: inputs.password
+            })
+            if(error) {
+                toast.error(error.message);
+                setIsLoadingSubmit(false);
+                return;
+            }
+            router.refresh();
+            setIsLoadingSubmit(false);
+            toast.success("welcome back!");
+        }catch (err){
+            toast.error("Error logging in: " + (err as { message: string }).message);
+            setIsLoadingSubmit(false);
         }
-        router.refresh();
-        toast.success("welcome back!");
     }
 
     const signInWithProvider = async (provider: "google", e: MouseEvent) => {
@@ -73,10 +82,10 @@ export function LoginForm() {
                 className='w-full max-w-[450px] space-y-3'
             >
                 {/* --- Title & Description --- */}
-                <FaStarOfLife size={26} className='text-blue-600'/>
-                <h1 className='text-3xl text-neutral-700 font-bold text-start'>Access your account</h1>
+                <FaStarOfLife size={40} className='text-blue-700'/>
+                <h1 className='text-3xl text-white font-bold text-start'>Access your account</h1>
                 <p
-                    className='text-gray-500 text-sm mb-6'
+                    className='text-neutral-600 text-sm mb-6'
                 >
                     Welcome back! Enter your credentials to securely access your account and manage tasks efficiently.
                 </p>
@@ -87,7 +96,7 @@ export function LoginForm() {
                 >
                     <label 
                         htmlFor="EmailInput" 
-                        className='text-neutral-600 hover:text-neutral-700 cursor-pointer 
+                        className='text-neutral-400 hover:text-neutral-200 cursor-pointer 
                             w-max mb-1'
                     >
                         Email
@@ -99,8 +108,8 @@ export function LoginForm() {
                         onChange={HandleChangeInputs}
                         value={inputs.email}
                         placeholder='Enter your Email'
-                        className='py-2 px-3 rounded-lg border-b border-neutral-400 ring 
-                            ring-neutral-300 focus:ring-neutral-400 focus:border-transparent 
+                        className='py-2 px-3 rounded border border-neutral-700/60
+                            focus:border-neutral-600 
                             outline-none transition-border duration-200'
                     />
                 </div>
@@ -111,7 +120,7 @@ export function LoginForm() {
                 >
                     <label 
                         htmlFor="PasswordInput" 
-                        className='text-neutral-600 hover:text-neutral-700 cursor-pointer 
+                        className='text-neutral-400 hover:text-neutral-200 cursor-pointer 
                             w-max mb-1'
                     >
                         Password
@@ -123,8 +132,8 @@ export function LoginForm() {
                         onChange={HandleChangeInputs}
                         value={inputs.password}
                         placeholder='Enter your Password'
-                        className='py-2 px-3 rounded-lg border-b border-neutral-400 ring 
-                            ring-neutral-300 focus:ring-neutral-400 focus:border-transparent 
+                        className='py-2 px-3 rounded border border-neutral-700/60
+                            focus:border-neutral-600 
                             outline-none transition-border duration-200'
                     />
                 </div>
@@ -132,20 +141,22 @@ export function LoginForm() {
                 {/* --- Submit Button --- */}
                 <button
                     type='submit'
-                    className='font-[550] text-white bg-gradient-to-t 
-                        from-blue-700 to-blue-500 hover:to-blue-700 w-full 
-                        px-3 py-2 rounded-lg cursor-pointer transition-colors duration-200'
+                    disabled={inputs.email === "" || inputs.password === "" || isLoadingSubmit}
+                    className='font-[550] text-white bg-blue-700 hover:bg-blue-700/80 
+                        border border-blue-600 w-full px-6 py-2 rounded 
+                        cursor-pointer transition-colors duration-200
+                        disabled:cursor-not-allowed disabled:bg-blue-700/50 disabled:hover:bg-blue-700/50 disabled:text-neutral-400'
                 >
-                    Login
+                    {isLoadingSubmit ? "Logging in..." : "Login"}
                 </button>
 
                 {/* --- Devider --- */}
                 <div
                     className='flex items-center gap-1.5'
                 >
-                    <span className='flex w-full bg-gray-400/80 h-px'/>
+                    <span className='flex w-full bg-neutral-700/60 h-px'/>
                     <span className='text-gray-500 text-sm'>or</span>
-                    <span className='flex w-full bg-gray-400/80 h-px'/>
+                    <span className='flex w-full bg-neutral-700/60 h-px'/>
                 </div>
 
                 {/* --- Providers --- */}
@@ -154,7 +165,7 @@ export function LoginForm() {
                 >
                     <button
                         onClick={(e) => signInWithProvider("google", e)}
-                        className='bg-gray-400/40 w-full py-2 flex gap-1.5 items-center text-sm justify-center rounded-lg border border-gray-400/10 hover:bg-gray-400/50 cursor-pointer'
+                        className='bg-neutral-700/60 w-full py-2 flex gap-1.5 items-center text-sm justify-center rounded border border-neutral-600 hover:bg-neutral-700 cursor-pointer'
                     ><FaGoogle size={20} /> Continue with Google</button>
                     {/* <button
                         className='bg-gray-400/40 w-full py-2 flex justify-center rounded-lg border border-gray-400/10 hover:bg-gray-400/50 cursor-pointer'
