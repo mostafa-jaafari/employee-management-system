@@ -33,22 +33,21 @@ export function DepartmentGrid() {
     try {
       // 1. Call Server Action
       const result = await DeleteDepartment(userInfos.id, departmentToDelete);
-
+      
       if (!result.success) {
         toast.error(result.message);
         return;
       }
-
+      
       toast.success(result.message);
       setDepartmentToDelete("");
-      setIsConfirmationModalOpen(false);
-
+      
       // 2. Refresh SWR Data immediately
-      mutateDepartments(); 
-
+      mutateDepartments();
+      setIsConfirmationModalOpen(false);
+      setIsDeleting(false);
     } catch {
       toast.error("An unexpected error occurred.");
-    } finally {
       setIsDeleting(false);
     }
   };

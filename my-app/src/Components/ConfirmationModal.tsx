@@ -2,7 +2,7 @@
 import { useConfirmationModal } from '@/context/ConfirmationModal';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { IoIosWarning } from 'react-icons/io';
-
+import { motion } from "framer-motion";
 
 type ConfirmationModalTypes = { 
     Title: string; 
@@ -23,7 +23,11 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
             className='fixed left-0 top-0 z-50 w-full h-screen backdrop-blur-[1px]
             overflow-hidden bg-black/20 flex justify-center items-center px-6'
         >
-            <div
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className='w-full min-w-[300px] max-w-[500px] bg-neutral-800 rounded-lg border border-neutral-700/60'
             >
                 <div
@@ -65,7 +69,6 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
                     <button
                         disabled={isLoadingConfirmation}
                         onClick={() => {
-                            setIsConfirmationModalOpen(false);
                             HandelConfirmModal();
                         }}
                         className={`flex items-center gap-1.5 ${isLoadingConfirmation ? "px-3" : "px-6"} py-2 cursor-pointer rounded-lg text-neutral-200 hover:text-white border border-red-600/60 
@@ -80,7 +83,7 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
                         {isLoadingConfirmation && (<AiOutlineLoading3Quarters size={14} className={isLoadingConfirmation ? "animate-spin" : ""}/>)} {ConfirmButtonLabel}
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </section>
     )
 }
