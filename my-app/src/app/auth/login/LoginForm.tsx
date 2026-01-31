@@ -2,6 +2,7 @@
 import { SupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaGoogle, FaStarOfLife } from 'react-icons/fa';
 import { toast } from 'sonner';
 
@@ -145,8 +146,12 @@ export function LoginForm() {
                     className='font-[550] text-white bg-blue-700 hover:bg-blue-700/80 
                         border border-blue-600 w-full px-6 py-2 rounded 
                         cursor-pointer transition-colors duration-200
+                        flex items-center gap-1.5 justify-center
                         disabled:cursor-not-allowed disabled:bg-blue-700/50 disabled:hover:bg-blue-700/50 disabled:text-neutral-400'
                 >
+                    {isLoadingSubmit && (
+                        <AiOutlineLoading3Quarters size={14} className={`${isLoadingSubmit && "animate-spin text-neutral-400"}`}/>
+                    )}
                     {isLoadingSubmit ? "Logging in..." : "Login"}
                 </button>
 
