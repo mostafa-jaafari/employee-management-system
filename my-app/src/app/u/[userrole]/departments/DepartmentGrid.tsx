@@ -68,7 +68,7 @@ export function DepartmentGrid() {
     <section className="w-full">
       {/* Confirmation Modal Logic */}
       <ConfirmationModal
-        Title={`Delete "${departmentToDelete}"?`}
+        Title={`Are you sure to Delete "${departmentToDelete}" Department ?`}
         WarningMessage="This action cannot be undone."
         ConfirmButtonLabel="Delete"
         isLoadingConfirmation={isDeleting}
@@ -78,20 +78,22 @@ export function DepartmentGrid() {
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="font-semibold text-lg text-gray-700">
-          Departments <span className="text-gray-400 text-sm">({departments.length})</span>
+      <div
+        className="w-full flex items-center justify-between"
+      >
+        <h1 className="text-xl md:text-2xl font-bold text-white">
+          Departments <span className="text-neutral-400">({departments.length})</span>
         </h1>
         <button
+          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 cursor-pointer text-neutral-100 py-1.5 px-3 rounded-lg text-sm"
           onClick={() => setIsOpenAddNewDepartment(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all"
         >
           <MdOutlineAddCircle size={18} />
           Add Department
         </button>
       </div>
 
-      <hr className="mb-4 border-gray-200" />
+      <hr className="mb-4 border-neutral-700/60 mt-3" />
 
       {/* Grid List */}
       {departments.length > 0 ? (
@@ -99,13 +101,13 @@ export function DepartmentGrid() {
           {departments.map((dep, idx) => (
             <div
               key={`${dep}-${idx}`}
-              className="group bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all flex justify-between items-center"
+              className="group bg-neutral-800 p-1.5 rounded-lg border border-neutral-700/60 hover:border-neutral-700 hover:shadow-md transition-all flex justify-between items-center"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <div className="p-2 bg-neutral-700/40 border border-neutral-700 text-blue-200 rounded-lg">
                   <AiOutlineApartment size={20} />
                 </div>
-                <span className="font-medium text-gray-700">{dep}</span>
+                <span className="font-medium text-neutral-200">{dep}</span>
               </div>
 
               <button
@@ -113,7 +115,7 @@ export function DepartmentGrid() {
                   setDepartmentToDelete(dep);
                   setIsConfirmationModalOpen(true);
                 }}
-                className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                className="text-red-600 cursor-pointer hover:text-red-500 bg-red-900/40 border border-red-700/60 hover:bg-red-900/60 p-2 rounded-lg transition-colors"
                 aria-label="Delete department"
               >
                 <FaTrash size={16} />

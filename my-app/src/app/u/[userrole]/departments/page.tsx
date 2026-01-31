@@ -5,7 +5,7 @@ export default async function page() {
     <main
         className='w-full min-h-140'
     >
-        <DepartmentGrid />
+      <DepartmentGrid />
     </main>
   )
 }

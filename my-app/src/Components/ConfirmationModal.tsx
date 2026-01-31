@@ -20,17 +20,17 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
     if(!isConfirmationModalOpen) return null;
     return (
         <section
-            className='fixed left-0 top-0 z-50 w-full h-screen backdrop-blur-[2px]
+            className='fixed left-0 top-0 z-50 w-full h-screen backdrop-blur-[1px]
             overflow-hidden bg-black/20 flex justify-center items-center px-6'
         >
             <div
-                className='w-full min-w-[300px] max-w-[500px] bg-white rounded-2xl'
+                className='w-full min-w-[300px] max-w-[500px] bg-neutral-800 rounded-lg border border-neutral-700/60'
             >
                 <div
                     className='px-6 pt-6 pb-3'
                 >
                     <h1
-                        className='text-md font-semibold'
+                        className='text-md font-medium text-neutral-300'
                     >
                         {Title}
                     </h1>
@@ -42,22 +42,23 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
                         className='px-6 py-1.5'
                     >
                         <span
-                            className='flex items-start md:items-center gap-1.5 text-yellow-800 bg-yellow-500/20 rounded-full text-xs px-3 py-1'
+                            className='flex items-start md:items-center gap-1.5 text-yellow-500 bg-yellow-500/20 rounded text-xs px-3 py-1.5'
                         >
                             <IoIosWarning size={14} className='flex-shrink-0' /> {WarningMessage}
                         </span>
                     </div>
                 )}
                 <div
-                    className='w-full border-t border-neutral-200 px-6 py-3 flex gap-1.5 justify-end items-center'
+                    className='w-full border-t border-neutral-700/60 px-6 py-3 flex gap-1.5 justify-end items-center'
                 >
                     <button
                         onClick={() => {
                             setIsConfirmationModalOpen(false)
                             HandelCancelModal?.();
                         }}
-                        className='px-6 py-1.5 cursor-pointer rounded-full bg-transparent
-                            hover:bg-neutral-100 text-neutral-600 font-semibold text-sm'
+                        className='px-6 py-2 cursor-pointer rounded-lg border border-neutral-700/60
+                            bg-neutral-700/20 hover:bg-neutral-700/40 text-neutral-400 
+                            hover:text-neutral-200 font-semibold text-sm'
                     >
                         Cancel
                     </button>
@@ -67,10 +68,10 @@ export function ConfirmationModal({ Title, ConfirmButtonLabel, ButtonStylesColor
                             setIsConfirmationModalOpen(false);
                             HandelConfirmModal();
                         }}
-                        className={`flex items-center gap-1.5 ${isLoadingConfirmation ? "px-3" : "px-6"} py-1.5 cursor-pointer rounded-full text-white 
+                        className={`flex items-center gap-1.5 ${isLoadingConfirmation ? "px-3" : "px-6"} py-2 cursor-pointer rounded-lg text-neutral-200 hover:text-white border border-red-600/60 
                             font-semibold text-sm disabled:opacity-50 disabled:text-red-300 disabled:cursor-not-allowed
                             ${ConfirmButtonLabel.toLowerCase() === "delete" ?
-                                "bg-red-600 hover:bg-red-700"
+                                "bg-red-700/80 hover:bg-red-700"
                                 :
                                 ButtonStylesColor ? 
                                 ButtonStylesColor
