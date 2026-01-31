@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineApartment } from "react-icons/ai";
 import { FaArrowsAltH, FaUsers, FaUserTie } from "react-icons/fa";
-import { FaFolderTree } from "react-icons/fa6";
+import { FaFolderTree, FaUser } from "react-icons/fa6";
 import { FiSidebar } from "react-icons/fi"
 import { GoHomeFill } from "react-icons/go";
 import { RiInboxFill } from "react-icons/ri";
@@ -15,6 +15,7 @@ const SideBar__Navigations = [
     { name: "home", href:"", icon: GoHomeFill },
     { name: "tasks", href:"tasks", icon: FaFolderTree },
     { name: "inbox", href: "inbox", icon: RiInboxFill },
+    { name: "profile", href: "profile", icon: FaUser },
     { name: "employees", href: "employees", icon: FaUsers },
     { name: "departments", href: "departments", icon: AiOutlineApartment },
     { name: "positions", href: "positions", icon: FaUserTie }

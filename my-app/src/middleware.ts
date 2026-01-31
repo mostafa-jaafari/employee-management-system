@@ -16,6 +16,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 
+  const pathSegments = pathname.split('/'); // ['', 'u', 'admin', 'profile', ...]
+  const pathRole = pathSegments[2]; // 'admin' or 'employee'
+
+  // If the URL role segment doesn't match the user role, redirect
+  if ((UserRole === 'admin' || UserRole === 'employee') && pathRole !== UserRole) {
+    const restPath = pathSegments.slice(3).join('/'); // all segments after the role
+    return NextResponse.redirect(new URL(`/u/${UserRole}/${restPath}`, request.url));
+  }
+
   // 4️⃣ إعادة التوجيه حسب الدور
   if (pathname.startsWith('/u/admin') && UserRole === 'employee') {
     return NextResponse.redirect(new URL('/u/employee', request.url));
