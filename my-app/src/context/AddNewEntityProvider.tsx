@@ -8,6 +8,8 @@ type AddNewEntityTypes = {
     setIsOpenAddNewEmployer: (isOpen: boolean) => void;
     isOpenAddNewDepartment: boolean;
     setIsOpenAddNewDepartment: (tab: boolean) => void;
+    setIsOpenAddNewPosition: (tab: boolean) => void;
+    isOpenAddNewPosition: boolean;
     employeeDataToUpdate: null | EmployerType;
     setEmployeeDataToUpdate: (data: null | EmployerType) => void;
 }
@@ -18,9 +20,10 @@ export function AddNewEntityProvider({ children }: { children: React.ReactNode }
     
     const [isOpenAddNewEmployer, setIsOpenAddNewEmployer] = useState(false);
     const [isOpenAddNewDepartment, setIsOpenAddNewDepartment] = useState<boolean>(false);
+    const [isOpenAddNewPosition, setIsOpenAddNewPosition] = useState<boolean>(false);
     const [employeeDataToUpdate, setEmployeeDataToUpdate] = useState<null | EmployerType>(null)
     return (
-        <AddNewEntity_Context.Provider value={{ isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate }}>
+        <AddNewEntity_Context.Provider value={{ isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, isOpenAddNewPosition, setIsOpenAddNewPosition, employeeDataToUpdate, setEmployeeDataToUpdate }}>
             {children}
         </AddNewEntity_Context.Provider>
     )

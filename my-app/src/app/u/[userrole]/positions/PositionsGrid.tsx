@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { AiOutlineApartment } from "react-icons/ai";
@@ -8,19 +7,19 @@ import { MdOutlineAddCircle } from "react-icons/md";
 
 // Imports from your project structure
 import { DeleteDepartmentAction } from "@/app/actions/Department";
-import { useDepartments } from "@/Hooks/useDepartments";
 import { useUserInfos } from "@/context/UserInfos";
 import { useAddNewEntity } from "@/context/AddNewEntityProvider";
 import { useConfirmationModal } from "@/context/ConfirmationModal";
 import { ConfirmationModal } from "@/Components/ConfirmationModal";
+import { usePositions } from "@/Hooks/usePositions";
 
-export function DepartmentGrid() {
+export function PositionsGrid() {
   const { userInfos, isLoadingUserInfos } = useUserInfos();
-  const { setIsOpenAddNewDepartment } = useAddNewEntity(); // Assuming this opens your Add Modal
+  const { setIsOpenAddNewPosition } = useAddNewEntity(); // Assuming this opens your Add Modal
   const { setIsConfirmationModalOpen } = useConfirmationModal();
   
   // Use our clean hook
-  const { departments, isLoading, mutateDepartments } = useDepartments(userInfos?.id);
+  const { positions, isLoading, mutatePositions } = usePositions(userInfos?.id);
 
   const [departmentToDelete, setDepartmentToDelete] = useState<string>("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -43,7 +42,7 @@ export function DepartmentGrid() {
       setDepartmentToDelete("");
       
       // 2. Refresh SWR Data immediately
-      mutateDepartments();
+      mutatePositions();
       setIsConfirmationModalOpen(false);
       setIsDeleting(false);
     } catch {
@@ -81,23 +80,23 @@ export function DepartmentGrid() {
         className="w-full flex items-center justify-between"
       >
         <h1 className="text-xl md:text-2xl font-bold text-white">
-          Departments <span className="text-neutral-400">({departments.length})</span>
+          Positions <span className="text-neutral-400">({positions.length})</span>
         </h1>
         <button
           className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 cursor-pointer text-neutral-100 py-1.5 px-3 rounded-lg text-sm"
-          onClick={() => setIsOpenAddNewDepartment(true)}
+          onClick={() => setIsOpenAddNewPosition(true)}
         >
           <MdOutlineAddCircle size={18} />
-          Add Department
+          Add Position
         </button>
       </div>
 
       <hr className="mb-4 border-neutral-700/60 mt-3" />
 
       {/* Grid List */}
-      {departments.length > 0 ? (
+      {positions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {departments.map((dep, idx) => (
+          {positions.map((dep, idx) => (
             <div
               key={`${dep}-${idx}`}
               className="group bg-neutral-800 p-1.5 rounded-lg border border-neutral-700/60 hover:border-neutral-700 hover:shadow-md transition-all flex justify-between items-center"
@@ -128,13 +127,13 @@ export function DepartmentGrid() {
           <div className="text-gray-400 mb-3">
             <AiOutlineApartment size={40} />
           </div>
-          <p className="text-gray-500 font-medium">No departments found</p>
+          <p className="text-gray-500 font-medium">No positions found</p>
           <p className="text-gray-400 text-sm mb-4">Get started by adding a new one</p>
           <button
-            onClick={() => setIsOpenAddNewDepartment(true)}
+            onClick={() => setIsOpenAddNewPosition(true)}
             className="cursor-pointer text-blue-600 hover:underline text-sm font-medium"
           >
-            Create your first department
+            Create your first position
           </button>
         </div>
       )}

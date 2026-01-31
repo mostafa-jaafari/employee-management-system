@@ -8,17 +8,20 @@ import { AddNewEmployerAction, UpdateEmployeeAction } from '@/app/actions/AddNew
 import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';
-import { AddNewDepartment } from '@/app/actions/Department';
+import { AddNewDepartmentAction } from '@/app/actions/Department';
 import { useUserInfos } from '@/context/UserInfos';
 import { useRouter } from 'next/navigation';
 import { useDepartments } from '@/Hooks/useDepartments';
+import { AddNewPositionAction } from '@/app/actions/Position';
+import { usePositions } from '@/Hooks/usePositions';
 
 
 export function AddNewEntity() {
-    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate } = useAddNewEntity();
+    const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate, setIsOpenAddNewPosition, isOpenAddNewPosition } = useAddNewEntity();
     const { userInfos } = useUserInfos();
 
     const { mutateDepartments, departments: DepartmentsHook } = useDepartments(userInfos?.id);
+    const { mutatePositions, positions: PositionsHook } = usePositions(userInfos?.id);
     
     const today = new Date().toISOString().split("T")[0];
     const router = useRouter();
@@ -64,6 +67,7 @@ export function AddNewEntity() {
     }, [derivedInputs]);
 
     const [newDepartment, setNewDepartment] = useState("");
+    const [newPosition, setNewPosition] = useState("");
 
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -158,7 +162,7 @@ export function AddNewEntity() {
         }
         setIsLoadingAddNewDepartment(true);
         try{
-            const Result = await AddNewDepartment(userInfos?.id, newDepartment, userInfos?.role);
+            const Result = await AddNewDepartmentAction(userInfos?.id, newDepartment, userInfos?.role);
             if(!Result.success){
                 toast.error(Result.message);
                 setIsLoadingAddNewDepartment(false);
@@ -176,7 +180,35 @@ export function AddNewEntity() {
         }
     }
 
-    if(!isOpenAddNewEmployer && !isOpenAddNewDepartment) return null;
+    const [isLoadingAddNewPosition, setIsLoadingAddNewPosition] = useState(false);
+    const HandleAddNewPosition = async () => {
+        if(!userInfos || userInfos.role === "guest") return;
+
+        if(newPosition === ""){
+            toast.info("Please type Position first !");
+            return;
+        }
+        setIsLoadingAddNewPosition(true);
+        try{
+            const Result = await AddNewPositionAction(userInfos?.id, newPosition, userInfos?.role);
+            if(!Result.success){
+                toast.error(Result.message);
+                setIsLoadingAddNewPosition(false);
+                return;
+            }
+
+            toast.success(newPosition + ", " + "Added successfully.")
+            mutatePositions();
+            setIsLoadingAddNewPosition(false);
+            setNewPosition("");
+            setIsOpenAddNewPosition(false)
+        }catch (err){
+            toast.error((err as { message: string }).message);
+            setIsLoadingAddNewPosition(false);
+        }
+    }
+
+    if(!isOpenAddNewEmployer && !isOpenAddNewDepartment && !isOpenAddNewPosition) return null;
     return (
         <section
             className='w-full h-screen overflow-hidden absolute z-50 left-0 top-0 text-neutral-700
@@ -283,6 +315,107 @@ export function AddNewEntity() {
                     </div>
                 </motion.div>
             )}
+            {isOpenAddNewPosition && (
+                <motion.div
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className='relative w-full max-w-1/4 bg-neutral-800 rounded-lg border border-neutral-700/60 shadow-lg min-h-80'
+                >
+                    <header
+                        className='w-full border-b border-neutral-700/60 flex items-center justify-between p-3'
+                    >
+                        <h1 className='text-sm text-neutral-300'>Add New Position</h1>
+                        <button
+                            onClick={() => setIsOpenAddNewPosition(false)}
+                            className='cursor-pointer text-neutral-500 hover:text-neutral-300'
+                        >
+                            <FaXmark size={16}/>
+                        </button>
+                    </header>
+                    
+                    {/* --- ADD New Department Body --- */}
+
+                    {PositionsHook.length > 0 ? 
+                        (
+                            <ul
+                                className='w-full p-3 grid grid-cols-3 gap-1.5'
+                            >
+                                {PositionsHook.slice(0, 9)
+                                    .map((position, idx) => {
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className='flex justify-start items-center gap-1.5 
+                                                    py-1 px-1.5 rounded border border-dashed 
+                                                    border-neutral-600 text-neutral-300 w-full'
+                                            >
+                                                <AiOutlineApartment size={14} className='flex-shrink-0'/> 
+                                                <span
+                                                    className='max-w-24 truncate text-xs'
+                                                >
+                                                    {position}
+                                                </span>
+                                            </div>
+                                        )
+                                    })}
+                            </ul>
+                        )
+                    : (
+                        <span
+                            className='flex justify-center p-3 w-full text-gray-500 text-xs'
+                        >
+                            No Positions are available Right Now!
+                        </span>
+                    )}
+
+                    <div
+                        className='w-full px-3 flex justify-center'
+                    >
+                        <button
+                            onClick={() => {
+                                setIsOpenAddNewPosition(false);
+                                setIsOpenAddNewEmployer(false);
+                                router.push("/u/admin/departments")
+                            }}
+                            className='capitalize w-max flex justify-center items-center hover:underline text-blue-600 text-xs cursor-pointer'
+                        >
+                            view & manage All
+                        </button>
+                    </div>
+                    {/* --- ADD New Employer Submit Button --- */}
+                    <div
+                        className='absolute left-0 bottom-0 w-full'
+                    >
+                        <div
+                            className='w-full p-3'
+                        >
+                            <input 
+                                type="text"
+                                name='position'
+                                onChange={(e) => setNewPosition(e.target.value)}
+                                value={newPosition}
+                                placeholder='Enter position...'
+                                className='outline-none w-full py-3 text-sm px-3 rounded-lg placeholder:text-neutral-500 text-neutral-200 ring ring-neutral-700 focus:ring-blue-400 focus:border-blue-400'
+                            />
+                        </div>
+                        <div
+                            className='w-full p-3 border-t border-neutral-700/60'
+                        >
+                            <button
+                                onClick={HandleAddNewPosition}
+                                disabled={newPosition.trim() === "" || isLoadingAddNewPosition}
+                                className='bg-blue-600 hover:bg-blue-700 text-neutral-200 hover:bg-blue-700 
+                                    py-3 px-6 text-sm w-full rounded-lg cursor-pointer
+                                    disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-neutral-500'
+                                >
+                                    {isLoadingAddNewPosition ? "Loading..." : "Add New Position"}
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
             {isOpenAddNewEmployer && (
                 <motion.div
                     // ref={MenuRef}
@@ -350,7 +483,7 @@ export function AddNewEntity() {
                                 HandleSelectOption={(option) => setInputs({...inputs, position: option})}
                                 selectedLabel={inputs.position || ''}
                                 DefaultAllButton={false}
-                                Options={["HR Manager", "test test", "test test test"]}
+                                Options={PositionsHook}
                                 className='w-full py-3 rounded-lg px-3 text-sm'
                             />
                             <input 
@@ -426,6 +559,7 @@ export function AddNewEntity() {
                                 <MdOutlineAddCircle size={18} /> Add Department
                             </button>
                             <button
+                                onClick={() => setIsOpenAddNewPosition(true)}
                                 className='w-full flex items-center gap-1.5 justify-center
                                     py-2 hover:bg-neutral-700/20 bg-neutral-700/40 cursor-pointer 
                                     border border-neutral-700 text-sm rounded-lg
