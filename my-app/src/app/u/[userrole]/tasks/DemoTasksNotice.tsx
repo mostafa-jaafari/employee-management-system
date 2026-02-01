@@ -1,12 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { TbAlertTriangle } from "react-icons/tb";
 
 
-
-
+const STORAGE_KEY = "demo-tasks-notice-closed";
 export function DemoTasksNotice() {
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(typeof window === "undefined") return;
+
+        const IsClosed = localStorage.getItem(STORAGE_KEY) === "true";
+
+        if(!IsClosed) {
+            setTimeout(() => setIsVisible(true))
+        }
+    },[])
+
+    const handleClose = () => {
+        localStorage.setItem(STORAGE_KEY, "true");
+        setIsVisible(false);
+    };
+
+    if (!isVisible) return null;
     return (
         <div
             className="my-1.5 w-full bg-yellow-800/20 border border-yellow-700/40 rounded-lg px-3 py-1.5"
@@ -26,6 +44,7 @@ export function DemoTasksNotice() {
                 </span>
 
                 <button
+                    onClick={handleClose}
                     className="border border-yellow-700/40 rounded bg-yellow-800/20 hover:bg-yellow-800/30 text-yellow-500 hover:text-yellow-400 cursor-pointer"
                 >
                     <HiMiniXMark size={20}/>
