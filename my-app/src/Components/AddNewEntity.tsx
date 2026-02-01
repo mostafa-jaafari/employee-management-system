@@ -4,7 +4,7 @@ import { FaXmark } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { DropDown } from './DropDown';
-import { AddNewEmployerAction, UpdateEmployeeAction } from '@/app/actions/AddNewEntity';
+import { AddNewEmployerAction, UpdateEmployeeAction } from '@/app/actions/Entity';
 import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';

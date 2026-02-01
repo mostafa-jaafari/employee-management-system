@@ -1,5 +1,5 @@
 "use client";
-import { DeleteEmployeeAction } from '@/app/actions/AddNewEntity';
+import { DeleteEmployeeAction } from '@/app/actions/Entity';
 import { ConfirmationModal } from '@/Components/ConfirmationModal';
 import { DropDown } from '@/Components/DropDown';
 import { useAddNewEntity } from '@/context/AddNewEntityProvider';
