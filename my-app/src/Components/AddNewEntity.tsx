@@ -212,7 +212,7 @@ export function AddNewEntity() {
     return (
         <section
             className='w-full h-screen overflow-hidden absolute z-50 left-0 top-0 text-neutral-700
-                backdrop-blur-[2px] bg-black/20 flex justify-end items-end gap-1.5 p-6'
+                backdrop-blur-[1px] bg-black/20 flex justify-end items-end gap-1.5 p-6'
         >
             {isOpenAddNewDepartment && (
                 <motion.div
@@ -321,7 +321,7 @@ export function AddNewEntity() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className='relative w-full max-w-1/4 bg-neutral-800 rounded-lg border border-neutral-700/60 shadow-lg min-h-80'
+                    className='relative w-full max-w-[450px] bg-neutral-800 rounded-lg border border-neutral-700/60 shadow-lg min-h-80'
                 >
                     <header
                         className='w-full border-b border-neutral-700/60 flex items-center justify-between p-3'
