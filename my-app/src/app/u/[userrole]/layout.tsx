@@ -3,17 +3,28 @@ import { SideBar } from "@/Components/SideBar";
 import { ConfirmationModalProvider } from "@/context/ConfirmationModal";
 import { AddNewTask } from "./tasks/AddNewTask";
 import { AddNewTaskProvider } from "@/context/AddNewTaskProvider";
+import { getCachedEmployeesEmails } from "@/data/EmployeesEmails";
+import { getUserId } from "@/utils/getUserId";
 
 
 
 
 export default async function RootLayout({ children }: { children: React.ReactNode }){
+    
+    const userId = await getUserId();
+    let employeesEmails: string[] = [];
+    
+    if (userId) {
+        const data = await getCachedEmployeesEmails(userId); // fetch cached emails
+        employeesEmails = data.map(e => e.email); // adjust if necessary
+    }
+
     return (
         <AddNewTaskProvider>
             <main
                 className="w-full h-screen overflow-x-hidden overflow-y-auto text-neutral-100"
             >
-                <AddNewTask />
+                <AddNewTask initialEmails={employeesEmails} />
                 <ConfirmationModalProvider>
                     <div
                         className="w-full flex items-start gap-3"

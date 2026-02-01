@@ -6,7 +6,7 @@ import { HiMiniXMark } from "react-icons/hi2";
 import { motion } from "framer-motion";
 
 
-export function AddNewTask(){
+export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
     const [inputs, setInputs] = useState({
         title: "",
@@ -108,7 +108,7 @@ export function AddNewTask(){
                             <DropDown
                                 HandleSelectOption={(employee) => setInputs({ ...inputs, assignedEmployee: employee }) }
                                 Label="Assined Employee"
-                                Options={["jaafarimostafa081@gmail.com", "fakec5563@gmail.com"]}
+                                Options={initialEmails}
                                 selectedLabel={inputs.assignedEmployee}
                                 DefaultAllButton={false}
                                 className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
