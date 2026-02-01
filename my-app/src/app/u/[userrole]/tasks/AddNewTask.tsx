@@ -3,7 +3,7 @@ import { DropDown } from "@/Components/DropDown";
 import { useAddNewTask } from "@/context/AddNewTaskProvider";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
-
+import { motion } from "framer-motion";
 
 
 export function AddNewTask(){
@@ -22,13 +22,17 @@ export function AddNewTask(){
             [name]: value
         })
     }
-    if(isOpenAddNewTask) return null;
+    if(!isOpenAddNewTask) return null;
     return (
         <section
             className="fixed left-0 top-0 z-50 w-full h-screen bg-black/20 
                 backdrop-blur-[1px] flex flex-col items-center justify-center"
         >
-            <div
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
                 className="w-full max-w-[550px] bg-neutral-800 rounded-lg border border-neutral-700/60 shadow-lg min-h-80"
             >
                 {/* --- TASK HEADER --- */}
@@ -137,7 +141,7 @@ export function AddNewTask(){
                         Create Task
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </section>
     )
 }

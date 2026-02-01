@@ -25,7 +25,7 @@ export function DropDown({ Label, Options, selectedLabel, HandleSelectOption, cl
             ref={MenuRef}
             className={`${className} ${isOpen ? "bg-neutral-800 border-neutral-600" : "border-neutral-700/60 bg-neutral-800/60"} border cursor-pointer relative flex items-center justify-between gap-3`}
         >
-            <h2 className={`font-[500] text-nowrap w-full ${isOpen ? "text-white" : "text-neutral-300"}`}>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180 text-white" : "text-neutral-300"} transition-transform duration-200`}/>
+            <h2 className={`font-[500] text-nowrap ${selectedLabel === "" ? "capitalize" : "lowercase"} w-full ${isOpen ? "text-white" : "text-neutral-300"}`}>{selectedLabel !== "" ? selectedLabel : Label ? Label : "Label"}</h2> <FaChevronDown size={12} className={`${isOpen ? "rotate-180 text-white" : "text-neutral-300"} transition-transform duration-200`}/>
             {isOpen && (
                 <motion.div
                     key="dropdown"
