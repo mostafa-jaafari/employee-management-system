@@ -62,7 +62,7 @@ export function AddNewTask(){
                     >
                         <label 
                             htmlFor="TaskTitle"
-                            className="mb-0.5 text-sm text-neutral-300 hover:text-neutral-200 cursor-pointer"
+                            className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
                         >
                             Task Title
                         </label>
@@ -82,9 +82,9 @@ export function AddNewTask(){
                     >
                         <label 
                             htmlFor="TaskDescription"
-                            className="mb-0.5 text-sm text-neutral-300 hover:text-neutral-200 cursor-pointer"
+                            className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
                         >
-                            Task Description
+                            Task Description <span className="text-neutral-400">(optional)</span>
                         </label>
                         <textarea
                             id="TaskDescription"
@@ -101,9 +101,9 @@ export function AddNewTask(){
                     >
                         <div>
                             <label 
-                                className="mb-0.5 text-sm text-neutral-300 hover:text-neutral-200 cursor-pointer"
+                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
                             >
-                                Task Description
+                                Assined Employee
                             </label>
                             <DropDown
                                 HandleSelectOption={(employee) => setInputs({ ...inputs, assignedEmployee: employee }) }
@@ -120,7 +120,7 @@ export function AddNewTask(){
                         >
                             <label 
                                 htmlFor="DueDate"
-                                className="mb-0.5 text-sm text-neutral-300 hover:text-neutral-200 cursor-pointer"
+                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
                             >
                                 Task Due Date
                             </label>
@@ -136,7 +136,11 @@ export function AddNewTask(){
                     </div>
 
                     <button
-                        className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 p-3 text-sm rounded-lg"
+                        disabled={(inputs.title === "" || inputs.dueDate === "" || inputs.assignedEmployee === "")}
+                        className="w-full cursor-pointer bg-blue-600 
+                            hover:bg-blue-700 p-3 text-sm rounded-lg
+                            border border-blue-500
+                            disabled:bg-neutral-700 disabled:border-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400"
                     >
                         Create Task
                     </button>
