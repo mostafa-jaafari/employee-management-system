@@ -42,6 +42,7 @@ export async function AddNewEmployerAction(formData: FormData, userRole: "admin"
         }
     
         updateTag("Employees-Data");
+        updateTag("employees-emails");
     return { success: true, message: "Employer added successfully.", data: data };
 }
 

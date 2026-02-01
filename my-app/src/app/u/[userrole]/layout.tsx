@@ -7,7 +7,7 @@ import { AddNewTaskProvider } from "@/context/AddNewTaskProvider";
 
 
 
-export default function RootLayout({ children }: { children: React.ReactNode }){
+export default async function RootLayout({ children }: { children: React.ReactNode }){
     return (
         <AddNewTaskProvider>
             <main
