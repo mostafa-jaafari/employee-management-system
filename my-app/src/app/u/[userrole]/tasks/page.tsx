@@ -1,4 +1,5 @@
 import { IoIosAddCircle } from "react-icons/io";
+import { DemoTasksNotice } from "./DemoTasksNotice";
 
 
 export default async function page({ params }: { params: Promise<{ userrole: string }> }) {
@@ -7,9 +8,9 @@ export default async function page({ params }: { params: Promise<{ userrole: str
     return (
         <main>
             <div
-                className="w-full flex items-center justify-between border-b border-neutral-700/60"
+                className="pb-3 w-full flex items-center justify-between border-b border-neutral-700/60"
             >
-                <h1 className="text-xl md:text-2xl font-bold text-white mb-6">
+                <h1 className="text-xl md:text-2xl font-bold text-white">
                     Tasks Management {User_Role === "admin" && "- Admin Panel"}
                 </h1>
                 <button
@@ -18,6 +19,9 @@ export default async function page({ params }: { params: Promise<{ userrole: str
                     <IoIosAddCircle size={18}/> New Task
                 </button>
             </div>
+
+            {/* --- TASKS DEMO NOTICE --- */}
+            <DemoTasksNotice />
 
             {/* --- Tasks Body --- */}
 
