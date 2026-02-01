@@ -4,15 +4,21 @@ import { useAddNewTask } from "@/context/AddNewTaskProvider";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { motion } from "framer-motion";
+import { CreateTaskAction } from "@/app/actions/Task";
+import { useUserInfos } from "@/context/UserInfos";
+import { toast } from "sonner";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
+    const { userInfos } = useUserInfos();
     const [inputs, setInputs] = useState({
         title: "",
         description: "",
-        assignedEmployee: "",
-        dueDate: ""
+        assigned_to: "",
+        due_date: "",
+        priority: "",
+        status: ""
     });
 
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -21,6 +27,34 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             ...inputs,
             [name]: value
         })
+    }
+
+
+    const [isLoadingSubmitTask, setIsLoadingSubmitTask] = useState(false);
+    const HandleCreateTask = async () => {
+        if(!userInfos?.id) return null;
+        try {
+            setIsLoadingSubmitTask(true);
+            const formData = new FormData();
+            formData.append("title", inputs.title);
+            formData.append("description", inputs.description);
+            formData.append("assigned_to", inputs.assigned_to);
+            formData.append("due_date", inputs.due_date);
+            formData.append("priority", inputs.priority);
+            formData.append("status", inputs.status);
+
+            const res = await CreateTaskAction(formData, userInfos?.id)
+            if(!res.success){
+                toast.error(res.message);
+                setIsLoadingSubmitTask(false);
+                return;
+            }
+            setIsLoadingSubmitTask(false);
+            toast.success(res.success)
+        }catch (err){
+            toast.error((err as { message: string }).message);
+            setIsLoadingSubmitTask(false);
+        }
     }
     if(!isOpenAddNewTask) return null;
     return (
@@ -106,10 +140,10 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 Assined Employee
                             </label>
                             <DropDown
-                                HandleSelectOption={(employee) => setInputs({ ...inputs, assignedEmployee: employee }) }
-                                Label="Assined Employee"
+                                HandleSelectOption={(employee) => setInputs({ ...inputs, assigned_to: employee }) }
+                                Label="--"
                                 Options={initialEmails}
-                                selectedLabel={inputs.assignedEmployee}
+                                selectedLabel={inputs.assigned_to}
                                 DefaultAllButton={false}
                                 className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
                             />
@@ -122,27 +156,66 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 htmlFor="DueDate"
                                 className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
                             >
-                                Task Due Date
+                                Due Date
                             </label>
                             <input
                                 id="DueDate"
                                 type="date"
-                                name="dueDate"
-                                value={inputs.dueDate}
+                                name="due_date"
+                                value={inputs.due_date}
                                 onChange={HandleChangeInputs}
                                 className="w-full outline-none border border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 focus:bg-neutral-700/20 rounded-lg p-3 text-sm"
                             />
                         </div>
                     </div>
 
+                    <div
+                        className="flex items-center gap-1.5"
+                    >
+                        {/* --- PRIORITY --- */}
+                        <div>
+                            <label 
+                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                            >
+                                Priority
+                            </label>
+                            <DropDown
+                                HandleSelectOption={(pre) => setInputs({ ...inputs, priority: pre }) }
+                                Label="--"
+                                Options={["low", "medium", "high"]}
+                                selectedLabel={inputs.priority}
+                                DefaultAllButton={false}
+                                className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
+                            />
+                        </div>
+
+                        {/* --- STATUS --- */}
+                        <div>
+                            <label 
+                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                            >
+                                Status
+                            </label>
+                            <DropDown
+                                HandleSelectOption={(stat) => setInputs({ ...inputs, status: stat }) }
+                                Label="Pending"
+                                Options={["pending", "in progress", "completed"]}
+                                selectedLabel={inputs.status}
+                                DefaultAllButton={false}
+                                className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
+                            />
+                        </div>
+                    </div>
+
                     <button
-                        disabled={(inputs.title === "" || inputs.dueDate === "" || inputs.assignedEmployee === "")}
+                        onClick={HandleCreateTask}
+                        disabled={isLoadingSubmitTask || (inputs.priority === "" || inputs.title === "" || inputs.due_date === "" || inputs.assigned_to === "")}
                         className="w-full cursor-pointer bg-blue-600 
                             hover:bg-blue-700 p-3 text-sm rounded-lg
                             border border-blue-500
                             disabled:bg-neutral-700 disabled:border-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400"
                     >
-                        Create Task
+                        {isLoadingSubmitTask ? "Creating Task..." : "Create Task"}
                     </button>
                 </div>
             </motion.div>
