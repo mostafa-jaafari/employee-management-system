@@ -8,6 +8,7 @@ import { CreateTaskAction } from "@/app/actions/Task";
 import { useUserInfos } from "@/context/UserInfos";
 import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
+import { FaTrash } from "react-icons/fa6";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
@@ -115,17 +116,29 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                         return (
                                             <li
                                                 key={idx}
-                                                className="flex flex-col"
+                                                className="w-full flex justify-between items-start pr-3"
                                             >
-                                                <span
-                                                    className="text-[12px] capitalize flex items-start gap-1 text-neutral-400"
+                                                <div
+                                                    className="w-full flex flex-col"
                                                 >
-                                                    <MdAddTask size={18} className="text-neutral-300"/>
-                                                    {task}
-                                                </span>
-                                                {idx !== inputs.tasks.length - 1 && (
-                                                    <span className="ml-2 mt-0.5 flex w-[1px] h-4 bg-neutral-500"/>
-                                                )}
+                                                    <span
+                                                        className="text-[12px] capitalize flex items-start gap-1 text-neutral-400"
+                                                    >
+                                                        <MdAddTask size={18} className="text-neutral-300"/>
+                                                        {task}
+                                                    </span>
+                                                    {idx !== inputs.tasks.length - 1 && (
+                                                        <span className="ml-2 mt-0.5 flex w-[1px] h-4 bg-neutral-500"/>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        const Cleaned_Tasks = inputs.tasks.filter((t) => t !== task);
+                                                        setInputs({ ...inputs, tasks: Cleaned_Tasks })
+                                                    }}
+                                                >
+                                                    <FaTrash className="w-3 h-3 cursor-pointer text-red-600 hover:text-red-500"/>
+                                                </button>
                                             </li>
                                         )
                                     })}
@@ -153,6 +166,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                     type="text"
                                     id="TaskToDo"
                                     name="task"
+                                    maxLength={50}
                                     value={inputs.task}
                                     onChange={HandleChangeInputs}
                                     className={`w-full grow outline-none border rounded-lg p-3 text-sm
