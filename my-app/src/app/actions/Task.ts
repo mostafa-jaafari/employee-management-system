@@ -11,6 +11,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
     const due_date = formData.get("due_date") as string;
     const priority = formData.get("priority") as string;
     const status = formData.get("status") || "pending" as string;
+    const due_time = formData.get("due_time") as string;
 
     if(title === "" && assigned_to === "" && due_date === "" && priority === ""){
         return { success: false, message: "Please fill required inputs first !" }
@@ -21,6 +22,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
         description,
         assigned_to,
         due_date,
+        due_time,
         priority,
         status,
         created_by: userId,

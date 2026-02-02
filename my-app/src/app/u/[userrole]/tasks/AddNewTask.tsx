@@ -18,7 +18,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
         assigned_to: "",
         due_date: "",
         priority: "",
-        status: ""
+        status: "",
+        due_time: ""
     });
 
     const HandleChangeInputs = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,6 +32,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
 
 
     const [isLoadingSubmitTask, setIsLoadingSubmitTask] = useState(false);
+    const Today = new Date()
     const HandleCreateTask = async () => {
         if(!userInfos?.id) return null;
         try {
@@ -42,6 +44,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
             formData.append("status", inputs.status);
+            formData.append("due_time", inputs.due_time);
 
             const res = await CreateTaskAction(formData, userInfos?.id)
             if(!res.success){
@@ -55,7 +58,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 due_date: "",
                 priority: "",
                 status: "",
-                title: ""
+                title: "",
+                due_time: ""
             })
             setIsLoadingSubmitTask(false);
             toast.success(res.message)
@@ -171,6 +175,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 id="DueDate"
                                 type="date"
                                 name="due_date"
+                                min={Today.toISOString().split("T")[0]}
                                 value={inputs.due_date}
                                 onChange={HandleChangeInputs}
                                 className="w-full outline-none border border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 focus:bg-neutral-700/20 rounded-lg p-3 text-sm"
@@ -181,6 +186,25 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                     <div
                         className="flex items-center gap-1.5"
                     >
+                        <div
+                            className="w-full flex flex-col "
+                        >
+                            <label 
+                                htmlFor="DueTime"
+                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                            >
+                                Due Time
+                            </label>
+                            <input
+                                id="DueTime"
+                                type="time"
+                                name="due_time"
+                                min={Today.toISOString().split("T")[1]}
+                                value={inputs.due_time}
+                                onChange={HandleChangeInputs}
+                                className="grow outline-none border border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 focus:bg-neutral-700/20 rounded-lg p-3 text-sm"
+                            />
+                        </div>
                         {/* --- PRIORITY --- */}
                         <div>
                             <label 
@@ -195,7 +219,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 selectedLabel={inputs.priority}
                                 DefaultAllButton={false}
                                 isLabelCapitalized
-                                className="w-full min-w-[250px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
+                                className="w-full min-w-[150px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
                             />
                         </div>
 
@@ -213,14 +237,14 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 selectedLabel={inputs.status}
                                 DefaultAllButton={false}
                                 isLabelCapitalized
-                                className="w-full min-w-[250px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
+                                className="w-full min-w-[150px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
                             />
                         </div>
                     </div>
 
                     <button
                         onClick={HandleCreateTask}
-                        disabled={isLoadingSubmitTask || (inputs.priority === "" || inputs.title === "" || inputs.due_date === "" || inputs.assigned_to === "")}
+                        disabled={isLoadingSubmitTask || (inputs.due_time === "" || inputs.priority === "" || inputs.title === "" || inputs.due_date === "" || inputs.assigned_to === "")}
                         className="w-full cursor-pointer bg-blue-600 
                             hover:bg-blue-700 p-3 text-sm rounded-lg
                             border border-blue-500
