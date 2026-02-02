@@ -11,8 +11,7 @@ export type EmployerType = {
 }
 
 export type TaskType = {
-    title: string;
-    description: string;
+    tasks: string[];
     assigned_to: string;
     due_date: string;
     due_time: string;

@@ -5,21 +5,19 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function CreateTaskAction(formData: FormData, userId: string){
     const supabase = await createSupabaseServerClient();
 
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const tasks = formData.getAll("tasks") as string[];
     const assigned_to = formData.get("assigned_to") as string;
     const due_date = formData.get("due_date") as string;
     const priority = formData.get("priority") as string;
     const status = formData.get("status") || "pending" as string;
     const due_time = formData.get("due_time") as string;
 
-    if(title === "" && assigned_to === "" && due_date === "" && priority === ""){
+    if(tasks.length === 0 && assigned_to === "" && due_date === "" && priority === ""){
         return { success: false, message: "Please fill required inputs first !" }
     }
 
     const TASK = {
-        title,
-        description,
+        tasks,
         assigned_to,
         due_date,
         due_time,

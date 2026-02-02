@@ -16,8 +16,7 @@ export function TasksContainer(){
                 return (
                     <TaskCard
                         key={idx}
-                        title={task.title}
-                        description={task.description}
+                        tasks={task.tasks}
                         assigned_to={task.assigned_to}
                         created_by={task.created_by}
                         due_date={task.due_date}

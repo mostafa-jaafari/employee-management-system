@@ -7,14 +7,15 @@ import { motion } from "framer-motion";
 import { CreateTaskAction } from "@/app/actions/Task";
 import { useUserInfos } from "@/context/UserInfos";
 import { toast } from "sonner";
+import { MdAddTask } from "react-icons/md";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
     const { userInfos } = useUserInfos();
     const [inputs, setInputs] = useState({
-        title: "",
-        description: "",
+        tasks: ["add new user to the database", "hello everyone how are you doing today"],
+        task: "",
         assigned_to: "",
         due_date: "",
         priority: "",
@@ -38,8 +39,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
         try {
             setIsLoadingSubmitTask(true);
             const formData = new FormData();
-            formData.append("title", inputs.title);
-            formData.append("description", inputs.description);
+            inputs.tasks.forEach(task => formData.append("tasks", task));
             formData.append("assigned_to", inputs.assigned_to);
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
@@ -53,12 +53,12 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 return;
             }
             setInputs({
+                tasks: [],
+                task: "",
                 assigned_to: "",
-                description: "",
                 due_date: "",
                 priority: "",
                 status: "",
-                title: "",
                 due_time: ""
             })
             setIsLoadingSubmitTask(false);
@@ -102,44 +102,88 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 <div
                     className="pt-3 pb-6 px-6 space-y-3"
                 >
-                    {/* --- TASK TITLE --- */}
-                    <div
-                        className="flex flex-col "
-                    >
-                        <label 
-                            htmlFor="TaskTitle"
-                            className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                    {/* --- TASKS --- */}
+                    <div>
+                        <div
+                            className="mb-1.5"
                         >
-                            Task Title
-                        </label>
-                        <input 
-                            type="text"
-                            id="TaskTitle"
-                            name="title"
-                            value={inputs.title}
-                            onChange={HandleChangeInputs}
-                            placeholder="Task Title"
-                            className="placeholder:font-[300] outline-none border border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 focus:bg-neutral-700/20 rounded-lg p-3 text-sm"
-                        />
-                    </div>
-                    {/* --- TASK DESCRIPTION --- */}
-                    <div
-                        className="flex flex-col "
-                    >
-                        <label 
-                            htmlFor="TaskDescription"
-                            className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                            {inputs.tasks.length > 0 ? (
+                                <ul
+                                    className="w-full max-h-[200px] overflow-auto flex flex-col items-start gap-1"
+                                >
+                                    {inputs.tasks.map((task, idx) => {
+                                        return (
+                                            <li
+                                                key={idx}
+                                                className="flex flex-col"
+                                            >
+                                                <span
+                                                    className="text-[12px] capitalize flex items-start gap-1 text-neutral-400"
+                                                >
+                                                    <MdAddTask size={18} className="text-neutral-300"/>
+                                                    {task}
+                                                </span>
+                                                {idx !== inputs.tasks.length - 1 && (
+                                                    <span className="ml-2 mt-0.5 flex w-[1px] h-4 bg-neutral-500"/>
+                                                )}
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
+                            ) : (
+                                <span
+                                    className="w-full flex justify-center p-2 border border-dashed border-neutral-700/60 text-sm text-neutral-500"
+                                >
+                                    Add To Do Tasks to see them here !
+                                </span>
+                            )}
+                        </div>
+                        <div
+                            className="w-full flex items-end gap-1.5"
                         >
-                            Task Description <span className="text-neutral-400">(optional)</span>
-                        </label>
-                        <textarea
-                            id="TaskDescription"
-                            name="description"
-                            value={inputs.description}
-                            onChange={HandleChangeInputs}
-                            placeholder="Task Description"
-                            className="placeholder:font-[300] outline-none resize-none min-h-20 border border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 focus:bg-neutral-700/20 rounded-lg p-3 text-sm"
-                        />
+
+                            <div className="w-full">
+                                <label 
+                                    className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
+                                    htmlFor="TaskToDo"
+                                >
+                                    To Do
+                                </label>
+                                <input 
+                                    type="text"
+                                    id="TaskToDo"
+                                    name="task"
+                                    value={inputs.task}
+                                    onChange={HandleChangeInputs}
+                                    className={`w-full grow outline-none border rounded-lg p-3 text-sm
+                                        ${(inputs.tasks.length === 10 && inputs.task.length > 0) ? "bg-yellow-700/10 border-yellow-700 focus:border-yellow-600 hover:border-yellow-600 "
+                                            :
+                                            "focus:bg-neutral-700/20 border-neutral-700 focus:border-neutral-600 hover:border-neutral-600 "}`}
+                                />
+                            </div>
+                            <button
+                                onClick={() => {
+                                    if(inputs.tasks.includes(inputs.task)){
+                                        toast.info(`${inputs.task} Already exists in your Tasks.`)
+                                        return;
+                                    }
+                                    if(inputs.tasks.length === 10){
+                                        toast.info("You can only add up to 10 tasks.")
+                                        return;
+                                    }
+                                    setInputs({...inputs, tasks: [...inputs.tasks, inputs.task], task: ""})}}
+                                disabled={inputs.task === ""}
+                                className="w-max cursor-pointer bg-blue-600 
+                                    hover:bg-blue-700 text-nowrap p-3 text-sm rounded-lg
+                                    border border-blue-500
+                                    disabled:bg-neutral-700 disabled:border-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400"
+                            >
+                                Add To Do
+                            </button>
+                        </div>
+                        {(inputs.tasks.length === 10 && inputs.task.length > 0) && (
+                            <span className="text-xs text-yellow-600"> You can only add up to 10 tasks. </span>
+                        )}
                     </div>
                     {/* --- TASK EMPLOYEE FOR --- */}
                     <div
@@ -244,7 +288,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
 
                     <button
                         onClick={HandleCreateTask}
-                        disabled={isLoadingSubmitTask || (inputs.due_time === "" || inputs.priority === "" || inputs.title === "" || inputs.due_date === "" || inputs.assigned_to === "")}
+                        disabled={isLoadingSubmitTask || (inputs.due_time === "" || inputs.priority === "" || inputs.tasks.length === 0 || inputs.due_date === "" || inputs.assigned_to === "")}
                         className="w-full cursor-pointer bg-blue-600 
                             hover:bg-blue-700 p-3 text-sm rounded-lg
                             border border-blue-500
