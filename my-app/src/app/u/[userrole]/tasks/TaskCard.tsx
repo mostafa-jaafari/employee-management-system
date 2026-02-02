@@ -1,13 +1,20 @@
 "use client";
+import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
-import { FaRegCircleCheck } from "react-icons/fa6";
+import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
+import { FaCheckCircle, FaUserEdit } from "react-icons/fa";
+import { FaFlag, FaRegCircleCheck, FaUserCheck } from "react-icons/fa6";
+import { FiCalendar, FiClock } from "react-icons/fi";
 import { GoTasklist } from "react-icons/go";
+import { RxLapTimer } from "react-icons/rx";
 import { SlOptionsVertical } from "react-icons/sl";
 
 
-export function TaskCard({ tasks, status, assigned_to, created_by, due_date, due_time, priority, created_at }: TaskType){
-    const PROGRESS_TEST = 76.5863578;
-    const Created_Data = new Date(created_at).toISOString().split("T")[0]
+export function TaskCard({ tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
+    const { taskList, toggleTask, progress, cardStatus } = useTaskCompletion(tasks, status);
+        
+    const { userInfos } = useUserInfos();
+    const Created_By = userInfos?.email;
     return (
         <div
             className="w-full min-w-[250px] h-max rounded-lg border
@@ -34,19 +41,131 @@ export function TaskCard({ tasks, status, assigned_to, created_by, due_date, due
             >
                 <FaRegCircleCheck className="w-4 h-4 text-neutral-400 flex-shrink-0"/>
                 <span className="flex gap-1 items-center flex-nowrap">
-                    <p>3</p>
+                    <p>{taskList.filter(t => t.completed).length}</p>
                     of
-                    <p>4</p>
+                    <p>
+                        {taskList.length}
+                    </p>
                 </span>
                 <div
                     className="relative h-2 w-full rounded-full bg-neutral-700/60 overflow-hidden"
                 >
                     <span 
-                        style={{ width: `${PROGRESS_TEST}%` }}
+                        style={{ width: `${progress}%` }}
                         className="absolute left-0 top-0 h-full bg-green-500"
                     />
                 </div>
-                <h2>{Math.floor(PROGRESS_TEST)}%</h2>
+                <h2>{Math.floor(progress)}%</h2>
+            </div>
+
+            {/* --- TASKS --- */}
+            <div className="pl-3">
+                <ul className="space-y-2 py-3">
+                    {taskList.map((task, idx) => {
+                    const isLast = idx === taskList.length - 1;
+
+                    return (
+                        <li 
+                            role="button" 
+                            onClick={() => toggleTask(idx)} 
+                            key={idx} 
+                            className="relative cursor-pointer hover:text-neutral-300 flex gap-3">
+                            {/* Timeline */}
+                            <div className="relative flex flex-col items-center">
+                                {/* Icon */}
+                                <FaCheckCircle
+                                className="z-10 mt-0.5 h-3.5 w-3.5 text-neutral-400"
+                                />
+
+                                {/* Connector */}
+                                {!isLast && (
+                                <span className="absolute top-5 bottom-0 w-px bg-neutral-700/70 rounded-full" />
+                                )}
+                            </div>
+
+                            {/* Content */}
+                            <p
+                                className={`text-sm hover:text-neutral-300 text-neutral-500 
+                                    leading-5
+                                    ${task.completed ? "line-through text-neutral-400" : ""}`}
+                                title={task.text}
+                            >
+                                {task.text}
+                            </p>
+                        </li>
+                    );
+                    })}
+                </ul>
+            </div>
+
+            <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                    <span
+                        className="flex items-center gap-3 text-neutral-400 text-xs"
+                    >
+                        <FaFlag size={12}/>
+                        Priority
+                    </span>
+                    <p className={`capitalize text-sm
+                        ${priority === "low" ?
+                            "text-green-600"
+                            :
+                            priority === "medium" ?
+                            "text-yellow-600"
+                            :
+                            "text-red-600"
+                        }`}>{priority}</p>
+                </div>
+                <div className="flex items-center justify-between">
+                    <span
+                        className="flex items-center gap-3 text-neutral-400 text-xs"
+                    >
+                        <RxLapTimer size={12}/>
+                        Status
+                    </span>
+                    <p className={`capitalize font-[500] text-sm ${cardStatus === "pending" ?
+                        "text-yellow-600"
+                        :
+                        cardStatus === "completed" ?
+                        "text-green-600"
+                        :
+                        "text-gray-600"
+                    }`}>{cardStatus}</p>
+                </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+      
+            {/* Assigned To */}
+            {assigned_to && (
+                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
+                <FaUserCheck className="h-3.5 w-3.5 text-neutral-300" />
+                <span>{assigned_to}</span>
+                </span>
+            )}
+
+            {/* Created By */}
+            {Created_By && (
+                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
+                <FaUserEdit className="h-3.5 w-3.5 text-neutral-400" />
+                <span>{Created_By}</span>
+                </span>
+            )}
+
+            {/* Due Date */}
+            {due_date && (
+                <span className="grow flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
+                <FiCalendar className="h-3.5 w-3.5 text-neutral-400" />
+                <span>{due_date}</span>
+                </span>
+            )}
+
+            {/* Due Time */}
+            {due_time && (
+                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
+                <FiClock className="h-3.5 w-3.5 text-neutral-400" />
+                <span>{due_time}</span>
+                </span>
+            )}
             </div>
         </div>
     )
