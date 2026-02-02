@@ -49,8 +49,16 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 setIsLoadingSubmitTask(false);
                 return;
             }
+            setInputs({
+                assigned_to: "",
+                description: "",
+                due_date: "",
+                priority: "",
+                status: "",
+                title: ""
+            })
             setIsLoadingSubmitTask(false);
-            toast.success(res.success)
+            toast.success(res.message)
         }catch (err){
             toast.error((err as { message: string }).message);
             setIsLoadingSubmitTask(false);
@@ -145,6 +153,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 Options={initialEmails}
                                 selectedLabel={inputs.assigned_to}
                                 DefaultAllButton={false}
+                                isLabelCapitalized={false}
                                 className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
                             />
                         </div>
@@ -185,7 +194,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 Options={["low", "medium", "high"]}
                                 selectedLabel={inputs.priority}
                                 DefaultAllButton={false}
-                                className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
+                                isLabelCapitalized
+                                className="w-full min-w-[250px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
                             />
                         </div>
 
@@ -202,7 +212,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 Options={["pending", "in progress", "completed"]}
                                 selectedLabel={inputs.status}
                                 DefaultAllButton={false}
-                                className="w-full min-w-[250px] lowercase border-neutral-600 text-sm p-3 rounded-lg"
+                                isLabelCapitalized
+                                className="w-full min-w-[250px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
                             />
                         </div>
                     </div>

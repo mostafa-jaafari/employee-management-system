@@ -7,8 +7,8 @@ export async function CreateTaskAction(formData: FormData, userId: string){
 
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
-    const assigned_to = formData.get("assignedEmployee") as string;
-    const due_date = formData.get("dueDate") as string;
+    const assigned_to = formData.get("assigned_to") as string;
+    const due_date = formData.get("due_date") as string;
     const priority = formData.get("priority") as string;
     const status = formData.get("status") || "pending" as string;
 
