@@ -1,4 +1,4 @@
-import { EmployerType } from "@/types/Employer";
+import { EmployerType } from "@/GlobalTypes";
 import { toast } from "sonner";
 
 

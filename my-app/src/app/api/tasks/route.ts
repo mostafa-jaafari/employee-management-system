@@ -11,14 +11,13 @@ export async function GET() {
   }
 
   const { data, error } = await supabase
-    .from("users")
-    .select("available_positions")
-    .eq("id", UserId)
-    .single();
+    .from("tasks")
+    .select("*", { count: "exact" })
+    .eq("created_by", UserId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data?.available_positions ?? []);
+  return NextResponse.json(data ?? []);
 }

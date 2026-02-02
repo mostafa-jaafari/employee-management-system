@@ -5,7 +5,7 @@ import { DropDown } from '@/Components/DropDown';
 import { useAddNewEntity } from '@/context/AddNewEntityProvider';
 import { useConfirmationModal } from '@/context/ConfirmationModal';
 import { useUserInfos } from '@/context/UserInfos';
-import { EmployerType } from '@/types/Employer';
+import { EmployerType } from '@/GlobalTypes';
 import { ConvertToCSV } from '@/utils/ConvertToCSV';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react'

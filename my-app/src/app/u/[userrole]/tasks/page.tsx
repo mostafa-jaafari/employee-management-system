@@ -1,7 +1,6 @@
 import { DemoTasksNotice } from "./DemoTasksNotice";
+import { TasksContainer } from "./TasksContainer";
 import { TasksHeader } from "./TasksHeader";
-import { getCachedEmployeesEmails } from "@/data/EmployeesEmails";
-import { getUserId } from "@/utils/getUserId";
 
 
 export default async function page({ params }: { params: Promise<{ userrole: string }> }) {
@@ -18,7 +17,7 @@ export default async function page({ params }: { params: Promise<{ userrole: str
             {/* --- Tasks Body --- */}
 
             <section>
-                
+                <TasksContainer />
             </section>
         </main>
     )

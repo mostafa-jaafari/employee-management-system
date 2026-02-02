@@ -1,6 +1,6 @@
 "use server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { EmployerType } from "@/types/Employer";
+import { EmployerType } from "@/GlobalTypes";
 import { updateTag } from "next/cache";
 
 

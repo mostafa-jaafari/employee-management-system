@@ -1,5 +1,5 @@
 "use client";
-import { EmployerType } from "@/types/Employer";
+import { EmployerType } from "@/GlobalTypes";
 import { createContext, useContext, useState } from "react";
 
 
