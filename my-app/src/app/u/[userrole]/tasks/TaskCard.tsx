@@ -10,15 +10,25 @@ import { RxLapTimer } from "react-icons/rx";
 import { SlOptionsVertical } from "react-icons/sl";
 
 
-export function TaskCard({ taskId, tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
-    const { taskList, toggleTask, progress, cardStatus } = useTaskCompletion(taskId, tasks, status);
-        
+export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
+
+    const normalizedTasks: { text: string; completed: boolean; }[] = Array.isArray(tasks)
+        ? tasks.map((t: { text: string; completed: boolean; }) => ({
+            text: typeof t === "string" ? t : t.text,
+            completed: typeof t === "object" ? !!t.completed : false,
+            }))
+        : [];
+
+    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, normalizedTasks, status);
     const { userInfos } = useUserInfos();
     const Created_By = userInfos?.email;
+
+
     return (
         <div
-            className="w-full min-w-[250px] h-max rounded-lg border
-                px-3 py-2 bg-section-h border border-neutral-700/60"
+            className={`w-full min-w-[250px] h-max rounded-lg border
+                px-3 py-2
+                ${isLocked ? "bg-green-800/20 border border-green-700/60" : "bg-section-h border border-neutral-700/60"}`}
         >
             <div
                 className="w-full flex items-center justify-between"
@@ -66,10 +76,12 @@ export function TaskCard({ taskId, tasks, status, assigned_to, due_date, due_tim
 
                     return (
                         <li 
-                            role="button" 
-                            onClick={() => toggleTask(idx)} 
                             key={idx} 
-                            className="relative cursor-pointer hover:text-neutral-300 flex gap-3">
+                            role="button" 
+                            aria-disabled={isLocked}
+                            onClick={() => toggleTask(idx)} 
+                            className="relative cursor-pointer hover:text-neutral-300 
+                                flex gap-3 aria-disabled:cursor-not-allowed">
                             {/* Timeline */}
                             <div className="relative flex flex-col items-center">
                                 {/* Icon */}

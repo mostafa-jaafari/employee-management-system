@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
 import { useTasks } from "@/Hooks/useTasks";
+import { mutate } from "swr";
+import { TaskType } from "@/GlobalTypes";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
@@ -36,7 +38,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
 
 
     const [isLoadingSubmitTask, setIsLoadingSubmitTask] = useState(false);
-    const Today = new Date()
+    const Today = new Date();
     const HandleCreateTask = async () => {
         if(!userInfos?.id) return null;
 
@@ -78,7 +80,14 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 due_time: ""
             });
 
-            mutateTasks();
+            mutate(
+            `/api/tasks?userId=${userInfos.id}`,
+            (current: TaskType[] = []) => {
+                if (!res.task) return current;
+                return [res.task, ...current];
+            },
+            false
+            );
             setIsOpenAddNewTask(false);
             toast.success(res.message);
         } catch (err) {

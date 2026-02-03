@@ -1,56 +1,92 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { updateTaskStatusInDB } from "@/app/actions/Task";
 
-export function useTaskCompletion(taskId: string, tasks: string[], status: string) {
-  // تحويل كل مهمة إلى { text, completed }
-  const [taskList, setTaskList] = useState(
-    Array.isArray(tasks) && tasks.length > 0
-        ? tasks.map(task => {
-            if (typeof task === "string") {
-              return { text: task, completed: false }; // إذا كان مجرد نص
-            }
-            if (typeof task === "object" && task !== null && "text" in task && typeof (task as Record<string, unknown>).text === "string") {
-              return { text: (task as Record<string, unknown>).text as string, completed: ((task as Record<string, unknown>).completed as boolean) ?? false }; // إذا جاء من DB
-            }
-            return { text: JSON.stringify(task), completed: false }; // fallback safety
-          })
-        : []
-    );
+type TaskItem = { text: string; completed: boolean };
 
-  const [cardStatus, setCardStatus] = useState(status);
+export function useTaskCompletion(
+  taskId: string,
+  tasks: TaskItem[],
+  initialStatus: string
+) {
+  const storageKey = `task-progress-${taskId}`;
 
-  // Toggle task
+  /* ----------------------------------
+     State
+  ---------------------------------- */
+
+  const [isLocked, setIsLocked] = useState(initialStatus === "completed");
+
+  const [taskList, setTaskList] = useState<TaskItem[]>(() => {
+    if (typeof window === "undefined") return tasks;
+
+    const stored = localStorage.getItem(storageKey);
+    return stored ? JSON.parse(stored) : tasks;
+  });
+
+  const [cardStatus, setCardStatus] = useState(initialStatus);
+
+  /* ----------------------------------
+     Toggle task (local only)
+  ---------------------------------- */
+
   const toggleTask = (index: number) => {
-    setTaskList(prev => {
-      const updated = prev.map((task, i) =>
+    if (isLocked) return;
+
+    setTaskList(prev =>
+      prev.map((task, i) =>
         i === index ? { ...task, completed: !task.completed } : task
-      );
-      return updated;
-    });
+      )
+    );
   };
 
-  // Progress
-  const progress = useMemo(() => {
-    if (taskList.length === 0) return 0;
-    const completedCount = taskList.filter(t => t.completed).length;
-    return Math.round((completedCount / taskList.length) * 100);
-  }, [taskList]);
+  /* ----------------------------------
+     Persist progress locally
+  ---------------------------------- */
 
-  // Auto-update status and DB
   useEffect(() => {
-    if (taskList.length === 0) return;
+    if (isLocked) return;
+    localStorage.setItem(storageKey, JSON.stringify(taskList));
+  }, [taskList, isLocked, storageKey]);
+
+  /* ----------------------------------
+     Detect full completion → sync once
+  ---------------------------------- */
+
+  useEffect(() => {
+    if (isLocked || taskList.length === 0) return;
 
     const allCompleted = taskList.every(t => t.completed);
-    const newStatus = allCompleted ? "completed" : "pending";
+    if (!allCompleted) return;
 
-    if (newStatus !== cardStatus) {
-      (async () => {
-        setCardStatus(newStatus);
-        await updateTaskStatusInDB(taskId, taskList, newStatus);
-      })();
-    }
-  }, [taskList, cardStatus, taskId]);
+    (async () => {
+      await updateTaskStatusInDB(taskId, taskList, "completed");
 
-  return { taskList, toggleTask, progress, cardStatus };
+      localStorage.removeItem(storageKey);
+      setCardStatus("completed");
+      setIsLocked(true);
+    })();
+  }, [taskList, isLocked, taskId, storageKey]);
+
+  /* ----------------------------------
+     Progress
+  ---------------------------------- */
+
+  const progress = useMemo(() => {
+    if (taskList.length === 0) return 0;
+    const completed = taskList.filter(t => t.completed).length;
+    return Math.round((completed / taskList.length) * 100);
+  }, [taskList]);
+
+  /* ----------------------------------
+     API
+  ---------------------------------- */
+
+  return {
+    taskList,
+    toggleTask,
+    progress,
+    cardStatus,
+    isLocked, // مفيد للـ UI (disable / opacity)
+  };
 }

@@ -18,7 +18,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
     }
 
     const TASK = {
-        tasks: tasks.map(text => ({ text, completed: false })),
+        tasks,
         assigned_to,
         due_date,
         due_time,
@@ -36,7 +36,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
         return { success: false, message: error.message, data: null }
     }
 
-    return { success: true, message: "Task added successfully.", data: data }
+    return { success: true, message: "Task added successfully.", task: data?.[0] }
 }
 
 export async function updateTaskStatusInDB(taskId: string, tasks: { text: string; completed: boolean; }[], status: string) {

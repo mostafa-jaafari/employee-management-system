@@ -10,11 +10,10 @@ const fetcher = (url: string) =>
 
 export function useTasks(userId?: string) {
   const { data, error, isLoading, mutate } = useSWR<TaskType[]>(
-    userId ? "/api/tasks" : null, // Key is the URL
+    userId ? `/api/tasks?userId=${userId}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // Cache for 1 minute
     }
   );
 
@@ -22,6 +21,6 @@ export function useTasks(userId?: string) {
     tasks: data ?? [],
     isLoading,
     isError: error,
-    mutateTasks: mutate, // Expose mutate to trigger re-fetch
+    mutateTasks: mutate,
   };
 }
