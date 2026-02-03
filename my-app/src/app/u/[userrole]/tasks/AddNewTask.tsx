@@ -22,7 +22,6 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
         assigned_to: "",
         due_date: "",
         priority: "",
-        status: "pending",
         due_time: ""
     });
 
@@ -52,7 +51,6 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             formData.append("assigned_to", inputs.assigned_to);
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
-            formData.append("status", inputs.status.toLowerCase());
             formData.append("due_time", inputs.due_time);
             const tasksToSend = inputs.tasks.map(taskText => ({
                 text: taskText,
@@ -74,7 +72,6 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 assigned_to: "",
                 due_date: "",
                 priority: "",
-                status: "",
                 due_time: ""
             });
 
@@ -276,7 +273,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                         className="flex items-center gap-1.5"
                     >
                         <div
-                            className="w-full flex flex-col "
+                            className="w-full flex flex-col"
                         >
                             <label 
                                 htmlFor="DueTime"
@@ -306,25 +303,6 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                 Label="--"
                                 Options={["low", "medium", "high"]}
                                 selectedLabel={inputs.priority}
-                                DefaultAllButton={false}
-                                isLabelCapitalized
-                                className="w-full min-w-[150px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
-                            />
-                        </div>
-
-                        {/* --- STATUS --- */}
-                        {inputs.status}
-                        <div>
-                            <label 
-                                className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"
-                            >
-                                Status
-                            </label>
-                            <DropDown
-                                HandleSelectOption={(stat) => setInputs({ ...inputs, status: stat }) }
-                                Label="Pending"
-                                Options={["pending", "in progress", "completed"]}
-                                selectedLabel={inputs.status}
                                 DefaultAllButton={false}
                                 isLabelCapitalized
                                 className="w-full min-w-[150px] capitalize border-neutral-600 text-sm p-3 rounded-lg"
