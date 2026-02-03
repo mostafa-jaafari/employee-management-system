@@ -2,10 +2,11 @@
 import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
 import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
-import { useEffect, useRef, useState } from "react";
+import { getFormattedTimeLeft } from "@/utils/getDaysRemaining";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaCheckCircle, FaUserEdit } from "react-icons/fa";
 import { FaFlag, FaRegCircleCheck, FaTrash, FaUserCheck } from "react-icons/fa6";
-import { FiCalendar, FiClock } from "react-icons/fi";
+import { FiClock } from "react-icons/fi";
 import { GoTasklist } from "react-icons/go";
 import { MdEdit } from "react-icons/md";
 import { RxLapTimer } from "react-icons/rx";
@@ -53,12 +54,19 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
     const { userInfos } = useUserInfos();
     const Created_By = userInfos?.email;
 
+  const timeMetrics = useMemo(() => {
+    if (!due_date) return null;
+    // We pass currentTime to trigger the re-calculation
+    return getFormattedTimeLeft(due_date, due_time);
+  }, [due_date, due_time]);
+
+
     return (
         <div
             className={`w-full min-w-[250px] h-max rounded-lg border
-                px-3 py-2
-                ${isLocked ? "bg-green-800/20 border border-green-700/60" : "bg-section-h border border-neutral-700/60"}`}
+                px-3 py-2`}
         >
+            {JSON.stringify(due_date + " / " + due_time)}
             <div
                 className="relative w-full flex items-center justify-between"
             >
@@ -83,12 +91,12 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
 
             {/* --- PROGRESS --- */}
             <div
-                className="text-sm text-neutral-400 mt-1.5 rounded-full px-1 py-0.5 border border-neutral-700/60 flex items-center gap-1.5"
+                className="text-xs text-neutral-400 mt-1.5 rounded-full px-1 py-0.5 border border-neutral-700/60 flex items-center gap-1.5"
             >
                 {isLocked ?
-                    <FaCheckCircle className="w-4 h-4 text-green-600 flex-shrink-0"/>
+                    <FaCheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0"/>
                     :
-                    <FaRegCircleCheck className="w-4 h-4 text-neutral-400 flex-shrink-0"/>
+                    <FaRegCircleCheck className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0"/>
                 }
                 <span className="flex gap-1 items-center flex-nowrap">
                     <p>{taskList.filter(t => t.completed).length}</p>
@@ -120,7 +128,7 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                             role="button" 
                             aria-disabled={isLocked}
                             onClick={() => toggleTask(idx)} 
-                            className="relative cursor-pointer hover:text-neutral-300 
+                            className="relative cursor-pointer hover:text-neutral-300
                                 flex gap-2 capitalize aria-disabled:cursor-not-allowed">
                             {/* Timeline */}
                             <div className="relative flex flex-col items-center">
@@ -141,11 +149,11 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
 
                             {/* Content */}
                             <p
-                                className={`text-sm leading-5
-                                    ${task.completed ? 
-                                        "line-through hover:text-green-300 text-green-400"
+                                className={`text-xs leading-5
+                                    ${isLocked ? 
+                                        "line-through text-neutral-300"
                                         :
-                                        "hover:text-neutral-300 text-neutral-500 "}
+                                        "text-neutral-100"}
                                     `}
                                 title={task.text}
                             >
@@ -157,6 +165,8 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                 </ul>
             </div>
 
+            <span className="flex mb-1.5 w-full h-px bg-neutral-700/60"/>
+
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                     <span
@@ -165,7 +175,7 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                         <FaFlag size={12}/>
                         Priority
                     </span>
-                    <p className={`capitalize text-sm
+                    <p className={`capitalize text-xs font-[400]
                         ${priority === "low" ?
                             "text-green-600"
                             :
@@ -182,7 +192,8 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                         <RxLapTimer size={12}/>
                         Status
                     </span>
-                    <p className={`capitalize font-[500] text-sm ${cardStatus === "pending" ?
+                    <p className={`capitalize text-xs font-[400] 
+                    ${cardStatus === "pending" ?
                         "text-yellow-600"
                         :
                         cardStatus === "completed" ?
@@ -191,6 +202,14 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                         "text-gray-600"
                     }`}>{cardStatus}</p>
                 </div>
+
+                 <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border`}>
+        <FiClock size={14} />
+        <span className="text-[11px] font-bold uppercase">
+            {timeMetrics}
+        </span>
+     </div>
+
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
       
@@ -210,17 +229,10 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                 </span>
             )}
 
-            {/* Due Date */}
-            {due_date && (
-                <span className="grow flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
-                <FiCalendar className="h-3.5 w-3.5 text-neutral-400" />
-                <span>{due_date}</span>
-                </span>
-            )}
 
             {/* Due Time */}
             {due_time && (
-                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
+                <span className="grow flex justify-center items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
                 <FiClock className="h-3.5 w-3.5 text-neutral-400" />
                 <span>{due_time}</span>
                 </span>
