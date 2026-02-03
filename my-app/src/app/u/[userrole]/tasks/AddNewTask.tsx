@@ -9,14 +9,12 @@ import { useUserInfos } from "@/context/UserInfos";
 import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
-import { useTasks } from "@/Hooks/useTasks";
 import { mutate } from "swr";
 import { TaskType } from "@/GlobalTypes";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
-    const { mutateTasks } = useTasks();
     const { userInfos } = useUserInfos();
     const [inputs, setInputs] = useState({
         tasks: ["add new user to the database", "hello everyone how are you doing today"],

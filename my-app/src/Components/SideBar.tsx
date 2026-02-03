@@ -21,7 +21,15 @@ const SideBar__Navigations = [
     { name: "positions", href: "positions", icon: FaUserTie }
 ];
 export function SideBar(){
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(() => {
+        const stored = localStorage.getItem("sidebarOpen");
+        return stored !== null ? JSON.parse(stored) : true;
+    });
+
+    const handleToggleSidebar = (newState: boolean) => {
+        setIsOpen(newState);
+        localStorage.setItem("sidebarOpen", JSON.stringify(newState));
+    };
 
     const pathname = usePathname();
     const isActive = (href: string) => {
@@ -60,7 +68,7 @@ export function SideBar(){
                     </h1>
                 </span>
                 <button
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => handleToggleSidebar(!isOpen)}
                     className={`absolute right-0 w-full flex
                         ${isOpen ? "justify-end pr-4" : "justify-center group-hover:opacity-100 opacity-0"}`}
                 >
@@ -90,6 +98,7 @@ export function SideBar(){
                     return (
                         <Link
                             key={idx}
+                            title={nav.name}
                             href={`/u/${User_Role}/${nav.href}`}
                             
                         >
