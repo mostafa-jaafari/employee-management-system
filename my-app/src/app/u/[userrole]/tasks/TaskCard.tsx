@@ -1,5 +1,4 @@
 "use client";
-import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
 import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
 import { getFormattedTimeLeft } from "@/utils/getDaysRemaining";
@@ -36,7 +35,7 @@ const DropDownOptions = () => {
         </ul>
     )
 }
-export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
+export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due_time, priority, created_by }: TaskType){
     const DropDownOptionRef = useRef<HTMLButtonElement | null>(null);
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     useEffect(() => {
@@ -58,8 +57,6 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
       const is_Over_Due = timeMetrics?.toLowerCase() === "overdue";
 
     const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status, is_Over_Due);
-    const { userInfos } = useUserInfos();
-    const Created_By = userInfos?.email;
 
     return (
         <div
@@ -240,17 +237,17 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
 
                 <span className="flex w-full h-px bg-neutral-700/60"/>
 
-                <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
+                <div className="text-nowrap flex items-center gap-1.5 text-neutral-400 text-xs">
                         <span className="p-0.5 rounded border border-neutral-700/60 text-white bg-neutral-800">
                             <FaUserCheck size={12}/>
                         </span>
-                        Assined to : <p className="text-neutral-200">{assigned_to}</p>
+                        Assined to : <p className="text-neutral-200 truncate">{assigned_to}</p>
                 </div>
-                <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
+                <div className="text-nowrap flex items-center gap-1.5 text-neutral-400 text-xs">
                         <span className="p-0.5 rounded border border-neutral-700/60 text-white bg-neutral-800">
                             <FaUserEdit size={12}/>
                         </span>
-                        Created by : <p className="text-neutral-200">{assigned_to}</p>
+                        Created by : <p className="text-neutral-200 truncate">{created_by}</p>
                 </div> 
             </div>
         </div>

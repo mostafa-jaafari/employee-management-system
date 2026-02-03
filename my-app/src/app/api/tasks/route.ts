@@ -12,7 +12,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, tasks, status, assigned_to, due_date, due_time, priority", { count: "exact" })
+    .select("id, tasks, status, assigned_to, due_date, due_time, priority, created_by", { count: "exact" })
     .eq("created_by", UserId);
 
   if (error) {
