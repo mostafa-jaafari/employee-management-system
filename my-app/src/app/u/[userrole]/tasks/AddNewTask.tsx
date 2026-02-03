@@ -17,12 +17,12 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
     const { userInfos } = useUserInfos();
     const [inputs, setInputs] = useState({
-        tasks: ["add new user to the database", "hello everyone how are you doing today"],
+        tasks: [] as string[],
         task: "",
         assigned_to: "",
         due_date: "",
         priority: "",
-        status: "",
+        status: "pending",
         due_time: ""
     });
 
@@ -52,7 +52,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             formData.append("assigned_to", inputs.assigned_to);
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
-            formData.append("status", inputs.status || "pending");
+            formData.append("status", inputs.status.toLowerCase());
             formData.append("due_time", inputs.due_time);
             const tasksToSend = inputs.tasks.map(taskText => ({
                 text: taskText,
@@ -217,8 +217,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                         task: ""
                                         });
                                 }}
-                                disabled={inputs.task === ""}
-                                className="w-max cursor-pointer bg-blue-600 
+                                disabled={inputs.task === "" || inputs.tasks.length === 10}
+                                className="w-max cursor-pointer bg-blue-600
                                     hover:bg-blue-700 text-nowrap p-3 text-sm rounded-lg
                                     border border-blue-500
                                     disabled:bg-neutral-700 disabled:border-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400"
@@ -313,6 +313,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                         </div>
 
                         {/* --- STATUS --- */}
+                        {inputs.status}
                         <div>
                             <label 
                                 className="mb-0.5 text-sm text-neutral-300 w-max hover:text-neutral-200 cursor-pointer"

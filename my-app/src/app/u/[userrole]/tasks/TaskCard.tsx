@@ -48,14 +48,14 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
         window.addEventListener('mousedown', HideDropDownOptions)
         return () => window.removeEventListener('mousedown', HideDropDownOptions);
     },[])
-    const normalizedTasks: { text: string; completed: boolean; }[] = Array.isArray(tasks)
-        ? tasks.map((t: { text: string; completed: boolean; }) => ({
-            text: typeof t === "string" ? t : t.text,
-            completed: typeof t === "object" ? !!t.completed : false,
-            }))
-        : [];
+    // const normalizedTasks: { text: string; completed: boolean; }[] = Array.isArray(tasks)
+    //     ? tasks.map((t: { text: string; completed: boolean; }) => ({
+    //         text: typeof t === "string" ? t : t.text,
+    //         completed: typeof t === "object" ? !!t.completed : false,
+    //         }))
+    //     : [];
 
-    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, normalizedTasks, status);
+    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status);
     const { userInfos } = useUserInfos();
     const Created_By = userInfos?.email;
 

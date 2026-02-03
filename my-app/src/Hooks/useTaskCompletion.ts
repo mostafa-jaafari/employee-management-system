@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { updateTaskStatusInDB } from "@/app/actions/Task";
 
 type TaskItem = { text: string; completed: boolean };
 
@@ -11,24 +10,25 @@ export function useTaskCompletion(
 ) {
   const storageKey = `task-progress-${taskId}`;
 
-  /* ----------------------------------
-     State
-  ---------------------------------- */
-
   const [isLocked, setIsLocked] = useState(initialStatus === "completed");
 
   const [taskList, setTaskList] = useState<TaskItem[]>(() => {
     if (typeof window === "undefined") return tasks;
 
     const stored = localStorage.getItem(storageKey);
-    return stored ? JSON.parse(stored) : tasks;
+    try {
+      const parsed = stored ? JSON.parse(stored) : null;
+      // إذا الـ tasks الجديدة مختلفة عن ما في storage، نستخدم الجديدة
+      if (parsed && Array.isArray(parsed) && parsed.length === tasks.length) {
+        return parsed;
+      }
+      return tasks;
+    } catch {
+      return tasks;
+    }
   });
 
   const [cardStatus, setCardStatus] = useState(initialStatus);
-
-  /* ----------------------------------
-     Toggle task (local only)
-  ---------------------------------- */
 
   const toggleTask = (index: number) => {
     if (isLocked) return;
@@ -40,18 +40,10 @@ export function useTaskCompletion(
     );
   };
 
-  /* ----------------------------------
-     Persist progress locally
-  ---------------------------------- */
-
   useEffect(() => {
     if (isLocked) return;
     localStorage.setItem(storageKey, JSON.stringify(taskList));
   }, [taskList, isLocked, storageKey]);
-
-  /* ----------------------------------
-     Detect full completion → sync once
-  ---------------------------------- */
 
   useEffect(() => {
     if (isLocked || taskList.length === 0) return;
@@ -60,6 +52,7 @@ export function useTaskCompletion(
     if (!allCompleted) return;
 
     (async () => {
+      const { updateTaskStatusInDB } = await import("@/app/actions/Task");
       await updateTaskStatusInDB(taskId, taskList, "completed");
 
       localStorage.removeItem(storageKey);
@@ -68,25 +61,22 @@ export function useTaskCompletion(
     })();
   }, [taskList, isLocked, taskId, storageKey]);
 
-  /* ----------------------------------
-     Progress
-  ---------------------------------- */
-
   const progress = useMemo(() => {
     if (taskList.length === 0) return 0;
     const completed = taskList.filter(t => t.completed).length;
     return Math.round((completed / taskList.length) * 100);
   }, [taskList]);
 
-  /* ----------------------------------
-     API
-  ---------------------------------- */
+  // إذا تغيرت prop tasks (مثل عند إنشاء مهمة جديدة)، نحدث taskList مباشرة
+  useEffect(() => {
+    setTaskList(tasks);
+  }, [tasks]);
 
   return {
     taskList,
     toggleTask,
     progress,
     cardStatus,
-    isLocked, // مفيد للـ UI (disable / opacity)
+    isLocked,
   };
 }
