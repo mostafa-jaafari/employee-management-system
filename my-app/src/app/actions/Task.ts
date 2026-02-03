@@ -37,7 +37,7 @@ export async function CreateTaskAction(formData: FormData, userEmail: string){
     return { success: true, message: "Task added successfully.", task: data?.[0] }
 }
 
-export async function updateTaskStatusInDB(taskId: string, tasks: string[], status: string) {
+export async function updateTaskStatusInDBAction(taskId: string, status: string) {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
         .from("tasks")
@@ -46,4 +46,17 @@ export async function updateTaskStatusInDB(taskId: string, tasks: string[], stat
     
     if (error) throw new Error(error.message);
     return data;
+}
+
+export async function DeleteTaskAction(taskId: string) {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId); 
+    
+    if (error) {
+        return { success: false, message: error.message, data: null }
+    };
+    return { success: true, message: "Task deleted successfully.", task: data?.[0] }
 }

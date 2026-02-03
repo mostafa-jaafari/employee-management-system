@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { updateTaskStatusInDB } from "@/app/actions/Task";
+import { updateTaskStatusInDBAction } from "@/app/actions/Task";
 
 type TaskItem = { text: string; completed: boolean };
 
@@ -70,7 +70,7 @@ export function useTaskCompletion(
         setCardStatus("completed")
         setIsLocked(true);
         localStorage.removeItem(storageKey);
-        updateTaskStatusInDB(taskId, tasks, "completed");
+        updateTaskStatusInDBAction(taskId, tasks, "completed");
       } else if (completedCount > 0) {
         // In Progress
         setCardStatus("in progress");

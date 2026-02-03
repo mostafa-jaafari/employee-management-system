@@ -1,4 +1,8 @@
 "use client";
+import { DeleteTaskAction } from "@/app/actions/Task";
+import { ConfirmationModal } from "@/Components/ConfirmationModal";
+import { useConfirmationModal } from "@/context/ConfirmationModal";
+import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
 import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
 import { getFormattedTimeLeft } from "@/utils/getDaysRemaining";
@@ -9,9 +13,12 @@ import { GoTasklist } from "react-icons/go";
 import { MdEdit, MdOutlineTimerOff, MdRunningWithErrors, MdTimer } from "react-icons/md";
 import { RiMapPinTimeFill } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
+import { toast } from "sonner";
+import { mutate } from "swr";
 
 
-const DropDownOptions = () => {
+const DropDownOptions = ({ setIsConfirmationModalOpen }: { setIsConfirmationModalOpen: (isOpen: boolean) => void }) => {
+    
     const Options = [{ label: "Edit", icon: MdEdit }, { label: "Delete", icon: FaTrash }]
     return (
         <ul
@@ -22,6 +29,13 @@ const DropDownOptions = () => {
                 return (
                     <li
                         key={idx}
+                        role="button"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            if(opt.label.toLocaleLowerCase() === "delete"){
+                                setIsConfirmationModalOpen(true);
+                            }
+                        }}
                         className="w-full justify-start flex items-center gap-1.5 py-1 px-3 
                             text-neutral-400 hover:text-neutral-100 cursor-pointer hover:bg-neutral-800 text-sm"
                     >
@@ -36,7 +50,7 @@ const DropDownOptions = () => {
     )
 }
 export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due_time, priority, created_by }: TaskType){
-    const DropDownOptionRef = useRef<HTMLButtonElement | null>(null);
+    const DropDownOptionRef = useRef<HTMLDivElement | null>(null);
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     useEffect(() => {
         const HideDropDownOptions = (e: MouseEvent) => {
@@ -57,7 +71,36 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
       const is_Over_Due = timeMetrics?.toLowerCase() === "overdue";
 
     const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status, is_Over_Due);
+    const { userInfos } = useUserInfos();
+    const { setIsConfirmationModalOpen } = useConfirmationModal();
+    const [isLoadingDeleteTask, setIsLoadingDeleteTask] = useState(false);
+    const HandleDeleteTask = async (taskId: string) => {
+        if(!taskId) return;
 
+        try{
+            setIsLoadingDeleteTask(true);
+            const res = await DeleteTaskAction(taskId);
+            if(!res.success){
+                toast.error(res.message)
+                setIsLoadingDeleteTask(false);
+                return;
+            }
+            mutate(
+            `/api/tasks?userId=${userInfos?.id}`,
+            (current: TaskType[] = []) => {
+                if (!res.task) return current;
+                return [res.task, ...current];
+            },
+            false
+            );
+            toast.success(res.message)
+            setIsLoadingDeleteTask(false);
+            setIsConfirmationModalOpen(false);
+        }catch (err){
+            setIsLoadingDeleteTask(false);
+            toast.error((err as { message: string }).message)
+        }
+    }
     return (
         <div
             className={`w-full min-w-[250px] h-max rounded-lg border px-3 py-2
@@ -68,6 +111,12 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                     :
                     "border-neutral-700/60 bg-section-h"}`}
         >
+            <ConfirmationModal
+                HandelConfirmModal={() => HandleDeleteTask(taskId)}
+                Title={`are you sure to delete this Task Card ?`}
+                ConfirmButtonLabel="Delete"
+                isLoadingConfirmation={isLoadingDeleteTask}
+            />
             <div
                 className="relative w-full flex items-center justify-between"
             >
@@ -78,16 +127,17 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                     <h1 className="text-md capitalize text-neutral-300">Task Item</h1>
                 </span>
 
-                <button
-                    ref={DropDownOptionRef}
+                <div ref={DropDownOptionRef}>
+                    <button
                     onClick={() => setIsOptionsOpen(!isOptionsOpen)}
                 >
                     <SlOptionsVertical className="w-4 h-4 cursor-pointer text-neutral-400 hover:text-neutral-200"/>
                 </button>
 
                 {isOptionsOpen && (
-                    <DropDownOptions />
+                    <DropDownOptions setIsConfirmationModalOpen={setIsConfirmationModalOpen} />
                 )}
+                </div>
             </div>
 
             {/* --- PROGRESS --- */}
