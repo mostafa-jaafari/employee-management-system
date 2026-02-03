@@ -52,11 +52,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
             formData.append("due_time", inputs.due_time);
-            const tasksToSend = inputs.tasks.map(taskText => ({
-                text: taskText,
-                completed: false
-                }));
-            formData.append("tasks", JSON.stringify(tasksToSend));
+            formData.append("tasks", JSON.stringify(inputs.tasks));
 
             const res = await CreateTaskAction(formData, userInfos?.id);
 

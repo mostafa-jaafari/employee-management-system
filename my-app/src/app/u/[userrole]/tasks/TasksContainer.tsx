@@ -10,12 +10,12 @@ export function TasksContainer(){
     const { tasks } = useTasks(userInfos?.id);
     return (
         <section
-            className="w-full grid grid-cols-4 gap-3"
+            className="w-full grid grid-cols-4 gap-1.5"
         >
-            {tasks.length > 0 ? tasks.map((task, idx) => {
+            {tasks.length > 0 ? tasks.map((task) => {
                 return (
                     <TaskCard
-                        key={idx}
+                        key={task.id}
                         id={task.id}
                         tasks={task.tasks}
                         assigned_to={task.assigned_to}

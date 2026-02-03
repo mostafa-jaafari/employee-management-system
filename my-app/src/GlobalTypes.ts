@@ -12,7 +12,7 @@ export type EmployerType = {
 
 export type TaskType = {
     id: string;
-    tasks: { text: string; completed: boolean }[];
+    tasks: string[];
     assigned_to: string;
     due_date: string;
     due_time: string;

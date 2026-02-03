@@ -1,32 +1,50 @@
 "use client";
+
 import { useEffect, useMemo, useState } from "react";
+import { updateTaskStatusInDB } from "@/app/actions/Task";
 
-
-// TYPES
 type TaskItem = { text: string; completed: boolean };
 
-// HOOK: useTaskCompletion
-export function useTaskCompletion(taskId: string, tasks: TaskItem[], initialStatus: string) {
+export function useTaskCompletion(
+  taskId: string,
+  tasks: string[], 
+  initialStatus: string
+) {
   const storageKey = `task-progress-${taskId}`;
 
-  const [isLocked, setIsLocked] = useState(initialStatus === "completed");
-  const [taskList, setTaskList] = useState<TaskItem[]>(() => {
-    if (typeof window === "undefined") return tasks;
-
+  // 1. Helper to get saved state
+  const getSavedTasks = (): TaskItem[] => {
+    if (typeof window === "undefined") return tasks.map(t => ({ text: t, completed: false }));
+    
     const stored = localStorage.getItem(storageKey);
-    try {
-      const parsed = stored ? JSON.parse(stored) : null;
-      if (parsed && Array.isArray(parsed) && parsed.length === tasks.length) {
-        return parsed;
-      }
-      return tasks;
-    } catch {
-      return tasks;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length === tasks.length) {
+          return parsed;
+        }
+      } catch (e) { console.error(e); }
     }
+    // If DB says completed, all are true, else all false
+    return tasks.map(t => ({ text: t, completed: initialStatus === "completed" }));
+  };
+
+  // 2. Initialize State
+  const [taskList, setTaskList] = useState<TaskItem[]>(getSavedTasks);
+  const [isLocked, setIsLocked] = useState(initialStatus === "completed");
+
+  // 3. Sync cardStatus with the loaded data immediately
+  const [cardStatus, setCardStatus] = useState(() => {
+    const saved = getSavedTasks();
+    const anyDone = saved.some(t => t.completed);
+    const allDone = saved.every(t => t.completed) && saved.length > 0;
+
+    if (initialStatus === "completed" || allDone) return "completed";
+    if (anyDone) return "in progress";
+    return initialStatus || "pending";
   });
 
-  const [cardStatus, setCardStatus] = useState(initialStatus);
-
+  // 4. Handle Task Toggling
   const toggleTask = (index: number) => {
     if (isLocked) return;
     setTaskList(prev =>
@@ -36,45 +54,39 @@ export function useTaskCompletion(taskId: string, tasks: TaskItem[], initialStat
     );
   };
 
-  // حفظ progress في localStorage
+  // 5. Watch for changes and update Database/LocalStorage
   useEffect(() => {
-    if (!isLocked) localStorage.setItem(storageKey, JSON.stringify(taskList));
-  }, [taskList, isLocked, storageKey]);
+    if (isLocked) return;
 
-  // تحديث status تلقائي حسب تقدم المهام + إرسال completed إلى DB
-  useEffect(() => {
-    if (taskList.length === 0) {
-    setCardStatus("pending"); // مهمة جديدة دائماً pending أولاً
-    return;
-  }
+    setTimeout(() => {
+    const completedCount = taskList.filter(t => t.completed).length;
+    const total = taskList.length;
 
-    const allCompleted = taskList.every(t => t.completed);
-    const anyCompleted = taskList.some(t => t.completed);
+    if (total === 0) return;
 
-    if (allCompleted) setCardStatus("completed");
-    else if (anyCompleted) setCardStatus("in progress");
-    else setCardStatus("pending");
-
-    if (allCompleted) {
-      (async () => {
-        const { updateTaskStatusInDB } = await import("@/app/actions/Task");
-        await updateTaskStatusInDB(taskId, taskList, "completed");
-        localStorage.removeItem(storageKey);
+    if (completedCount === total) {
+      // 100% Completed
+        setCardStatus("completed")
         setIsLocked(true);
-      })();
-    }
-  }, [taskList, isLocked, taskId, storageKey]);
-
-  // إذا تغيرت prop tasks، نحدث taskList مباشرة
-  useEffect(() => {
-    setTaskList(tasks);
-  }, [tasks]);
+        localStorage.removeItem(storageKey);
+        updateTaskStatusInDB(taskId, tasks, "completed");
+      } else if (completedCount > 0) {
+        // In Progress
+        setCardStatus("in progress");
+        localStorage.setItem(storageKey, JSON.stringify(taskList));
+      } else {
+        // Pending
+        setCardStatus("pending");
+        localStorage.setItem(storageKey, JSON.stringify(taskList));
+      }
+    },0)
+  }, [taskList, taskId, storageKey, isLocked, tasks]);
 
   const progress = useMemo(() => {
     if (taskList.length === 0) return 0;
     const completed = taskList.filter(t => t.completed).length;
-    return Math.round((completed / taskList.length) * 100);
+    return (completed / taskList.length) * 100;
   }, [taskList]);
 
-  return { taskList, toggleTask, progress, cardStatus, isLocked, setCardStatus };
+  return { taskList, toggleTask, progress, cardStatus, isLocked };
 }
