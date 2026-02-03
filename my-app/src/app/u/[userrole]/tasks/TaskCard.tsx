@@ -2,16 +2,52 @@
 import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
 import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
+import { useEffect, useRef, useState } from "react";
 import { FaCheckCircle, FaUserEdit } from "react-icons/fa";
-import { FaFlag, FaRegCircleCheck, FaUserCheck } from "react-icons/fa6";
+import { FaFlag, FaRegCircleCheck, FaTrash, FaUserCheck } from "react-icons/fa6";
 import { FiCalendar, FiClock } from "react-icons/fi";
 import { GoTasklist } from "react-icons/go";
+import { MdEdit } from "react-icons/md";
 import { RxLapTimer } from "react-icons/rx";
 import { SlOptionsVertical } from "react-icons/sl";
 
 
+const DropDownOptions = () => {
+    const Options = [{ label: "Edit", icon: MdEdit }, { label: "Delete", icon: FaTrash }]
+    return (
+        <ul
+            className="absolute right-1 top-full z-30 w-full max-w-[160px]
+                p-1.5 bg-neutral-900 shadow-lg rounded-lg border border-neutral-700/60"
+        >
+            {Options.map((opt, idx) => {
+                return (
+                    <li
+                        key={idx}
+                        className="w-full justify-start flex items-center gap-1.5 py-1 px-3 
+                            text-neutral-400 hover:text-neutral-100 cursor-pointer hover:bg-neutral-800 text-sm"
+                    >
+                        <opt.icon size={14}/>
+                        <h1>
+                            {opt.label}
+                        </h1>
+                    </li>
+                )
+            })}
+        </ul>
+    )
+}
 export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
-
+    const DropDownOptionRef = useRef<HTMLButtonElement | null>(null);
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    useEffect(() => {
+        const HideDropDownOptions = (e: MouseEvent) => {
+            if(DropDownOptionRef.current && !DropDownOptionRef.current.contains(e.target as Node)){
+                setIsOptionsOpen(false);
+            }
+        }
+        window.addEventListener('mousedown', HideDropDownOptions)
+        return () => window.removeEventListener('mousedown', HideDropDownOptions);
+    },[])
     const normalizedTasks: { text: string; completed: boolean; }[] = Array.isArray(tasks)
         ? tasks.map((t: { text: string; completed: boolean; }) => ({
             text: typeof t === "string" ? t : t.text,
@@ -31,7 +67,7 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                 ${isLocked ? "bg-green-800/20 border border-green-700/60" : "bg-section-h border border-neutral-700/60"}`}
         >
             <div
-                className="w-full flex items-center justify-between"
+                className="relative w-full flex items-center justify-between"
             >
                 <span
                     className="flex items-center gap-1.5"
@@ -40,9 +76,16 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                     <h1 className="text-lg capitalize">Task Item</h1>
                 </span>
 
-                <button>
-                    <SlOptionsVertical className="w-5 h-5 text-neutral-400 hover:text-neutral-200"/>
+                <button
+                    ref={DropDownOptionRef}
+                    onClick={() => setIsOptionsOpen(!isOptionsOpen)}
+                >
+                    <SlOptionsVertical className="w-4 h-4 cursor-pointer text-neutral-400 hover:text-neutral-200"/>
                 </button>
+
+                {isOptionsOpen && (
+                    <DropDownOptions />
+                )}
             </div>
 
             {/* --- PROGRESS --- */}
@@ -97,9 +140,8 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
 
                             {/* Content */}
                             <p
-                                className={`text-sm hover:text-neutral-300 text-neutral-500 
-                                    leading-5
-                                    ${task.completed ? "line-through text-neutral-400" : ""}`}
+                                className={`text-sm leading-5
+                                    ${task.completed ? "line-through hover:text-green-300 text-green-400 " : "hover:text-neutral-300 text-neutral-500 "}`}
                                 title={task.text}
                             >
                                 {task.text}
