@@ -10,8 +10,8 @@ import { RxLapTimer } from "react-icons/rx";
 import { SlOptionsVertical } from "react-icons/sl";
 
 
-export function TaskCard({ tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
-    const { taskList, toggleTask, progress, cardStatus } = useTaskCompletion(tasks, status);
+export function TaskCard({ taskId, tasks, status, assigned_to, due_date, due_time, priority }: TaskType){
+    const { taskList, toggleTask, progress, cardStatus } = useTaskCompletion(taskId, tasks, status);
         
     const { userInfos } = useUserInfos();
     const Created_By = userInfos?.email;

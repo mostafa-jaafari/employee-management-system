@@ -1,72 +1,56 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
+import { updateTaskStatusInDB } from "@/app/actions/Task";
 
-const STORAGE_KEY = "task-card-completed";
-
-export function useTaskCompletion(tasks: string[], status: string) {
-  // 1️⃣ Tasks state
+export function useTaskCompletion(taskId: string, tasks: string[], status: string) {
+  // تحويل كل مهمة إلى { text, completed }
   const [taskList, setTaskList] = useState(
-    tasks.map(text => ({ text, completed: false }))
-  );
+    Array.isArray(tasks) && tasks.length > 0
+        ? tasks.map(task => {
+            if (typeof task === "string") {
+              return { text: task, completed: false }; // إذا كان مجرد نص
+            }
+            if (typeof task === "object" && task !== null && "text" in task && typeof (task as Record<string, unknown>).text === "string") {
+              return { text: (task as Record<string, unknown>).text as string, completed: ((task as Record<string, unknown>).completed as boolean) ?? false }; // إذا جاء من DB
+            }
+            return { text: JSON.stringify(task), completed: false }; // fallback safety
+          })
+        : []
+    );
 
-  // 2️⃣ Status state
   const [cardStatus, setCardStatus] = useState(status);
 
-  // 3️⃣ Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-
-    try {
-      const parsed = JSON.parse(saved);
-      if (parsed.tasks) {
-        setTimeout(() => setTaskList(parsed.tasks), 0)
-      }
-      if (parsed.status) {
-        setTimeout(() => setCardStatus(parsed.status), 0)
-      }
-    } catch {}
-  }, []);
-
-  // 4️⃣ Persist to localStorage
-  useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ tasks: taskList, status: cardStatus })
-    );
-  }, [taskList, cardStatus]);
-
-  // 5️⃣ Toggle single task
+  // Toggle task
   const toggleTask = (index: number) => {
-    setTaskList(prev =>
-      prev.map((task, i) =>
+    setTaskList(prev => {
+      const updated = prev.map((task, i) =>
         i === index ? { ...task, completed: !task.completed } : task
-      )
-    );
+      );
+      return updated;
+    });
   };
 
-  // 6️⃣ Progress calculation
+  // Progress
   const progress = useMemo(() => {
     if (taskList.length === 0) return 0;
     const completedCount = taskList.filter(t => t.completed).length;
     return Math.round((completedCount / taskList.length) * 100);
   }, [taskList]);
 
-  // 7️⃣ Auto-complete status
+  // Auto-update status and DB
   useEffect(() => {
     if (taskList.length === 0) return;
 
     const allCompleted = taskList.every(t => t.completed);
+    const newStatus = allCompleted ? "completed" : "pending";
 
-    if (allCompleted && cardStatus !== "completed") {
+    if (newStatus !== cardStatus) {
       (async () => {
-        await new Promise(res => setTimeout(res, 300));
-        setCardStatus("completed");
+        setCardStatus(newStatus);
+        await updateTaskStatusInDB(taskId, taskList, newStatus);
       })();
-    } else if (!allCompleted && cardStatus === "completed") {
-        setTimeout(() => setCardStatus("pending"), 0)
     }
-  }, [taskList, cardStatus]);
+  }, [taskList, cardStatus, taskId]);
 
-  return { taskList, toggleTask, progress, cardStatus, setCardStatus };
+  return { taskList, toggleTask, progress, cardStatus };
 }

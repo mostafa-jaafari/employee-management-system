@@ -39,22 +39,35 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const Today = new Date()
     const HandleCreateTask = async () => {
         if(!userInfos?.id) return null;
+
+        if(inputs.tasks.length === 0){
+            toast.error("Add at least one task!");
+            return;
+        }
+
         try {
             setIsLoadingSubmitTask(true);
+
             const formData = new FormData();
-            inputs.tasks.forEach(task => formData.append("tasks", task));
             formData.append("assigned_to", inputs.assigned_to);
             formData.append("due_date", inputs.due_date);
             formData.append("priority", inputs.priority);
-            formData.append("status", inputs.status);
+            formData.append("status", inputs.status || "pending");
             formData.append("due_time", inputs.due_time);
+            const tasksToSend = inputs.tasks.map(taskText => ({
+                text: taskText,
+                completed: false
+                }));
+            formData.append("tasks", JSON.stringify(tasksToSend));
 
-            const res = await CreateTaskAction(formData, userInfos?.id)
+            const res = await CreateTaskAction(formData, userInfos?.id);
+
             if(!res.success){
                 toast.error(res.message);
                 setIsLoadingSubmitTask(false);
                 return;
             }
+
             setInputs({
                 tasks: [],
                 task: "",
@@ -63,16 +76,18 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 priority: "",
                 status: "",
                 due_time: ""
-            })
+            });
+
             mutateTasks();
             setIsOpenAddNewTask(false);
-            setIsLoadingSubmitTask(false);
-            toast.success(res.message)
-        }catch (err){
+            toast.success(res.message);
+        } catch (err) {
             toast.error((err as { message: string }).message);
+        } finally {
             setIsLoadingSubmitTask(false);
         }
     }
+
     if(!isOpenAddNewTask) return null;
     return (
         <section
@@ -189,7 +204,12 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                                         toast.info("You can only add up to 10 tasks.")
                                         return;
                                     }
-                                    setInputs({...inputs, tasks: [...inputs.tasks, inputs.task], task: ""})}}
+                                    setInputs({
+                                        ...inputs,
+                                        tasks: [...inputs.tasks, inputs.task], // فقط نص المهمة
+                                        task: ""
+                                        });
+                                }}
                                 disabled={inputs.task === ""}
                                 className="w-max cursor-pointer bg-blue-600 
                                     hover:bg-blue-700 text-nowrap p-3 text-sm rounded-lg

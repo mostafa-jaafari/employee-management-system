@@ -5,7 +5,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function CreateTaskAction(formData: FormData, userId: string){
     const supabase = await createSupabaseServerClient();
 
-    const tasks = formData.getAll("tasks") as string[];
+    const tasksRaw = formData.get("tasks") as string; 
+    const tasks = JSON.parse(tasksRaw) as { text: string; completed: boolean }[];
     const assigned_to = formData.get("assigned_to") as string;
     const due_date = formData.get("due_date") as string;
     const priority = formData.get("priority") as string;
@@ -17,7 +18,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
     }
 
     const TASK = {
-        tasks,
+        tasks: tasks.map(text => ({ text, completed: false })),
         assigned_to,
         due_date,
         due_time,
@@ -36,4 +37,15 @@ export async function CreateTaskAction(formData: FormData, userId: string){
     }
 
     return { success: true, message: "Task added successfully.", data: data }
+}
+
+export async function updateTaskStatusInDB(taskId: string, tasks: { text: string; completed: boolean; }[], status: string) {
+  
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from("tasks")
+        .update({ tasks, status })
+        .eq("id", taskId); // id للـ card أو project
+  if (error) console.error("Failed to update task:", error);
+  return data;
 }
