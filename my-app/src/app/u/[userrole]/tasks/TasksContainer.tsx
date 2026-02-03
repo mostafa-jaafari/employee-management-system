@@ -10,7 +10,7 @@ export function TasksContainer(){
     const { tasks } = useTasks(userInfos?.id);
     return (
         <section
-            className="w-full grid grid-cols-4 gap-1.5"
+            className="w-full grid grid-cols-4 gap-3"
         >
             {tasks.length > 0 ? tasks.map((task) => {
                 return (

@@ -2,7 +2,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 
-export async function CreateTaskAction(formData: FormData, userId: string){
+export async function CreateTaskAction(formData: FormData, userEmail: string){
     const supabase = await createSupabaseServerClient();
 
     const tasksRaw = formData.get("tasks") as string; 
@@ -22,7 +22,7 @@ export async function CreateTaskAction(formData: FormData, userId: string){
         due_date,
         due_time,
         priority,
-        created_by: userId,
+        created_by: userEmail,
     }
 
     const { data, error } = await supabase

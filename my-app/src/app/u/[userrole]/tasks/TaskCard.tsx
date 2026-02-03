@@ -6,10 +6,9 @@ import { getFormattedTimeLeft } from "@/utils/getDaysRemaining";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaCheckCircle, FaUserEdit } from "react-icons/fa";
 import { FaFlag, FaRegCircleCheck, FaTrash, FaUserCheck } from "react-icons/fa6";
-import { FiClock } from "react-icons/fi";
 import { GoTasklist } from "react-icons/go";
-import { MdEdit } from "react-icons/md";
-import { RxLapTimer } from "react-icons/rx";
+import { MdEdit, MdOutlineTimerOff, MdRunningWithErrors, MdTimer } from "react-icons/md";
+import { RiMapPinTimeFill } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
 
 
@@ -50,31 +49,36 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
         return () => window.removeEventListener('mousedown', HideDropDownOptions);
     },[])
 
-    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status);
+    const timeMetrics = useMemo(() => {
+      if (!due_date) return null;
+      // We pass currentTime to trigger the re-calculation
+      return getFormattedTimeLeft(due_date, due_time);
+    }, [due_date, due_time]);
+  
+      const is_Over_Due = timeMetrics?.toLowerCase() === "overdue";
+
+    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status, is_Over_Due);
     const { userInfos } = useUserInfos();
     const Created_By = userInfos?.email;
 
-  const timeMetrics = useMemo(() => {
-    if (!due_date) return null;
-    // We pass currentTime to trigger the re-calculation
-    return getFormattedTimeLeft(due_date, due_time);
-  }, [due_date, due_time]);
-
-
     return (
         <div
-            className={`w-full min-w-[250px] h-max rounded-lg border
-                px-3 py-2`}
+            className={`w-full min-w-[250px] h-max rounded-lg border px-3 py-2
+                ${is_Over_Due ? 
+                    "border-red-700/60 bg-red-800/10"
+                    :
+                    isLocked ? "border-green-700/60 bg-green-800/10"
+                    :
+                    "border-neutral-700/60 bg-section-h"}`}
         >
-            {JSON.stringify(due_date + " / " + due_time)}
             <div
                 className="relative w-full flex items-center justify-between"
             >
                 <span
                     className="flex items-center gap-1.5"
                 >
-                    <GoTasklist className="w-8 h-8 text-neutral-400" />
-                    <h1 className="text-lg capitalize">Task Item</h1>
+                    <GoTasklist className="w-6 h-6 text-neutral-400" />
+                    <h1 className="text-md capitalize text-neutral-300">Task Item</h1>
                 </span>
 
                 <button
@@ -126,18 +130,21 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                         <li 
                             key={idx} 
                             role="button" 
-                            aria-disabled={isLocked}
+                            aria-disabled={isLocked || is_Over_Due}
                             onClick={() => toggleTask(idx)} 
                             className="relative cursor-pointer hover:text-neutral-300
                                 flex gap-2 capitalize aria-disabled:cursor-not-allowed">
                             {/* Timeline */}
                             <div className="relative flex flex-col items-center">
                                 {/* Icon */}
-                                {!isLocked ?
-                               <FaRegCircleCheck className="z-10 mt-1 h-3 w-3 text-neutral-200 flex-shrink-0"/>
+                                {is_Over_Due ?  
+                                <MdRunningWithErrors className="z-10 mt-1 h-3.5 w-3.5 text-neutral-200 flex-shrink-0"/>
+                                :
+                                !isLocked ?
+                               <FaRegCircleCheck className="z-10 mt-1 h-3.5 w-3.5 text-neutral-200 flex-shrink-0"/>
                                :
                                <FaCheckCircle
-                                    className="z-10 mt-1 h-3 w-3 text-green-500 flex-shrink-0"
+                                    className="z-10 mt-1 h-3.5 w-3.5 text-green-500 flex-shrink-0"
                                 />
                                 }
 
@@ -149,7 +156,7 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
 
                             {/* Content */}
                             <p
-                                className={`text-xs leading-5
+                                className={`text-sm leading-5
                                     ${isLocked ? 
                                         "line-through text-neutral-300"
                                         :
@@ -189,54 +196,62 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                     <span
                         className="flex items-center gap-3 text-neutral-400 text-xs"
                     >
-                        <RxLapTimer size={12}/>
+                        <RiMapPinTimeFill size={12}/>
                         Status
                     </span>
                     <p className={`capitalize text-xs font-[400] 
-                    ${cardStatus === "pending" ?
+                    ${is_Over_Due ?
+                        "text-red-500"
+                        :
+                        cardStatus === "pending" ?
                         "text-yellow-600"
                         :
                         cardStatus === "completed" ?
                         "text-green-600"
                         :
                         "text-gray-600"
-                    }`}>{cardStatus}</p>
+                    }`}>{is_Over_Due ? "Overdue" : cardStatus}</p>
                 </div>
 
-                 <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border`}>
-        <FiClock size={14} />
-        <span className="text-[11px] font-bold uppercase">
-            {timeMetrics}
-        </span>
-     </div>
+                <div className="flex items-center justify-between">
+                    <span
+                        className="flex items-center gap-3 text-neutral-400 text-xs"
+                    >
+                        {is_Over_Due ? 
+                            <MdOutlineTimerOff size={12}/>
+                        :
+                            <MdTimer size={12}/>
+                        }
+                        Due Time
+                    </span>
+                    <p className={`capitalize text-xs font-[400] 
+                    ${is_Over_Due ?
+                        "text-red-500"
+                        :
+                        cardStatus === "pending" ?
+                        "text-yellow-600"
+                        :
+                        cardStatus === "completed" ?
+                        "text-green-600"
+                        :
+                        "text-gray-600"
+                    }`}>{is_Over_Due ? "--" : timeMetrics}</p>
+                </div>
 
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
-      
-            {/* Assigned To */}
-            {assigned_to && (
-                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
-                <FaUserCheck className="h-3.5 w-3.5 text-neutral-300" />
-                <span>{assigned_to}</span>
-                </span>
-            )}
+                <span className="flex w-full h-px bg-neutral-700/60"/>
 
-            {/* Created By */}
-            {Created_By && (
-                <span className="flex items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
-                <FaUserEdit className="h-3.5 w-3.5 text-neutral-400" />
-                <span>{Created_By}</span>
-                </span>
-            )}
-
-
-            {/* Due Time */}
-            {due_time && (
-                <span className="grow flex justify-center items-center gap-1.5 rounded-md border border-neutral-700/40 bg-neutral-800/40 px-2 py-1">
-                <FiClock className="h-3.5 w-3.5 text-neutral-400" />
-                <span>{due_time}</span>
-                </span>
-            )}
+                <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
+                        <span className="p-0.5 rounded border border-neutral-700/60 text-white bg-neutral-800">
+                            <FaUserCheck size={12}/>
+                        </span>
+                        Assined to : <p className="text-neutral-200">{assigned_to}</p>
+                </div>
+                <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
+                        <span className="p-0.5 rounded border border-neutral-700/60 text-white bg-neutral-800">
+                            <FaUserEdit size={12}/>
+                        </span>
+                        Created by : <p className="text-neutral-200">{assigned_to}</p>
+                </div> 
             </div>
         </div>
     )

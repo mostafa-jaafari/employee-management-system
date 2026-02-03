@@ -54,7 +54,7 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
             formData.append("due_time", inputs.due_time);
             formData.append("tasks", JSON.stringify(inputs.tasks));
 
-            const res = await CreateTaskAction(formData, userInfos?.id);
+            const res = await CreateTaskAction(formData, userInfos?.email);
 
             if(!res.success){
                 toast.error(res.message);

@@ -8,7 +8,8 @@ type TaskItem = { text: string; completed: boolean };
 export function useTaskCompletion(
   taskId: string,
   tasks: string[], 
-  initialStatus: string
+  initialStatus: string,
+  is_Over_Due: boolean,
 ) {
   const storageKey = `task-progress-${taskId}`;
 
@@ -46,7 +47,7 @@ export function useTaskCompletion(
 
   // 4. Handle Task Toggling
   const toggleTask = (index: number) => {
-    if (isLocked) return;
+    if (isLocked || is_Over_Due) return;
     setTaskList(prev =>
       prev.map((task, i) =>
         i === index ? { ...task, completed: !task.completed } : task
