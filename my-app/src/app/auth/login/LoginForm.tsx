@@ -1,4 +1,5 @@
 "use client";
+import { loginAction } from '@/app/actions/Auth';
 import { SupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react'
@@ -28,30 +29,30 @@ export function LoginForm() {
     const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
     const HandleSubmitForm = async (e: FormEvent) => {
         e.preventDefault();
+        setIsLoadingSubmit(true);
 
-        if(inputs.email === "" || inputs.password === ""){
-            toast.info("Please fill in all fields.");
-            return;
-        }
+        const formData = new FormData();
+        formData.append("email", inputs.email);
+        formData.append("password", inputs.password);
 
         try{
-            const { error } = await supabase.auth.signInWithPassword({
-                email: inputs.email,
-                password: inputs.password
-            })
-            if(error) {
-                toast.error(error.message);
+            const res = await loginAction(formData);
+
+            if (!res.success) {
+                toast.error(res.message);
                 setIsLoadingSubmit(false);
                 return;
             }
+
+            toast.success("Welcome back!");
+            router.push(`/u/${res.role}`);
             router.refresh();
             setIsLoadingSubmit(false);
-            toast.success("welcome back!");
         }catch (err){
-            toast.error("Error logging in: " + (err as { message: string }).message);
+            toast.error((err as { message: string }).message)
             setIsLoadingSubmit(false);
         }
-    }
+    };
 
     const signInWithProvider = async (provider: "google", e: MouseEvent) => {
         e.preventDefault();

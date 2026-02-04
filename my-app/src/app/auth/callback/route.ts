@@ -3,25 +3,18 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 export async function GET(request: Request) {
-  // 1. Parse the URL
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') ?? '/u/admin'
   
-  // 2. Calculate the correct origin (Fix for Codespaces/Proxies)
-  // Check if we have an x-forwarded-host header (standard in proxies like Codespaces)
+  // 1. حساب الـ Origin (نفس منطقك السابق)
   const forwardedHost = request.headers.get('x-forwarded-host')
   let origin = requestUrl.origin
 
   if (forwardedHost) {
-    // If behind a proxy, use the protocol and host reported by the proxy
     const protocol = request.headers.get('x-forwarded-proto') || 'https'
     origin = `${protocol}://${forwardedHost}`
-  } else {
-    // Fallback manual fix: If we are on a Codespaces domain, usually we must strip :3000 from the origin string
-    if (origin.includes('app.github.dev') && origin.includes(':3000')) {
-        origin = origin.replace(':3000', '')
-    }
+  } else if (origin.includes('app.github.dev') && origin.includes(':3000')) {
+    origin = origin.replace(':3000', '')
   }
 
   if (code) {
@@ -31,9 +24,7 @@ export async function GET(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
+          getAll() { return cookieStore.getAll() },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
@@ -43,13 +34,37 @@ export async function GET(request: Request) {
       }
     )
     
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    // 2. تبديل الكود بجلسة (Session)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error) {
-      // 3. Redirect using the cleaned origin
-      return NextResponse.redirect(`${origin}${next}`)
+    if (!error && data.user) {
+      // --- الخطوة الإضافية الهامة: جلب الدور وتعيين الكوكي ---
+      
+      const { data: roleData } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      const userRole = roleData?.role || "guest";
+
+      // 3. تعيين كوكي الدور (نفس إعدادات LoginAction)
+      cookieStore.set("user-role", userRole, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // أسبوع
+      });
+
+      // 4. التوجيه بناءً على الدور
+      // إذا كان المستخدم جديداً (guest)، نوجهه لصفحة اختيار الدور
+      const targetPath = userRole === "guest" ? "/auth/set-role" : `/u/${userRole}`;
+      
+      return NextResponse.redirect(`${origin}${targetPath}`)
     }
   }
 
+  // في حال حدوث خطأ
   return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }

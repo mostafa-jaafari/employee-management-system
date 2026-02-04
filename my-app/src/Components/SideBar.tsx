@@ -22,9 +22,12 @@ const SideBar__Navigations = [
 ];
 export function SideBar(){
     const [isOpen, setIsOpen] = useState(() => {
-        const stored = localStorage.getItem("sidebarOpen");
-        return stored !== null ? JSON.parse(stored) : true;
-    });
+    if (typeof window !== "undefined") { // تأكد من وجود المتصفح
+      const stored = localStorage.getItem("sidebarOpen");
+      return stored !== null ? JSON.parse(stored) : true;
+    }
+    return true; // Default value عند SSR
+  });
 
     const handleToggleSidebar = (newState: boolean) => {
         setIsOpen(newState);

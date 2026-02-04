@@ -1,10 +1,10 @@
 // middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getUserRole } from './utils/getUserRole';
 
 export async function middleware(request: NextRequest) {
-  const UserRole = (await getUserRole()).UserRole as "admin" | "employee" | "guest";
+  const userRoleCookie = request.cookies.get('user-role')?.value;
+  const UserRole = (userRoleCookie || "guest") as "admin" | "employee" | "guest";
 
   const pathname = request.nextUrl.pathname;
 

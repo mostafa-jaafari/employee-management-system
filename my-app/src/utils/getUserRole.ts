@@ -1,25 +1,11 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-
-
+import { cookies } from "next/headers";
 
 export async function getUserRole(){
-    const supabase = await createSupabaseServerClient();
+    const cookieStore = await cookies();
+    const userRole = cookieStore.get("user-role")?.value;
 
-    const { data, error } = await supabase.auth.getSession();
-    
-    if(error){
-        return { success: false, message: error.message, UserRole: null };
+    if(!userRole){
+        return { success: false, message: "Please login to get access!", UserRole: null }
     }
-
-    const { data: role, error: RoleError } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", data.session?.user?.id)
-        .single();
-
-    if(RoleError){
-        return { success: false, message: RoleError.message }
-    }
-    return { success: true, message: "Get user role successfully.", UserRole: role.role }
+    return { success: true, message: "Get user role successfully.", UserRole: userRole }
 }

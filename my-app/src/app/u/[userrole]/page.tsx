@@ -3,11 +3,8 @@ import AdminPage from "./AdminPage";
 import NotFoundPage from "./NotFoundPage";
 
 
-
-
 export default async function page({ params }: { params: Promise<{ userrole: string }> }){
     const CurrentPage = (await params).userrole;
-    // const UserRole = await getUserRole();
 
     let RenderTab;
     switch (CurrentPage) {
