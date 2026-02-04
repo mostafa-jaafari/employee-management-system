@@ -22,6 +22,7 @@ export async function CreateTaskAction(formData: FormData, userEmail: string){
         due_date,
         due_time,
         priority,
+        status: "pending",
         created_by: userEmail,
     }
 

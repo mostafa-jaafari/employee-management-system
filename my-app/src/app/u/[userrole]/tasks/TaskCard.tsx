@@ -1,10 +1,11 @@
 "use client";
-import { DeleteTaskAction } from "@/app/actions/Task";
+// import { DeleteTaskAction } from "@/app/actions/Task";
 import { ConfirmationModal } from "@/Components/ConfirmationModal";
 import { useConfirmationModal } from "@/context/ConfirmationModal";
-import { useUserInfos } from "@/context/UserInfos";
 import { TaskType } from "@/GlobalTypes";
 import { useTaskCompletion } from "@/Hooks/useTaskCompletion";
+import { useTasks } from "@/Hooks/useTasks";
+import { taskDB } from "@/lib/Ind/db";
 import { getFormattedTimeLeft } from "@/utils/getDaysRemaining";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaCheckCircle, FaUserEdit } from "react-icons/fa";
@@ -14,7 +15,6 @@ import { MdEdit, MdOutlineTimerOff, MdRunningWithErrors, MdTimer } from "react-i
 import { RiMapPinTimeFill } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
 import { toast } from "sonner";
-import { mutate } from "swr";
 
 
 const DropDownOptions = ({ setIsConfirmationModalOpen }: { setIsConfirmationModalOpen: (isOpen: boolean) => void }) => {
@@ -70,37 +70,41 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
   
       const is_Over_Due = timeMetrics?.toLowerCase() === "overdue";
 
-    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status, is_Over_Due);
-    const { userInfos } = useUserInfos();
+    const { taskList, toggleTask, progress, cardStatus, isLocked } = useTaskCompletion(taskId, tasks, status);
+    const { mutateTasks } = useTasks(); // تأكد أنك تستخدم هذا الهوك في المكون
     const { setIsConfirmationModalOpen } = useConfirmationModal();
     const [isLoadingDeleteTask, setIsLoadingDeleteTask] = useState(false);
-    const HandleDeleteTask = async (taskId: string) => {
-        if(!taskId) return;
+    
 
-        try{
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            // 1. بدء حالة التحميل (اختياري لأن العملية محلية وسريعة جداً)
             setIsLoadingDeleteTask(true);
-            const res = await DeleteTaskAction(taskId);
-            if(!res.success){
-                toast.error(res.message)
-                setIsLoadingDeleteTask(false);
-                return;
+
+            // 2. الحذف من IndexedDB (التخزين الدائم)
+            await taskDB.delete(taskId);
+
+            // 3. تحديث واجهة المستخدم فوراً عبر SWR (الذاكرة المؤقتة)
+            // نقوم بفلترة القائمة الحالية لإزالة المهمة المحذوفة
+            mutateTasks((currentTasks: TaskType[] = []) => {
+                return currentTasks.filter((task) => task.id !== taskId);
+            }, false); // 'false' لعدم إعادة جلب البيانات من القرص مجدداً الآن
+
+            // 4. إغلاق مودال التأكيد وإظهار رسالة نجاح
+            toast.success("Task deleted from local storage");
+            
+            if (typeof setIsConfirmationModalOpen === "function") {
+                setIsConfirmationModalOpen(false);
             }
-            mutate(
-            `/api/tasks?userId=${userInfos?.id}`,
-            (current: TaskType[] = []) => {
-                if (!res.task) return current;
-                return [res.task, ...current];
-            },
-            false
-            );
-            toast.success(res.message)
+
+        } catch (err) {
+            console.error("Delete Error:", err);
+            toast.error("Failed to delete task locally");
+        } finally {
             setIsLoadingDeleteTask(false);
-            setIsConfirmationModalOpen(false);
-        }catch (err){
-            setIsLoadingDeleteTask(false);
-            toast.error((err as { message: string }).message)
         }
-    }
+    };
     return (
         <div
             className={`w-full min-w-[250px] h-max rounded-lg border px-3 py-2
@@ -112,7 +116,7 @@ export function TaskCard({ id: taskId, tasks, status, assigned_to, due_date, due
                     "border-neutral-700/60 bg-section-h"}`}
         >
             <ConfirmationModal
-                HandelConfirmModal={() => HandleDeleteTask(taskId)}
+                HandelConfirmModal={() => handleDeleteTask(taskId)}
                 Title={`are you sure to delete this Task Card ?`}
                 ConfirmButtonLabel="Delete"
                 isLoadingConfirmation={isLoadingDeleteTask}

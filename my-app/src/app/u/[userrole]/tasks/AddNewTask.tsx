@@ -4,18 +4,20 @@ import { useAddNewTask } from "@/context/AddNewTaskProvider";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { motion } from "framer-motion";
-import { CreateTaskAction } from "@/app/actions/Task";
 import { useUserInfos } from "@/context/UserInfos";
 import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
-import { mutate } from "swr";
+import { taskDB } from "@/lib/Ind/db";
+import { useTasks } from "@/Hooks/useTasks";
 import { TaskType } from "@/GlobalTypes";
 
 
 export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
     const { userInfos } = useUserInfos();
+    const { mutateTasks } = useTasks();
+
     const [inputs, setInputs] = useState({
         tasks: [] as string[],
         task: "",
@@ -37,9 +39,8 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
     const [isLoadingSubmitTask, setIsLoadingSubmitTask] = useState(false);
     const Today = new Date();
     const HandleCreateTask = async () => {
-        if(!userInfos?.id) return null;
-
-        if(inputs.tasks.length === 0){
+        // 1. التحقق من البيانات
+        if (inputs.tasks.length === 0) {
             toast.error("Add at least one task!");
             return;
         }
@@ -47,21 +48,24 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
         try {
             setIsLoadingSubmitTask(true);
 
-            const formData = new FormData();
-            formData.append("assigned_to", inputs.assigned_to);
-            formData.append("due_date", inputs.due_date);
-            formData.append("priority", inputs.priority);
-            formData.append("due_time", inputs.due_time);
-            formData.append("tasks", JSON.stringify(inputs.tasks));
+            // 2. حفظ المهمة في IndexedDB (التخزين الدائم)
+            // دالة add تعيد لنا الكائن الكامل مع الـ ID والـ created_at
+            const newTask = await taskDB.add({
+                tasks: inputs.tasks,
+                assigned_to: inputs.assigned_to,
+                due_date: inputs.due_date,
+                due_time: inputs.due_time,
+                priority: inputs.priority as "high" | "medium" | "low",
+                created_by: userInfos?.email || "Local User",
+            });
 
-            const res = await CreateTaskAction(formData, userInfos?.email);
+            // 3. استخدام newTask لتحديث الواجهة فوراً (In-Memory Update)
+            // نقوم بإضافة المهمة الجديدة إلى أعلى القائمة الحالية
+            mutateTasks((currentTasks: TaskType[] = []) => {
+                return [newTask, ...currentTasks];
+            }, false); // 'false' تعني: لا تقم بإعادة جلب البيانات من القرص الآن، ثق في البيانات التي أعطيتك إياها
 
-            if(!res.success){
-                toast.error(res.message);
-                setIsLoadingSubmitTask(false);
-                return;
-            }
-
+            // 4. تنظيف الحالة وإغلاق النافذة
             setInputs({
                 tasks: [],
                 task: "",
@@ -70,23 +74,16 @@ export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
                 priority: "",
                 due_time: ""
             });
-
-            mutate(
-            `/api/tasks?userId=${userInfos.id}`,
-            (current: TaskType[] = []) => {
-                if (!res.task) return current;
-                return [res.task, ...current];
-            },
-            false
-            );
             setIsOpenAddNewTask(false);
-            toast.success(res.message);
+            
+            toast.success("Task saved locally!");
         } catch (err) {
-            toast.error((err as { message: string }).message);
+            console.error(err);
+            toast.error("Failed to save task");
         } finally {
             setIsLoadingSubmitTask(false);
         }
-    }
+    };
 
     if(!isOpenAddNewTask) return null;
     return (

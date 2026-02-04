@@ -1,26 +1,27 @@
-import { TaskType } from "@/GlobalTypes";
-import useSWR from "swr";
+import useSWR from 'swr';
+import { taskDB } from '@/lib/Ind/db';
+import { TaskType } from '@/GlobalTypes';
 
-// Simple fetcher function
-const fetcher = (url: string) =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch tasks");
-    return res.json();
-  });
+// The "fetcher" now simply reads from IndexedDB
+const localFetcher = async () => {
+  return await taskDB.getAll();
+};
 
-export function useTasks(userId?: string) {
-  const { data, error, isLoading, mutate } = useSWR<TaskType[]>(
-    userId ? `/api/tasks?userId=${userId}` : null,
-    fetcher,
+export function useTasks() {
+  const { data, mutate, isLoading } = useSWR<TaskType[]>(
+    'local-tasks-key', 
+    localFetcher,
     {
-      revalidateOnFocus: false,
+      fallbackData: [],
+      revalidateOnFocus: false, // Not needed for local DB
     }
   );
 
   return {
-    tasks: data ?? [],
+    tasks: (data || []).sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ),
     isLoading,
-    isError: error,
     mutateTasks: mutate,
   };
 }
