@@ -43,12 +43,13 @@ export async function GET(request: Request) {
     if (!error && user) {
       const { data: userData } = await supabase
         .from("users")
-        .select("id, email, name, role, avatar_url")
+        .select("name, role, avatar_url")
         .eq("id", user?.id)
         .single();
 
       const payload = {
         id: user?.id,
+        eima: user?.email,
         role: userData?.role,
         name: userData?.name,
         avatar_url: userData?.avatar_url,

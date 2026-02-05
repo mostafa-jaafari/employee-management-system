@@ -22,7 +22,7 @@ export async function loginAction(formData: FormData) {
 
   const { data: userData } = await supabase
     .from("users")
-    .select("email, name, role, avatar_url")
+    .select("name, role, avatar_url")
     .eq("id", user?.id)
     .single();
 
@@ -31,6 +31,7 @@ export async function loginAction(formData: FormData) {
       role: userData?.role,
       name: userData?.name,
       avatar_url: userData?.avatar_url,
+      email: user?.email,
     };
 
 
