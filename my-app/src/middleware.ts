@@ -1,51 +1,58 @@
-// middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { jwtVerify } from "jose";
+import { NextRequest, NextResponse } from "next/server";
 
+
+const SECRET_KEY = new TextEncoder().encode(process.env.ROLE_SECRET_KEY);
 export async function middleware(request: NextRequest) {
-  const userRoleCookie = request.cookies.get('user-role')?.value;
-  const UserRole = (userRoleCookie || "guest") as "admin" | "employee" | "guest";
-
-  
   const pathname = request.nextUrl.pathname;
 
-  if(UserRole === "guest" && pathname.startsWith('/u')) {
-    return NextResponse.redirect(new URL('/auth/set-role', request.url));
+  // ✅ استثناء صفحات auth
+  if (
+    pathname.startsWith("/auth/login") ||
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/auth/auth-code-error")
+  ) {
+    return NextResponse.next();
   }
 
-  if(!UserRole && pathname === "/auth/set-role") {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+  const token = request.cookies.get("user-role-token")?.value;
+
+  if (!token) {
+    return NextResponse.redirect(
+      new URL("/auth/login", request.url)
+    );
   }
 
-  const pathSegments = pathname.split('/'); // ['', 'u', 'admin', 'profile', ...]
-  const pathRole = pathSegments[2]; // 'admin' or 'employee'
-
-  // If the URL role segment doesn't match the user role, redirect
-  if ((UserRole === 'admin' || UserRole === 'employee') && pathRole !== UserRole) {
-    const restPath = pathSegments.slice(3).join('/'); // all segments after the role
-    return NextResponse.redirect(new URL(`/u/${UserRole}/${restPath}`, request.url));
+  let payload;
+  try {
+    ({ payload } = await jwtVerify(token, SECRET_KEY));
+  } catch {
+    return NextResponse.redirect(
+      new URL("/auth/login", request.url)
+    );
   }
 
-  // 4️⃣ إعادة التوجيه حسب الدور
-  if (pathname.startsWith('/u/admin') && UserRole === 'employee') {
-    return NextResponse.redirect(new URL('/u/employee', request.url));
+  const userRole = payload.role as "admin" | "employee" | "guest";
+  const pathSegments = pathname.split("/");
+  const pathRole = pathSegments[2];
+
+  if (pathname.startsWith("/u") && userRole === "guest") {
+    return NextResponse.redirect(
+      new URL("/auth/set-role", request.url)
+    );
   }
 
-  if (pathname.startsWith('/u/employee') && UserRole === 'admin') {
-    return NextResponse.redirect(new URL('/u/admin', request.url));
-  }
-
-  if (pathname.startsWith('/auth/set-role') && (UserRole === 'admin' || UserRole === 'employee')) {
-    return NextResponse.redirect(new URL('/u/admin', request.url));
-  }
-
-  if (!UserRole && pathname.startsWith('/u')) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+  if (
+    (userRole === "admin" || userRole === "employee") &&
+    pathRole !== userRole
+  ) {
+    return NextResponse.redirect(
+      new URL(`/u/${userRole}`, request.url)
+    );
   }
 
   return NextResponse.next();
 }
-
 export const config = {
-  matcher: ["/u/:path*", "/auth/:path*"],
+  matcher: ["/u/:path*", "/auth/set-role"],
 };
