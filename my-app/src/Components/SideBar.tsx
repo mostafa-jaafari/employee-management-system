@@ -1,5 +1,5 @@
 "use client";
-import { useUserInfos } from "@/context/UserInfos";
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -20,7 +20,7 @@ const SideBar__Navigations = [
     { name: "departments", href: "departments", icon: AiOutlineApartment },
     { name: "positions", href: "positions", icon: FaUserTie }
 ];
-export function SideBar(){
+export function SideBar({ userInfos }: { userInfos: TokenUserInfosPayload | undefined }){
     const [isOpen, setIsOpen] = useState(() => {
     if (typeof window !== "undefined") { // تأكد من وجود المتصفح
       const stored = localStorage.getItem("sidebarOpen");
@@ -39,7 +39,6 @@ export function SideBar(){
         const fullPath = `/u/${User_Role}/${href}`;
         return pathname === fullPath || pathname.startsWith(`${fullPath}/`) || (href === "" && pathname === `/u/${User_Role}`);
     };
-    const { userInfos, isLoadingUserInfos } = useUserInfos();
     const User_Role = userInfos?.role as "employee" | "admin";
     
     const SideBarNavigations = User_Role === "employee" ? 
@@ -90,7 +89,7 @@ export function SideBar(){
                 className={`flex flex-col px-1 my-3
                     ${isOpen ? "gap-0.5" : "gap-1.5 w-max"}`}
             >
-                {isLoadingUserInfos ? 
+                {!SideBarNavigations ? 
                     Array(6).fill(0).map((_, idx) => {
                         return (
                             <span key={idx} className="mb-0.5 w-full h-7 rounded bg-neutral-800 animate-pulse" />

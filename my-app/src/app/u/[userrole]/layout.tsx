@@ -4,18 +4,17 @@ import { ConfirmationModalProvider } from "@/context/ConfirmationModal";
 import { AddNewTask } from "./tasks/AddNewTask";
 import { AddNewTaskProvider } from "@/context/AddNewTaskProvider";
 import { getCachedEmployeesEmails } from "@/data/EmployeesEmails";
-import { getUserId } from "@/utils/getUserId";
-
-
+import { getUserInfos } from "@/utils/getUserRole";
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 
 
 export default async function RootLayout({ children }: { children: React.ReactNode }){
     
-    const userId = await getUserId();
+    const user = await getUserInfos() as TokenUserInfosPayload | undefined;
     let employeesEmails: string[] = [];
     
-    if (userId) {
-        const data = await getCachedEmployeesEmails(userId); // fetch cached emails
+    if (user?.id) {
+        const data = await getCachedEmployeesEmails(user?.id); // fetch cached emails
         employeesEmails = data.map(e => e.email); // adjust if necessary
     }
 
@@ -29,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <div
                         className="w-full flex items-start gap-3"
                     >
-                        <SideBar />
+                        <SideBar userInfos={user} />
                         <div
                             className="w-full py-3 space-y-1.5 pr-3"
                         >
