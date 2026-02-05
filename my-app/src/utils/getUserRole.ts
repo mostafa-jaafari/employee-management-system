@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const SECRET_KEY = new TextEncoder().encode(process.env.ROLE_SECRET_KEY);
 export async function getUserInfos() {
-  const token = (await cookies()).get("user-role-token")?.value;
+  const token = (await cookies()).get("user-role-token")?.value as string | undefined;
   if (!token) return null;
 
   try {
