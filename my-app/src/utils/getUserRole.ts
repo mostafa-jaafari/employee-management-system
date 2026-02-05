@@ -3,12 +3,12 @@ import { cookies } from "next/headers";
 
 const SECRET_KEY = new TextEncoder().encode(process.env.ROLE_SECRET_KEY);
 export async function getUserInfos() {
-  const token = (await cookies()).get("user-role-token")?.value as string | undefined;
+  const token = (await cookies()).get("user-context")?.value;
   if (!token) return null;
 
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    return payload; // { role, userId, email }
+    return payload;
   } catch {
     return null;
   }

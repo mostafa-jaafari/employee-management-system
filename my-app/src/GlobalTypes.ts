@@ -27,4 +27,5 @@ export type TokenUserInfosPayload = {
     role: string;
     name: string;
     avatar_url: string;
+    email: string;
 }

@@ -111,14 +111,14 @@ export function Header() {
                                     quality={100}
                                 />
                             ) : (
-                                <h1 className='text-white text-lg font-bold'>{userInfos.name.slice(0 ,1).toUpperCase()}</h1>
+                                <h1 className='text-white text-lg font-bold'>{userInfos?.name.slice(0 ,1).toUpperCase()}</h1>
                             )}
                         </div>
                         <span
                             className="flex flex-col"
                         >
-                            <h1 className='text-sm max-w-[120px] truncate text-neutral-100 font-semibold'>{userInfos.name || userInfos.email.split('@')[0]}</h1>
-                            <p className='text-xs max-w-[140px] truncate text-gray-400'>{userInfos.email}</p>
+                            <h1 className='text-sm max-w-[120px] truncate text-neutral-100 font-semibold'>{userInfos?.name || userInfos?.email.split('@')[0]}</h1>
+                            <p className='text-xs max-w-[140px] truncate text-gray-400'>{userInfos?.email}</p>
                         </span>
 
                         {isOpenMenu && (
@@ -134,7 +134,7 @@ export function Header() {
                                 {NavigationMenuLinks.map((nav, idx) => {
                                     return (
                                         <Link
-                                            href={`/u/${userInfos.role}/${nav.href}`}
+                                            href={`/u/${userInfos?.role}/${nav.href}`}
                                             key={idx}
                                         >
                                             <div

@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 
       const payload = {
         id: user?.id,
-        eima: user?.email,
+        email: user?.email,
         role: userData?.role,
         name: userData?.name,
         avatar_url: userData?.avatar_url,
