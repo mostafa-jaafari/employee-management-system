@@ -27,7 +27,7 @@ export async function loginAction(formData: FormData) {
     .single();
 
     const payload = {
-      uid: user?.id,
+      id: user?.id,
       role: userData?.role,
       name: userData?.name,
       avatar_url: userData?.avatar_url,

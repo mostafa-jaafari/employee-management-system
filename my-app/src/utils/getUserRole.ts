@@ -1,11 +1,15 @@
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-export async function getUserRole(){
-    const cookieStore = await cookies();
-    const userRole = cookieStore.get("user-role")?.value;
+const SECRET_KEY = new TextEncoder().encode(process.env.ROLE_SECRET_KEY);
+export async function getUserInfos() {
+  const token = (await cookies()).get("user-role-token")?.value;
+  if (!token) return null;
 
-    if(!userRole){
-        return { success: false, message: "Please login to get access!", UserRole: null }
-    }
-    return { success: true, message: "Get user role successfully.", UserRole: userRole }
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY);
+    return payload; // { role, userId, email }
+  } catch {
+    return null;
+  }
 }

@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         .single();
 
       const payload = {
-        uid: user?.id,
+        id: user?.id,
         role: userData?.role,
         name: userData?.name,
         avatar_url: userData?.avatar_url,

@@ -21,3 +21,10 @@ export type TaskType = {
     created_by: string;
     created_at: string;
 }
+
+export type TokenUserInfosPayload = {
+    id: string;
+    role: string;
+    name: string;
+    avatar_url: string;
+}
