@@ -1,4 +1,4 @@
-import { getUserRole } from "@/utils/getUserRole";
+import { getUserRole } from "@/utils/getUserInfos";
 import { DemoTasksNotice } from "./DemoTasksNotice";
 import { TasksContainer } from "./TasksContainer";
 import { TasksHeader } from "./TasksHeader";

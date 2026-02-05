@@ -22,7 +22,7 @@ const SideBar__Navigations = [
 ];
 export function SideBar({ userInfos }: { userInfos: TokenUserInfosPayload | undefined }){
     const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window !== "undefined") { // تأكد من وجود المتصفح
+    if (typeof window !== "undefined") {
       const stored = localStorage.getItem("sidebarOpen");
       return stored !== null ? JSON.parse(stored) : true;
     }

@@ -1,6 +1,6 @@
 import { getCachedEmployeesData } from "@/data/EmployeesData";
 import { EmployeesTable } from "./EmployeesTable";
-import { getUserId } from "@/utils/getUserId";
+import { getUserInfos } from "@/utils/getUserInfos";
 
 
 export default async function Page({
@@ -13,11 +13,12 @@ export default async function Page({
   const status = Search_Params?.status;
   const department = Search_Params?.department;
   const q = Search_Params?.q;
-  const UserId = await getUserId();
+  const user = await getUserInfos();
+  
 
-  if(!UserId) return null;
+  if(!user?.id) return null;
 
-  const Employees_Data = await getCachedEmployeesData(UserId, page, status, department, q);
+  const Employees_Data = await getCachedEmployeesData(user?.id, page, status, department, q);
 
   return (
     <main className="w-full">

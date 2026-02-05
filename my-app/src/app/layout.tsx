@@ -5,8 +5,7 @@ import { Toaster } from "sonner";
 import { UserInfosProvider } from "@/context/UserInfos";
 import { AddNewEntityProvider } from "@/context/AddNewEntityProvider";
 import { AddNewEntity } from "@/Components/AddNewEntity";
-import { getUserInfos } from "@/utils/getUserRole";
-import { TokenUserInfosPayload } from "@/GlobalTypes";
+import { getUserInfos } from "@/utils/getUserInfos";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,7 +23,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const user = await getUserInfos() as TokenUserInfosPayload | undefined;
+  const user = await getUserInfos() ?? undefined;
   return (
     <html lang="en">
       <body

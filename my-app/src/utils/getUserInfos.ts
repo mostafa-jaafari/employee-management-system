@@ -1,3 +1,4 @@
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
@@ -8,7 +9,7 @@ export async function getUserInfos() {
 
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    return payload;
+    return payload as TokenUserInfosPayload | undefined;
   } catch {
     return null;
   }

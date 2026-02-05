@@ -4,13 +4,12 @@ import { ConfirmationModalProvider } from "@/context/ConfirmationModal";
 import { AddNewTask } from "./tasks/AddNewTask";
 import { AddNewTaskProvider } from "@/context/AddNewTaskProvider";
 import { getCachedEmployeesEmails } from "@/data/EmployeesEmails";
-import { getUserInfos } from "@/utils/getUserRole";
-import { TokenUserInfosPayload } from "@/GlobalTypes";
+import { getUserInfos } from "@/utils/getUserInfos";
 
 
 export default async function RootLayout({ children }: { children: React.ReactNode }){
     
-    const user = await getUserInfos() as TokenUserInfosPayload | undefined;
+    const user = await getUserInfos() ?? undefined;
     let employeesEmails: string[] = [];
     
     if (user?.id) {
