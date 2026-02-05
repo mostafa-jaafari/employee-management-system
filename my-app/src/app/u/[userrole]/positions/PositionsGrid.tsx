@@ -7,14 +7,13 @@ import { MdOutlineAddCircle } from "react-icons/md";
 
 // Imports from your project structure
 import { DeleteDepartmentAction } from "@/app/actions/Department";
-import { useUserInfos } from "@/context/UserInfos";
 import { useAddNewEntity } from "@/context/AddNewEntityProvider";
 import { useConfirmationModal } from "@/context/ConfirmationModal";
 import { ConfirmationModal } from "@/Components/ConfirmationModal";
 import { usePositions } from "@/Hooks/usePositions";
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 
-export function PositionsGrid() {
-  const { userInfos, isLoadingUserInfos } = useUserInfos();
+export function PositionsGrid({ userInfos }: { userInfos: TokenUserInfosPayload | undefined }) {
   const { setIsOpenAddNewPosition } = useAddNewEntity(); // Assuming this opens your Add Modal
   const { setIsConfirmationModalOpen } = useConfirmationModal();
   
@@ -51,17 +50,6 @@ export function PositionsGrid() {
     }
   };
 
-  // --- Loading State ---
-  if (isLoading || isLoadingUserInfos) {
-    return (
-      <div className="w-full grid grid-cols-2 gap-3 pt-10">
-        {Array(6).fill(0).map((_, idx) => (
-          <div key={idx} className="w-full h-12 bg-gray-200 rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
   return (
     <section className="w-full">
       {/* Confirmation Modal Logic */}
@@ -94,7 +82,15 @@ export function PositionsGrid() {
       <hr className="mb-4 border-neutral-700/60 mt-3" />
 
       {/* Grid List */}
-      {positions.length > 0 ? (
+      {isLoading ? (
+        <div className="w-full grid grid-cols-2 gap-3 pt-10">
+          {Array(6).fill(0).map((_, idx) => (
+            <div key={idx} className="w-full h-12 bg-gray-200 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      )
+        :
+      positions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {positions.map((dep, idx) => (
             <div

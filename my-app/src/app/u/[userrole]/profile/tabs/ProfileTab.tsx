@@ -1,14 +1,12 @@
 "use client";
-
-import { useUserInfos } from "@/context/UserInfos";
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 import Image from "next/image";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 
 
-export function ProfileTab(){
+export function ProfileTab({ userInfos }: { userInfos: TokenUserInfosPayload | undefined }){
 
-    const { userInfos } = useUserInfos();
     const [inputs, setInputs] = useState({
         fullname: userInfos?.name || "",
         emailaddress: userInfos?.email || "",

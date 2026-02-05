@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <main
                 className="w-full h-screen overflow-x-hidden overflow-y-auto text-neutral-100"
             >
-                <AddNewTask initialEmails={employeesEmails} />
+                <AddNewTask initialEmails={employeesEmails} userInfos={user} />
                 <ConfirmationModalProvider>
                     <div
                         className="w-full flex items-start gap-3"

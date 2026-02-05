@@ -4,18 +4,16 @@ import { useAddNewTask } from "@/context/AddNewTaskProvider";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { motion } from "framer-motion";
-import { useUserInfos } from "@/context/UserInfos";
 import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
 import { taskDB } from "@/lib/Ind/db";
 import { useTasks } from "@/Hooks/useTasks";
-import { TaskType } from "@/GlobalTypes";
+import { TaskType, TokenUserInfosPayload } from "@/GlobalTypes";
 
 
-export function AddNewTask({ initialEmails }: { initialEmails: string[] }){
+export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string[]; userInfos: TokenUserInfosPayload | undefined }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
-    const { userInfos } = useUserInfos();
     const { mutateTasks } = useTasks();
 
     const [inputs, setInputs] = useState({

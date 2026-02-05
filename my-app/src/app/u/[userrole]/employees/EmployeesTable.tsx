@@ -4,8 +4,7 @@ import { ConfirmationModal } from '@/Components/ConfirmationModal';
 import { DropDown } from '@/Components/DropDown';
 import { useAddNewEntity } from '@/context/AddNewEntityProvider';
 import { useConfirmationModal } from '@/context/ConfirmationModal';
-import { useUserInfos } from '@/context/UserInfos';
-import { EmployerType } from '@/GlobalTypes';
+import { EmployerType, TokenUserInfosPayload } from '@/GlobalTypes';
 import { ConvertToCSV } from '@/utils/ConvertToCSV';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react'
@@ -20,8 +19,7 @@ const OptionsMenu = [
     { label: "Delete", icon: FaTrash },
     { label: "Edit", icon: MdModeEdit }
 ];
-const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptions }: { EmployeesData: EmployerType[]; CurrentIndex: number; isOpenOptions: boolean; setIsOpenOptions: (isOpen: null | number) => void; }) => {
-    const { userInfos } = useUserInfos();
+const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptions, userInfos }: { EmployeesData: EmployerType[]; CurrentIndex: number; isOpenOptions: boolean; setIsOpenOptions: (isOpen: null | number) => void; userInfos: TokenUserInfosPayload | undefined }) => {
     const { setIsConfirmationModalOpen } = useConfirmationModal();
     const { setIsOpenAddNewEmployer, setEmployeeDataToUpdate } = useAddNewEntity();
     const OptionsMenuRef = useRef<HTMLDivElement | null>(null);
@@ -118,7 +116,7 @@ const OptionMenu = ({ EmployeesData, CurrentIndex, isOpenOptions, setIsOpenOptio
     )
 }
 const LIMIT = 20;
-export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmployees: number; data: EmployerType[]; Available_Status: string[]; } }) {
+export function EmployeesTable({ Employees_Data, userInfos }: { Employees_Data: { TotalEmployees: number; data: EmployerType[]; Available_Status: string[]; }; userInfos: TokenUserInfosPayload | undefined }) {
     const { setIsOpenAddNewEmployer } = useAddNewEntity();
     
     const [isOpenOptions, setIsOpenOptions] = useState<null | number>(null);
@@ -370,7 +368,14 @@ export function EmployeesTable({ Employees_Data }: { Employees_Data: { TotalEmpl
                                         <SlOptionsVertical size={14} className='text-neutral-300'/>
                                     </button>
                                     {(
-                                        <OptionMenu setIsOpenOptions={setIsOpenOptions} key={idx} isOpenOptions={isOpenOptions === idx} EmployeesData={Employees_Data.data} CurrentIndex={idx} />
+                                        <OptionMenu 
+                                            setIsOpenOptions={setIsOpenOptions} 
+                                            key={idx} 
+                                            isOpenOptions={isOpenOptions === idx} 
+                                            EmployeesData={Employees_Data.data} 
+                                            CurrentIndex={idx}
+                                            userInfos={userInfos}
+                                        />
                                     )}
                                 </td>
                             </tr>

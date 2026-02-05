@@ -1,16 +1,15 @@
-import { getUserRole } from "@/utils/getUserInfos";
+import { getUserInfos } from "@/utils/getUserInfos";
 import { DemoTasksNotice } from "./DemoTasksNotice";
 import { TasksContainer } from "./TasksContainer";
 import { TasksHeader } from "./TasksHeader";
 
 
-export default async function page({ params }: { params: Promise<{ userrole: string }> }) {
-    const PARAMS = await params;
-    const User_Role = PARAMS.userrole as "employee" | "admin";
-    const T = await getUserRole();
+export default async function page() {
+    const user = await getUserInfos() ?? undefined;
+    const User_Role = user?.role;
+
     return (
         <main>
-            {T.UserRole}
             <TasksHeader User_Role={User_Role}/>
 
             {/* --- TASKS DEMO NOTICE --- */}

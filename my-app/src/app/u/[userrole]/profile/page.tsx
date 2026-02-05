@@ -1,3 +1,4 @@
+import { getUserInfos } from "@/utils/getUserInfos";
 import { HeaderProfile } from "./ProfileHeader";
 import { ProfileTab } from "./tabs/ProfileTab";
 
@@ -6,11 +7,12 @@ import { ProfileTab } from "./tabs/ProfileTab";
 export default async function page({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
     const SearchParams = await searchParams;
     const tab = SearchParams.tab;
+    const user = await getUserInfos() ?? undefined;
 
     let TabToRender;
     switch (tab) {
         case 'profile':
-            TabToRender = <ProfileTab />;
+            TabToRender = <ProfileTab userInfos={user} />;
             break;
         case 'account':
             TabToRender = "Account";

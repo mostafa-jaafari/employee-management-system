@@ -9,16 +9,15 @@ import { toast } from 'sonner';
 import { MdOutlineAddCircle } from 'react-icons/md';
 import { AiOutlineApartment } from 'react-icons/ai';
 import { AddNewDepartmentAction } from '@/app/actions/Department';
-import { useUserInfos } from '@/context/UserInfos';
 import { useRouter } from 'next/navigation';
 import { useDepartments } from '@/Hooks/useDepartments';
 import { AddNewPositionAction } from '@/app/actions/Position';
 import { usePositions } from '@/Hooks/usePositions';
+import { TokenUserInfosPayload } from '@/GlobalTypes';
 
 
-export function AddNewEntity() {
+export function AddNewEntity({ userInfos }: { userInfos: TokenUserInfosPayload | undefined }) {
     const { isOpenAddNewEmployer, setIsOpenAddNewEmployer, isOpenAddNewDepartment, setIsOpenAddNewDepartment, employeeDataToUpdate, setEmployeeDataToUpdate, setIsOpenAddNewPosition, isOpenAddNewPosition } = useAddNewEntity();
-    const { userInfos } = useUserInfos();
 
     const { mutateDepartments, departments: DepartmentsHook } = useDepartments(userInfos?.id);
     const { mutatePositions, positions: PositionsHook } = usePositions(userInfos?.id);

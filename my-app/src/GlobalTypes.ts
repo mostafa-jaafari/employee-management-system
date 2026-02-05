@@ -24,7 +24,7 @@ export type TaskType = {
 
 export type TokenUserInfosPayload = {
     id: string;
-    role: string;
+    role: "employee" | "admin" | "guest";
     name: string;
     avatar_url: string;
     email: string;

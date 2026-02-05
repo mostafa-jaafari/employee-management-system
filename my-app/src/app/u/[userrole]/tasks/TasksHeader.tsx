@@ -3,7 +3,7 @@ import { useAddNewTask } from "@/context/AddNewTaskProvider";
 import { IoIosAddCircle } from "react-icons/io";
 
 
-export function TasksHeader({ User_Role }: { User_Role: string; }){
+export function TasksHeader({ User_Role }: { User_Role: string | undefined; }){
     const { setIsOpenAddNewTask } = useAddNewTask();
     return (
         <div

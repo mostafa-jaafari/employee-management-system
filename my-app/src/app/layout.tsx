@@ -32,7 +32,7 @@ export default async function RootLayout({
         <Toaster position="top-right"/>
         <UserInfosProvider user={user}>
           <AddNewEntityProvider>
-            <AddNewEntity />
+            <AddNewEntity userInfos={user} />
             {children}
           </AddNewEntityProvider>
         </UserInfosProvider>
