@@ -1,5 +1,5 @@
 "use client";
-import { SetRoleAction } from "@/app/actions/SetRoleAction";
+import { SetRoleAction } from "@/app/actions/SetRole";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";

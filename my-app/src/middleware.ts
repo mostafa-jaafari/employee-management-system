@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
   const userRoleCookie = request.cookies.get('user-role')?.value;
   const UserRole = (userRoleCookie || "guest") as "admin" | "employee" | "guest";
 
+  
   const pathname = request.nextUrl.pathname;
 
   if(UserRole === "guest" && pathname.startsWith('/u')) {
