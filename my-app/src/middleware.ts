@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("user-role-token")?.value;
+  const token = request.cookies.get("user-context")?.value;
 
   if (!token) {
     return NextResponse.redirect(

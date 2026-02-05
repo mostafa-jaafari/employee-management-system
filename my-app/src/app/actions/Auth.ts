@@ -13,35 +13,42 @@ export async function loginAction(formData: FormData) {
   const cookieStore = await cookies();
 
   // 1. Sign in
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data: { user }, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) return { success: false, message: error.message };
 
-  const { data: roleData } = await supabase
+  const { data: userData } = await supabase
     .from("users")
-    .select("role")
-    .eq("id", data.user.id)
+    .select("email, name, role, avatar_url")
+    .eq("id", user?.id)
     .single();
 
-    const userRole = roleData?.role || "guest";
+    const payload = {
+      uid: user?.id,
+      role: userData?.role,
+      name: userData?.name,
+      avatar_url: userData?.avatar_url,
+    };
+
 
     // Sign the token even if they are a 'guest' so the middleware can track them
-    const roleToken = await new SignJWT({ role: userRole })
-      .setProtectedHeader({ alg: 'HS256' })
+    const userToken = await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
       .setExpirationTime('7d')
       .sign(SECRET_KEY);
 
-      cookieStore.set("user-role-token", roleToken, {
+      cookieStore.set("user-context", userToken, {
         httpOnly: true,
         secure: true,
         sameSite: "lax",
         path: "/",
       });
 
-    return { success: true, role: userRole };
+    return { success: true, role: userToken };
 }
 
 
@@ -51,6 +58,6 @@ export async function logoutAction() {
 
   await supabase.auth.signOut();
 
-  cookieStore.delete("user-role-token");
+  cookieStore.delete("user-context");
   redirect("/auth/login");
 }

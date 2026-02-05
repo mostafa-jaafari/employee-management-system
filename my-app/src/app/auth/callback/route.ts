@@ -38,36 +38,39 @@ export async function GET(request: Request) {
       }
     )
     
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error && data.user) {
-      // جلب الدور مع معالجة حالة عدم وجود السجل
-      const { data: roleData, error: roleError } = await supabase
+    if (!error && user) {
+      const { data: userData } = await supabase
         .from("users")
-        .select("role")
-        .eq("id", data.user.id)
-        .maybeSingle(); // استخدم maybeSingle بدلاً من single لمنع الخطأ 500
+        .select("id, email, name, role, avatar_url")
+        .eq("id", user?.id)
+        .single();
 
-      const userRole = roleData?.role || "guest";
-      if(roleError) throw error;
+      const payload = {
+        uid: user?.id,
+        role: userData?.role,
+        name: userData?.name,
+        avatar_url: userData?.avatar_url,
+      };
+      if(error) throw error;
 
       // إنشاء التوكن
       try {
-          const roleToken = await new SignJWT({ role: userRole })
-              .setProtectedHeader({ alg: 'HS256' })
-              .setExpirationTime('7d')
-              .sign(SECRET_KEY);
+          const userToken = await new SignJWT(payload)
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('7d')
+            .sign(SECRET_KEY);
 
           // توحيد اسم الكوكي مع الـ LoginAction
-          cookieStore.set("user-role-token", roleToken, {
+          cookieStore.set("user-context", userToken, {
             httpOnly: true,
             secure: true,
             sameSite: "lax",
             path: "/",
-            maxAge: 60 * 60 * 24 * 7,
           });
 
-          const targetPath = userRole === "guest" ? "/auth/set-role" : `/u/${userRole}`;
+          const targetPath = user.role === "guest" ? "/auth/set-role" : `/u/${user.role}`;
           return NextResponse.redirect(`${origin}${targetPath}`)
       } catch (jwtError) {
           console.error("JWT Signing Error:", jwtError);
