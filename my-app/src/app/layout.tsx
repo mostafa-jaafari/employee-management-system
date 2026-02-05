@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { UserInfosProvider } from "@/context/UserInfos";
 import { AddNewEntityProvider } from "@/context/AddNewEntityProvider";
 import { AddNewEntity } from "@/Components/AddNewEntity";
 import { getUserInfos } from "@/utils/getUserInfos";
@@ -30,12 +29,10 @@ export default async function RootLayout({
         className={`${inter.variable} antialiased`}
       >
         <Toaster position="top-right"/>
-        <UserInfosProvider user={user}>
-          <AddNewEntityProvider>
-            <AddNewEntity userInfos={user} />
-            {children}
-          </AddNewEntityProvider>
-        </UserInfosProvider>
+        <AddNewEntityProvider>
+          <AddNewEntity userInfos={user} />
+          {children}
+        </AddNewEntityProvider>
       </body>
     </html>
   );

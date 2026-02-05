@@ -7,14 +7,13 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
-import { taskDB } from "@/lib/Ind/db";
 import { useTasks } from "@/Hooks/useTasks";
-import { TaskType, TokenUserInfosPayload } from "@/GlobalTypes";
+import { TokenUserInfosPayload } from "@/GlobalTypes";
 
 
 export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string[]; userInfos: TokenUserInfosPayload | undefined }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
-    const { mutateTasks } = useTasks();
+    const { addTask } = useTasks();
 
     const [inputs, setInputs] = useState({
         tasks: [] as string[],
@@ -46,9 +45,7 @@ export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string
         try {
             setIsLoadingSubmitTask(true);
 
-            // 2. حفظ المهمة في IndexedDB (التخزين الدائم)
-            // دالة add تعيد لنا الكائن الكامل مع الـ ID والـ created_at
-            const newTask = await taskDB.add({
+            await addTask({
                 tasks: inputs.tasks,
                 assigned_to: inputs.assigned_to,
                 due_date: inputs.due_date,
@@ -57,13 +54,6 @@ export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string
                 created_by: userInfos?.email || "Local User",
             });
 
-            // 3. استخدام newTask لتحديث الواجهة فوراً (In-Memory Update)
-            // نقوم بإضافة المهمة الجديدة إلى أعلى القائمة الحالية
-            mutateTasks((currentTasks: TaskType[] = []) => {
-                return [newTask, ...currentTasks];
-            }, false); // 'false' تعني: لا تقم بإعادة جلب البيانات من القرص الآن، ثق في البيانات التي أعطيتك إياها
-
-            // 4. تنظيف الحالة وإغلاق النافذة
             setInputs({
                 tasks: [],
                 task: "",

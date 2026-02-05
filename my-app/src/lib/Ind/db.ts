@@ -1,8 +1,9 @@
 import { openDB } from 'idb';
 import { TaskType } from '@/GlobalTypes';
 
-const DB_NAME = 'LocalTaskManager';
+const DB_NAME = 'Staffy-Employees-Manager';
 const STORE_NAME = 'tasks';
+const SYNC_STORE_NAME = 'pending-sync';
 
 export async function initDB() {
   if (typeof window === 'undefined') return null;
@@ -11,40 +12,52 @@ export async function initDB() {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id' });
       }
+      if (!db.objectStoreNames.contains(SYNC_STORE_NAME)) {
+        db.createObjectStore(SYNC_STORE_NAME, { keyPath: 'id' });
+      }
     },
   });
 }
 
 export const taskDB = {
-  // Create
-  async add(task: Omit<TaskType, 'id' | 'created_at' | 'status'>) {
+  async addTask(task: Omit<TaskType, 'id' | 'created_at' | 'status'>) {
     const db = await initDB();
     const newTask: TaskType = {
       ...task,
-      id: crypto.randomUUID(), // Generate local unique ID
+      id: crypto.randomUUID(),
       status: 'pending',
       created_at: new Date().toISOString(),
     };
     await db?.add(STORE_NAME, newTask);
+    // Add to sync queue
+    await db?.add(SYNC_STORE_NAME, newTask);
     return newTask;
   },
 
-  // Read
-  async getAll(): Promise<TaskType[]> {
+  async getAllTasks(): Promise<TaskType[]> {
     const db = await initDB();
     if (!db) return [];
     return db.getAll(STORE_NAME);
   },
 
-  // Update
-  async update(task: TaskType) {
+  async getPendingTasks(): Promise<TaskType[]> {
+    const db = await initDB();
+    if (!db) return [];
+    return db.getAll(SYNC_STORE_NAME);
+  },
+
+  async markSynced(taskId: string) {
+    const db = await initDB();
+    await db?.delete(SYNC_STORE_NAME, taskId);
+  },
+
+  async updateTask(task: TaskType) {
     const db = await initDB();
     return db?.put(STORE_NAME, task);
   },
 
-  // Delete
-  async delete(id: string) {
+  async deleteTask(id: string) {
     const db = await initDB();
     return db?.delete(STORE_NAME, id);
-  }
+  },
 };

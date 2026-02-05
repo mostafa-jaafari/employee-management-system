@@ -65,14 +65,14 @@ export function useTaskCompletion(
         const allDone = taskList.every(t => t.completed);
         
         // Find the full task object in IDB to update it
-        const allTasks = await taskDB.getAll();
+        const allTasks = await taskDB.getAllTasks();
         const currentTask = allTasks.find(t => t.id === taskId);
 
         if (currentTask) {
             const newStatus = allDone ? "completed" : taskList.some(t => t.completed) ? "in progress" : "pending";
             
             if (currentTask.status !== newStatus) {
-                await taskDB.update({ ...currentTask, status: newStatus });
+                await taskDB.updateTask({ ...currentTask, status: newStatus });
                 // Note: You might want to trigger a global mutate('local-tasks-key') 
                 // here if you want other components to react to the status change
             }
