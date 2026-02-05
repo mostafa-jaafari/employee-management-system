@@ -1,15 +1,23 @@
 "use client";
-
 import { TokenUserInfosPayload } from "@/GlobalTypes";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SignOutButton } from "@/app/auth/SignOutButton";
-import { IconType } from "react-icons";
+import { FaUsers } from 'react-icons/fa';
+import { FaFolderTree } from 'react-icons/fa6';
+import { GoHomeFill } from 'react-icons/go';
+import { RiInboxFill } from 'react-icons/ri';
 
 
-export const DropDownHeaderProfile = ({ userInfos, NavigationMenuLinks }: { userInfos: TokenUserInfosPayload | undefined; NavigationMenuLinks: { name: string; href: string; icon: IconType; }[] }) => {
+const Navigation_Menu_Links = [
+    { name: "home", href:"", icon: GoHomeFill },
+    { name: "tasks", href:"tasks", icon: FaFolderTree },
+    { name: "inbox", href: "inbox", icon: RiInboxFill },
+    { name: "employees", href: "employees", icon: FaUsers },
+];
+export const DropDownHeaderProfile = ({ userInfos }: { userInfos: TokenUserInfosPayload | undefined; }) => {
     const [isOpenMenu, setIsOpenMenu] = useState(false);
     const Open_Menu_Ref = useRef<HTMLDivElement | null>(null);
     
@@ -23,6 +31,11 @@ export const DropDownHeaderProfile = ({ userInfos, NavigationMenuLinks }: { user
         window.addEventListener("mousedown", handleHideMenu);
         return () => window.removeEventListener("mousedown", handleHideMenu);
     },[])
+
+    const NavigationMenuLinks = userInfos?.role === "employee" ?
+        Navigation_Menu_Links.filter((nav) => nav.name !== "employees")
+        :
+        Navigation_Menu_Links;
     return (
         <div
             role='button'

@@ -1,9 +1,6 @@
 import Link from 'next/link';
-import { FaUsers } from 'react-icons/fa';
-import { FaFolderTree } from 'react-icons/fa6';
-import { GoHomeFill } from 'react-icons/go';
 import { IoNotifications, IoSettingsSharp } from 'react-icons/io5';
-import { RiInboxFill, RiMessage3Fill } from 'react-icons/ri';
+import { RiMessage3Fill } from 'react-icons/ri';
 import { getUserInfos } from '@/utils/getUserRole';
 import { DropDownHeaderProfile } from './DropDownHeaderProfile';
 import { TokenUserInfosPayload } from '@/GlobalTypes';
@@ -14,18 +11,8 @@ const Header_Links = [
     { name: "Career", href: "/" }
 ]
 
-const Navigation_Menu_Links = [
-    { name: "home", href:"", icon: GoHomeFill },
-    { name: "tasks", href:"tasks", icon: FaFolderTree },
-    { name: "inbox", href: "inbox", icon: RiInboxFill },
-    { name: "employees", href: "employees", icon: FaUsers },
-];
 export async function Header() {
     const User_Infos = await getUserInfos() as TokenUserInfosPayload | undefined;
-    const NavigationMenuLinks = User_Infos?.role === "employee" ?
-        Navigation_Menu_Links.filter((nav) => nav.name !== "employees")
-        :
-        Navigation_Menu_Links;
 
     return (
         <div
@@ -57,7 +44,7 @@ export async function Header() {
                     <IoSettingsSharp size={20}/>
                 </span>
                 {User_Infos !== null ? (
-                    <DropDownHeaderProfile userInfos={User_Infos} NavigationMenuLinks={NavigationMenuLinks} />
+                    <DropDownHeaderProfile userInfos={User_Infos} />
                 )
                 :
                 (
