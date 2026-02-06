@@ -2,9 +2,12 @@
 import { useEffect, useState } from "react";
 import { useTasks } from "@/Hooks/useTasks";
 import { TaskCard } from "./TaskCard";
+import { useMergedTasks } from "@/utils/fetchAndMergeTasks";
 
 export function TasksContainer() {
     const { tasks, isLoading } = useTasks();
+    const { isLoading:isLoadinMerge, mutateTasks, tasks:tasksMerge } = useMergedTasks();
+
     const [hasMounted, setHasMounted] = useState(false);
 
     // Ensure component is mounted on client before rendering IndexedDB data
@@ -22,8 +25,8 @@ export function TasksContainer() {
 
     return (
         <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {tasks.length > 0 ? (
-                tasks.map((task) => (
+            {tasksMerge.length > 0 ? (
+                tasksMerge.map((task) => (
                     <TaskCard
                         key={task.id}
                         {...task}

@@ -1,7 +1,7 @@
 import useSWR, { mutate } from 'swr';
 import { taskDB } from '@/lib/Ind/db';
 import { TaskType } from '@/GlobalTypes';
-import { scheduleSync } from '@/utils/scheduleSync';
+import { syncTasksToSupabase } from '@/utils/scheduleSync';
 
 // Fetcher reads tasks from IndexedDB
 const localFetcher = async () => {
@@ -21,7 +21,7 @@ export function useTasks() {
     mutate('local-tasks-key', [newTask, ...(data || [])], false);
     
     // Schedule delayed sync
-    scheduleSync();
+    syncTasksToSupabase();
 
     return newTask;
   };

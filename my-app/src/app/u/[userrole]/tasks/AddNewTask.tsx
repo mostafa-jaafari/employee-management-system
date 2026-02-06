@@ -9,8 +9,18 @@ import { MdAddTask } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
 import { useTasks } from "@/Hooks/useTasks";
 import { TokenUserInfosPayload } from "@/GlobalTypes";
+import { syncTasksToSupabase } from "@/utils/scheduleSync";
 
+let syncTimeout: NodeJS.Timeout;
+function scheduleSync() {
+  // Clear any previously scheduled sync
+  clearTimeout(syncTimeout);
 
+  // Schedule a new sync in 10 seconds
+  syncTimeout = setTimeout(() => {
+    syncTasksToSupabase();
+  }, 10000); // 10000ms = 10 seconds
+}
 export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string[]; userInfos: TokenUserInfosPayload | undefined }){
     const { isOpenAddNewTask, setIsOpenAddNewTask } = useAddNewTask();
     const { addTask } = useTasks();
@@ -52,6 +62,7 @@ export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string
                 due_time: inputs.due_time,
                 priority: inputs.priority as "high" | "medium" | "low",
                 created_by: userInfos?.email || "Local User",
+                synced: false,
             });
 
             setInputs({
@@ -65,6 +76,7 @@ export function AddNewTask({ initialEmails, userInfos }: { initialEmails: string
             setIsOpenAddNewTask(false);
             
             toast.success("Task saved locally!");
+            scheduleSync();
         } catch (err) {
             console.error(err);
             toast.error("Failed to save task");

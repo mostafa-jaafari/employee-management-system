@@ -20,6 +20,7 @@ export type TaskType = {
     status: "pending" | "in progress" | "completed";
     created_by: string;
     created_at: string;
+    synced: boolean;
 }
 
 export type TokenUserInfosPayload = {

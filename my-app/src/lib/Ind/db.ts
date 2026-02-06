@@ -19,18 +19,18 @@ export async function initDB() {
   });
 }
 
+// db.ts
 export const taskDB = {
-  async addTask(task: Omit<TaskType, 'id' | 'created_at' | 'status'>) {
+  async addTask(task: Omit<TaskType, "id" | "created_at" | "status" | "synced">) {
     const db = await initDB();
     const newTask: TaskType = {
       ...task,
       id: crypto.randomUUID(),
-      status: 'pending',
+      status: "pending",
       created_at: new Date().toISOString(),
+      synced: false, // NEW
     };
     await db?.add(STORE_NAME, newTask);
-    // Add to sync queue
-    await db?.add(SYNC_STORE_NAME, newTask);
     return newTask;
   },
 
@@ -38,17 +38,6 @@ export const taskDB = {
     const db = await initDB();
     if (!db) return [];
     return db.getAll(STORE_NAME);
-  },
-
-  async getPendingTasks(): Promise<TaskType[]> {
-    const db = await initDB();
-    if (!db) return [];
-    return db.getAll(SYNC_STORE_NAME);
-  },
-
-  async markSynced(taskId: string) {
-    const db = await initDB();
-    await db?.delete(SYNC_STORE_NAME, taskId);
   },
 
   async updateTask(task: TaskType) {
@@ -59,5 +48,5 @@ export const taskDB = {
   async deleteTask(id: string) {
     const db = await initDB();
     return db?.delete(STORE_NAME, id);
-  },
+  }
 };

@@ -1,35 +1,23 @@
 import { taskDB } from "@/lib/Ind/db";
 
-let syncTimeout: NodeJS.Timeout | null = null;
+export async function syncTasksToSupabase() {
+  const localTasks = await taskDB.getAllTasks();
+  const unsyncedTasks = localTasks.filter(t => !t.synced);
 
-async function syncPendingTasks() {
-  const pending = await taskDB.getPendingTasks();
-  if (pending.length === 0) return;
-
-  for (const task of pending) {
+  for (const task of unsyncedTasks) {
     try {
-      await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/tasks", {
+        method: "POST",
         body: JSON.stringify(task),
+        headers: { "Content-Type": "application/json" },
       });
-      await taskDB.markSynced(task.id);
+
+      if (!res.ok) throw new Error("Supabase POST failed");
+
+      // Mark synced AFTER successful POST
+      await taskDB.updateTask({ ...task, synced: true });
     } catch (err) {
-      console.error('Failed to sync task', task.id, err);
-      // keep in queue for retry
+      console.error("Sync failed:", task.id, err);
     }
   }
 }
-
-// Schedule sync with debounce
-export function scheduleSync(delay = 5000) {
-  if (syncTimeout) clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(() => {
-    syncPendingTasks();
-  }, delay);
-}
-
-// Sync on window close
-window.addEventListener('beforeunload', () => {
-  syncPendingTasks();
-});
