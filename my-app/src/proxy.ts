@@ -10,15 +10,6 @@ const SECRET_KEY = new TextEncoder().encode(
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ✅ Allow auth-related pages
-  if (
-    pathname.startsWith("/auth/login") ||
-    pathname.startsWith("/auth/callback") ||
-    pathname.startsWith("/auth/auth-code-error")
-  ) {
-    return NextResponse.next();
-  }
-
   const token = request.cookies.get("user-context")?.value;
 
   // ❌ No token → login
@@ -40,28 +31,43 @@ export async function proxy(request: NextRequest) {
   }
 
   const userRole = payload?.role as "admin" | "employee" | "guest";
+  const AllowedRole = userRole !== "guest";
 
-  // 🧭 guest لازم يحدد الدور
   if (pathname.startsWith("/u") && userRole === "guest") {
     return NextResponse.redirect(
       new URL("/auth/set-role", request.url)
     );
   }
 
-  // 🧭 حماية المسارات حسب الدور
   if (pathname.startsWith("/u/")) {
-    const roleInPath = pathname.split("/")[2]; // /u/admin/...
+    // /u/admin/tasks/task => ["", "u", "admin", "tasks", "task"]
+    const segments = pathname.split("/"); 
+    const roleInPath = segments[2]; // "admin" in this example
+
+    // reconstruct the path after the role
+    const restOfPath = segments.slice(3).join("/"); // "tasks/task"
 
     if (roleInPath && roleInPath !== userRole) {
-      return NextResponse.redirect(
-        new URL(`/u/${userRole}`, request.url)
-      );
+      // redirect to the same path but with the correct role
+      const redirectPath = `/u/${userRole}${restOfPath ? "/" + restOfPath : ""}`;
+      return NextResponse.redirect(new URL(redirectPath, request.url));
     }
+  }
+
+  if (token && (pathname.startsWith("/auth") || pathname === "/u")) {
+    return NextResponse.redirect(new URL(`/u/${AllowedRole}`, request.url));
+  }
+
+  if (
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/auth/auth-code-error")
+  ) {
+    return NextResponse.next();
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/u/:path*", "/auth/set-role"],
+  matcher: ["/u/:path*", "/auth/:path*"],
 };
