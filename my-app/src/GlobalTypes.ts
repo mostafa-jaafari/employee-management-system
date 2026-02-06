@@ -19,8 +19,8 @@ export type TaskType = {
     priority: "low" | "medium" | "high";
     status: "pending" | "in progress" | "completed";
     created_by: string;
-    created_at: string;
-    synced: boolean;
+    created_at?: string;
+    synced?: boolean;
 }
 
 export type TokenUserInfosPayload = {

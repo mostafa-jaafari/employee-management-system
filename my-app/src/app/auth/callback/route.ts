@@ -50,9 +50,9 @@ export async function GET(request: Request) {
       const payload = {
         id: user?.id,
         email: user?.email,
-        role: userData?.role,
-        name: userData?.name,
-        avatar_url: userData?.avatar_url,
+        role: userData?.role || "guest",
+        name: userData?.name || user?.email?.split("@")[0],
+        avatar_url: userData?.avatar_url || user?.user_metadata?.avatar_url || "",
       };
       if(error) throw error;
 
@@ -71,7 +71,8 @@ export async function GET(request: Request) {
             path: "/",
           });
 
-          const targetPath = user.role === "guest" ? "/auth/set-role" : `/u/${user.role}`;
+          const targetRole = payload.role || "guest";
+          const targetPath = targetRole === "guest" ? "/auth/set-role" : `/u/${targetRole}`;
           return NextResponse.redirect(`${origin}${targetPath}`)
       } catch (jwtError) {
           console.error("JWT Signing Error:", jwtError);

@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <div
                             className="w-full py-3 space-y-1.5 pr-3"
                         >
-                            <Header />
+                            <Header User_Infos={user} />
                             <div
                                 className="w-full overflow-hidden pr-3"
                             >

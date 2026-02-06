@@ -3,66 +3,48 @@ import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { TokenUserInfosPayload } from "./GlobalTypes";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.ROLE_SECRET_KEY!
-);
+const SECRET_KEY = new TextEncoder().encode(process.env.ROLE_SECRET_KEY!);
+
+const PUBLIC_ROUTES = ["/auth/login", "/auth/set-role", "/auth/callback", "/auth/auth-code-error"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
   const token = request.cookies.get("user-context")?.value;
 
-  // ❌ No token → login
-  if (!token) {
-    return NextResponse.redirect(
-      new URL("/auth/login", request.url)
-    );
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (!token && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  let payload;
+  let payload: TokenUserInfosPayload | undefined;
 
-  try {
-    const result = await jwtVerify(token, SECRET_KEY);
-    payload = result.payload as TokenUserInfosPayload | undefined;
-  } catch {
-    return NextResponse.redirect(
-      new URL("/auth/login", request.url)
-    );
-  }
-
-  const userRole = payload?.role as "admin" | "employee" | "guest";
-  const AllowedRole = userRole !== "guest";
-
-  if (pathname.startsWith("/u") && userRole === "guest") {
-    return NextResponse.redirect(
-      new URL("/auth/set-role", request.url)
-    );
-  }
-
-  if (pathname.startsWith("/u/")) {
-    // /u/admin/tasks/task => ["", "u", "admin", "tasks", "task"]
-    const segments = pathname.split("/"); 
-    const roleInPath = segments[2]; // "admin" in this example
-
-    // reconstruct the path after the role
-    const restOfPath = segments.slice(3).join("/"); // "tasks/task"
-
-    if (roleInPath && roleInPath !== userRole) {
-      // redirect to the same path but with the correct role
-      const redirectPath = `/u/${userRole}${restOfPath ? "/" + restOfPath : ""}`;
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+  // التحقق من صلاحية التوكن
+  if (token) {
+    try {
+      const result = await jwtVerify(token, SECRET_KEY);
+      payload = result.payload as TokenUserInfosPayload;
+    } catch (err) {
+      console.log(err)
+      return NextResponse.redirect(new URL("/auth/login", request.url));
     }
   }
 
-  if (token && (pathname.startsWith("/auth") || pathname === "/u")) {
-    return NextResponse.redirect(new URL(`/u/${AllowedRole}`, request.url));
+  const userRole = payload?.role ?? "guest"; // إذا لا payload → guest
+
+  if(pathname.startsWith("/auth/set-role") && !token){
+    return NextResponse.redirect(new URL("/auth/login", request.url))
+  }
+  // إذا الدور guest وحاول الوصول لمسار محمي → توجيه set-role
+  if (userRole === "guest" && pathname.startsWith("/u") && !pathname.startsWith("/auth/set-role")) {
+    return NextResponse.redirect(new URL("/auth/set-role", request.url));
   }
 
-  if (
-    pathname.startsWith("/auth/callback") ||
-    pathname.startsWith("/auth/auth-code-error")
-  ) {
-    return NextResponse.next();
+  // إذا المستخدم مسجل الدخول وليس guest وحاول الدخول لمسار auth (login/set-role) → إعادة التوجيه لمسار خاص بالدور
+  if (pathname.startsWith("/auth") && userRole !== "guest") {
+    // /auth/... → تحويله إلى /u/:role
+    const redirectPath = `/u/${userRole}`;
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
   return NextResponse.next();

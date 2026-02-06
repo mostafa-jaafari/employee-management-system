@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { AddNewEntityProvider } from "@/context/AddNewEntityProvider";
 import { AddNewEntity } from "@/Components/AddNewEntity";
 import { getUserInfos } from "@/utils/getUserInfos";
+import { SyncTasksOnExit } from "./TaskSyncClient";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,6 +32,9 @@ export default async function RootLayout({
         <Toaster position="top-right"/>
         <AddNewEntityProvider>
           <AddNewEntity userInfos={user} />
+          {user?.id && (
+            <SyncTasksOnExit userId={user.id} />
+          )}
           {children}
         </AddNewEntityProvider>
       </body>

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { IoNotifications, IoSettingsSharp } from 'react-icons/io5';
 import { RiMessage3Fill } from 'react-icons/ri';
-import { getUserInfos } from '@/utils/getUserInfos';
 import { DropDownHeaderProfile } from './DropDownHeaderProfile';
+import { TokenUserInfosPayload } from '@/GlobalTypes';
 
 const Header_Links = [
     { name: "Request Meeting Room", href: "/" },
@@ -10,8 +10,7 @@ const Header_Links = [
     { name: "Career", href: "/" }
 ]
 
-export async function Header() {
-    const User_Infos = await getUserInfos();
+export async function Header({ User_Infos }: { User_Infos: TokenUserInfosPayload | undefined }) {
 
     return (
         <div

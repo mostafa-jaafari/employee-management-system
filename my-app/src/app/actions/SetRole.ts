@@ -1,7 +1,7 @@
 "use server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { SignJWT } from "jose";
+import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
 const ROLE_SECRET = process.env.ROLE_SECRET_KEY || "your_32_character_secret_key_here";
@@ -28,15 +28,29 @@ export async function SetRoleAction(selectedRole: "admin" | "employee") {
     return { success: false, message: dbError.message };
   }
 
+  const existingToken = cookieStore.get("user-context")?.value as string;
+
+  if(!existingToken){
+    return { success: false, message: "Please login first !" }
+  }
   try {
-    // 3. Create the Signed JWT Token
-    const roleToken = await new SignJWT({ role: selectedRole })
+    const { payload } = await jwtVerify(existingToken, SECRET_KEY);
+
+    const newPayload = {
+      id: payload.id,
+      email: payload.email,
+      name: payload.name,
+      avatar_url: payload.avatar_url,
+      role: selectedRole,
+    };
+
+    const roleToken = await new SignJWT(newPayload)
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
       .sign(SECRET_KEY);
 
     // 4. Set the cookie (Matches the name used in Middleware)
-    cookieStore.set("user-role-token", roleToken, {
+    cookieStore.set("user-context", roleToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
